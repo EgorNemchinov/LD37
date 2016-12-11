@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.jacktheogre.lightswitch.Constants;
 import com.jacktheogre.lightswitch.commands.TeleportCommand;
+import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
 import com.jacktheogre.lightswitch.sprites.Actor;
 import com.jacktheogre.lightswitch.tools.AssetLoader;
@@ -20,7 +21,7 @@ public class Teleport extends InteractiveObject {
     private int x, y;
     private Array<Teleport> others;
 
-    public Teleport(PlayScreen screen, int x, int y) {
+    public Teleport(GeneratingScreen screen, int x, int y) {
         super(screen, x, y);
         this.x = x;
         this.y = y;

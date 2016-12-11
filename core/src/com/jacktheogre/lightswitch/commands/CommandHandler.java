@@ -1,6 +1,8 @@
 package com.jacktheogre.lightswitch.commands;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
+import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
 
 import java.util.Stack;
@@ -11,19 +13,24 @@ import java.util.Stack;
 public class CommandHandler {
 
     // TODO: 10.12.16 if add another screen then change everything. check for type of screen and command
-    private PlayScreen screen;
+    private Screen screen;
     private Stack<Command> commands;
     private int pointer = 0;
     private boolean newCommands;
 
-    public CommandHandler(PlayScreen screen) {
+    public CommandHandler(Screen screen) {
         this.screen = screen;
         commands = new Stack<Command>();
     }
 
     public void update(float dt) {
-        if(newCommands)
-            executeCommands();
+        if(newCommands) {
+            if (PlayScreen.class.isInstance(screen)) {
+                executeCommandsPlay();
+            } else if (GeneratingScreen.class.isInstance(screen)) {
+                executeCommandsGenerate();
+            }
+        }
     }
 
     public void addCommand(Command command) {
@@ -34,7 +41,8 @@ public class CommandHandler {
         newCommands = true;
     }
 
-    public void executeCommands() {
+    public void executeCommandsPlay() {
+        PlayScreen screen = (PlayScreen) this.screen;
         for (int i = pointer; i < commands.size(); i++) {
             if(commands.get(i) != null) {
                 if(ActorCommand.class.isInstance(commands.get(i))){
@@ -43,6 +51,20 @@ public class CommandHandler {
                         cmd.execute(screen.getPlayer().getActor());
                     else cmd.execute(cmd.actor);
                 } else if(GlobalCommand.class.isInstance(commands.get(i))){
+                    ((GlobalCommand)commands.get(i)).execute();
+                }
+            }
+        }
+        if(commands.size() > 0)
+            pointer = commands.size();
+        newCommands = false;
+    }
+
+    public void executeCommandsGenerate() {
+        GeneratingScreen screen = (GeneratingScreen) this.screen;
+        for (int i = pointer; i < commands.size(); i++) {
+            if(commands.get(i) != null) {
+                 if(GlobalCommand.class.isInstance(commands.get(i))){
                     ((GlobalCommand)commands.get(i)).execute();
                 }
             }
@@ -71,6 +93,10 @@ public class CommandHandler {
             return true;
         } else
             return false;
+    }
+
+    public void setScreen(Screen screen) {
+        this.screen = screen;
     }
 
     public boolean newCommands() {

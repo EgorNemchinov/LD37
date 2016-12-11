@@ -64,6 +64,8 @@ public class Agent implements Telegraph {
 //                        LevelManager.graph.getNodeByIndex(LevelManager.lvlTileWidth * 7 + 12))));
     }
 
+
+
     public GraphPathImp getResultPath() {
         return resultPath;
     }

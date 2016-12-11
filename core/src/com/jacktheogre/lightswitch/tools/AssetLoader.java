@@ -13,7 +13,7 @@ public class AssetLoader {
 
     private AssetManager manager;
 
-    public Texture link, zelda, teleport;
+    public Texture link, zelda, teleport, background;
     public TiledMap map;
     private TmxMapLoader mapLoader;
 

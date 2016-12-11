@@ -15,6 +15,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.jacktheogre.lightswitch.Constants;
 import com.jacktheogre.lightswitch.ai.LevelManager;
+import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
 import com.jacktheogre.lightswitch.sprites.Actor;
 
@@ -28,14 +29,14 @@ public abstract class InteractiveObject {
     protected World world;
     protected Circle bounds;
     protected Body body;
-    protected PlayScreen screen;
+    protected GeneratingScreen screen;
     protected Fixture fixture;
 
     // TODO: 10.12.16 may be animation
     public abstract void render(SpriteBatch spriteBatch);
     public abstract void activate(Actor actor);
 
-    public InteractiveObject(PlayScreen screen, int x, int y) {
+    public InteractiveObject(GeneratingScreen screen, int x, int y) {
         this.screen = screen;
         this.world = screen.getWorld();
         this.x = x;

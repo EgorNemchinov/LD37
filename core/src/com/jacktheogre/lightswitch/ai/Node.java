@@ -37,6 +37,7 @@ public class Node {
 //            Gdx.app.log("Indexer", "Index " + index);
             return index++;
         }
+
     }
 
 

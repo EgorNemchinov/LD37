@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.Array;
 import com.jacktheogre.lightswitch.Constants;
 import com.jacktheogre.lightswitch.objects.InteractiveObject;
 import com.jacktheogre.lightswitch.objects.Teleport;
+import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
 import com.jacktheogre.lightswitch.sprites.Actor;
 import com.jacktheogre.lightswitch.sprites.Enemy;
@@ -27,7 +28,7 @@ public class B2WorldCreator {
     private World world;
     private TiledMap map;
 
-    public B2WorldCreator(PlayScreen screen) {
+    public B2WorldCreator(GeneratingScreen screen) {
         world = screen.getWorld();
         map = Assets.getAssetLoader().map;
         objects = new Array<InteractiveObject>();
@@ -61,9 +62,7 @@ public class B2WorldCreator {
         for (MapObject object : map.getLayers().get(4).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle bounds = ((RectangleMapObject) object).getRectangle();
 
-            objects.add(new Teleport(screen, (int) bounds.getX(), (int) bounds.getY()));
-
-            /*bodyDef.type = BodyDef.BodyType.StaticBody;
+            bodyDef.type = BodyDef.BodyType.StaticBody;
             bodyDef.position.set(bounds.getX() + bounds.getWidth() / 2, bounds.getY() + bounds.getHeight() / 2);
 
             body = world.createBody(bodyDef);
@@ -75,10 +74,8 @@ public class B2WorldCreator {
                     Constants.OBJECT_BIT |
                     Constants.ACTOR_BIT;
 //            fixtureDef.filter.maskBits |= Constants.LIGHT_BIT;
-            body.createFixture(fixtureDef);*/
+            body.createFixture(fixtureDef);
         }
-        makeTeleportConnections();
-
 
         //actors
         for (MapObject object : map.getLayers().get(5).getObjects().getByType(RectangleMapObject.class)) {
@@ -102,20 +99,4 @@ public class B2WorldCreator {
         screen.setObjects(objects);
     }
 
-    private void makeTeleportConnections() {
-
-        ((Teleport)objects.get(0)).addTeleport((Teleport)objects.get(1));
-        ((Teleport)objects.get(1)).addTeleport((Teleport)objects.get(0));
-        /*for (int i = 0; i < objects.size; i++) {
-            if(Teleport.class.isInstance(objects.get(i))) {
-                Teleport tp = (Teleport) objects.get(i);
-                for (int j = 0; j < objects.size && j != i; j++) {
-                    if(Teleport.class.isInstance(objects.get(j))) {
-                        Teleport tpIns = (Teleport) objects.get(j);
-                        tp.addTeleport(tpIns);
-                    }
-                }
-            }
-        }*/
-    }
 }

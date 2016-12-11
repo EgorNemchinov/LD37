@@ -1,7 +1,6 @@
 package com.jacktheogre.lightswitch.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.FPSLogger;
@@ -9,26 +8,22 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.jacktheogre.lightswitch.Hud;
 import com.jacktheogre.lightswitch.LightSwitch;
-import com.jacktheogre.lightswitch.ai.Agent;
 import com.jacktheogre.lightswitch.ai.LevelManager;
 import com.jacktheogre.lightswitch.commands.CommandHandler;
 import com.jacktheogre.lightswitch.objects.InteractiveObject;
+import com.jacktheogre.lightswitch.objects.Teleport;
 import com.jacktheogre.lightswitch.sprites.EnemyPlayer;
 import com.jacktheogre.lightswitch.sprites.Player;
 import com.jacktheogre.lightswitch.tools.AssetLoader;
-import com.jacktheogre.lightswitch.tools.Assets;
-import com.jacktheogre.lightswitch.tools.B2WorldCreator;
-import com.jacktheogre.lightswitch.tools.InputHandler;
+import com.jacktheogre.lightswitch.tools.PlayInputHandler;
 import com.jacktheogre.lightswitch.tools.Lighting;
 import com.jacktheogre.lightswitch.tools.WorldContactListener;
 
@@ -63,8 +58,8 @@ public class PlayScreen implements Screen{
     private EnemyPlayer enemyPlayer;
     private Vector2 touchPoint;
 
-    public PlayScreen(LightSwitch game) {
-        this.game = game;
+    public PlayScreen(GeneratingScreen screen) {
+        /*this.game = game;
         gameCam = new OrthographicCamera();
         gamePort = new FitViewport(LightSwitch.WIDTH, LightSwitch.HEIGHT, gameCam);
         gameCam.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
@@ -80,9 +75,18 @@ public class PlayScreen implements Screen{
         objects = new Array<InteractiveObject>();
 
         LevelManager.loadLevel(loader.map);
-        player = new Player();
-        enemyPlayer = new EnemyPlayer(this);
-        new B2WorldCreator(this);
+        */
+        this.game = screen.getGame();
+        gameCam = screen.getGameCam();
+        gamePort = screen.getGamePort();
+        loader = screen.getLoader();
+        mapRenderer = screen.getMapRenderer();
+        world = screen.getWorld();
+        b2dRenderer = new Box2DDebugRenderer();
+
+        player = screen.getPlayer();
+        enemyPlayer = screen.getEnemyPlayer();
+        // TODO: 11.12.16 maybe set screen for them if it helps
 
         hud = new Hud(game.batch);
         hud.setActor(player.getActor().toString());
@@ -93,17 +97,38 @@ public class PlayScreen implements Screen{
         shapeRenderer.setProjectionMatrix(gameCam.combined);
         shapeRenderer.setAutoShapeType(true);
 
-        commandHandler = new CommandHandler(this);
-        Gdx.input.setInputProcessor(new InputHandler(this));
+        objects = screen.getObjects();
+
+        commandHandler = screen.getCommandHandler();
+        commandHandler.setScreen(this);
+
+        lighting = screen.getLighting();
+        Gdx.input.setInputProcessor(new PlayInputHandler(this));
         world.setContactListener(new WorldContactListener());
         lighting.turnOff();
+        makeTeleportConnections();
         runTime = 0;
+    }
+
+    private void makeTeleportConnections() {
+
+        for (int i = 0; i < objects.size; i++) {
+            if(Teleport.class.isInstance(objects.get(i))) {
+                Teleport tp = (Teleport) objects.get(i);
+                for (int j = 0; j < objects.size; j++) {
+                    if(Teleport.class.isInstance(objects.get(j)) && j != i) {
+                        Teleport tpIns = (Teleport) objects.get(j);
+                        tp.addTeleport(tpIns);
+                    }
+                }
+            }
+        }
     }
 
     public void update(float dt) {
         commandHandler.update(dt);
         if(commandHandler.newCommands())
-            commandHandler.executeCommands();
+            commandHandler.executeCommandsPlay();
         player.update(dt);
         enemyPlayer.update(dt);
         world.step(1/60f, 6, 2);
@@ -114,19 +139,6 @@ public class PlayScreen implements Screen{
 
         mapRenderer.setView(gameCam);
         runTime += dt;
-    }
-
-    private void lerpCamera(float targetX, float targetY, float dt) {
-        float lerp;
-        lerp = 10f;
-        Vector3 position = gameCam.position;
-        position.x += (targetX - position.x) * lerp * dt;
-        position.y += (targetY - position.y) * lerp * dt;
-    }
-
-    @Override
-    public void show() {
-
     }
 
     public void render(float dt) {
@@ -162,7 +174,7 @@ public class PlayScreen implements Screen{
 
         lighting.render();
 
-        game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
+//        game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
 //        hud.stage.draw();
 
 //        LevelManager.graph.render(shapeRenderer);
@@ -171,6 +183,19 @@ public class PlayScreen implements Screen{
 //        enemyPlayer.getEnemy().getPath().render(shapeRenderer);
 
         //fpsLogger.log();
+    }
+
+    private void lerpCamera(float targetX, float targetY, float dt) {
+        float lerp;
+        lerp = 10f;
+        Vector3 position = gameCam.position;
+        position.x += (targetX - position.x) * lerp * dt;
+        position.y += (targetY - position.y) * lerp * dt;
+    }
+
+    @Override
+    public void show() {
+
     }
 
     /*public void handleInput(float dt) {// TODO: 19.10.16 transfer handleinput to actor

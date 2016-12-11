@@ -27,6 +27,7 @@ public abstract class Actor extends Sprite {
 
     protected Fixture fixture;
     protected Agent agent;
+    protected boolean teleportCollide;
 
     public enum Direction {RIGHT, LEFT, UP, DOWN;}
     protected Direction direction;
@@ -76,11 +77,18 @@ public abstract class Actor extends Sprite {
         curPosition = new Vector2(x,y);
         nextPosition = curPosition;
         agent = new Agent(world);
+        teleportCollide = true;
     }
 
     public void update(float dt) {
-        if(!teleportReady)
+        if(!teleportReady) {
             teleportTime += dt;
+            if(teleportTime > Constants.TELEPORT_INTERVAL) {
+                teleportTime = 0;
+                teleportReady = true;
+                setCollideTeleport(true);
+            }
+        }
 
         curPosition = b2body.getPosition();
         if(nextPosition.cpy().sub(curPosition).len() < 2) {
@@ -123,6 +131,9 @@ public abstract class Actor extends Sprite {
         b2body.setLinearVelocity(velocity);
     }
 
+    public void remakePath() {
+        agent.makePath(this);
+    }
 
     public Vector2 getVelocity() {
         return b2body.getLinearVelocity();
@@ -155,6 +166,10 @@ public abstract class Actor extends Sprite {
         agent.makePath(this);
     }
 
+    public void setAgent(Agent agent) {
+        this.agent = agent;
+    }
+
     public Vector2 getTarget() {
         return target;
     }
@@ -176,11 +191,23 @@ public abstract class Actor extends Sprite {
     }
 
     public boolean isTeleportReady() {
-        if(teleportTime > Constants.TELEPORT_INTERVAL) {
-            teleportTime = 0;
-            teleportReady = true;
-        }
         return teleportReady;
+    }
+
+    public void setCollideTeleport(boolean collide) {
+        if(collide != teleportCollide) {
+            Filter filter = fixture.getFilterData();
+            if(teleportCollide)
+                filter.maskBits ^= Constants.INTERACTIVE_BIT;
+            else
+                filter.maskBits |= Constants.INTERACTIVE_BIT;
+            fixture.setFilterData(filter);
+        }
+        teleportCollide = collide;
+    }
+
+    public boolean isTeleportCollide() {
+        return teleportCollide;
     }
 
     public abstract void dispose();

@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.utils.Array;
 import com.jacktheogre.lightswitch.Constants;
+import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
 
 import java.util.Random;
@@ -24,12 +25,12 @@ public class Lighting {
     private RayHandler rayHandler;
     private Array<PointLight> pointLights;
     private PointLight actorLight;
-    private PlayScreen screen;
+    private GeneratingScreen screen;
     private Filter aboveLightFilter, actorLightFilter;
     private boolean lightsOn = true;
 
     // TODO: 24.10.16 probably make lights static
-    public Lighting(PlayScreen screen) {
+    public Lighting(GeneratingScreen screen) {
         this.screen = screen;
         rayHandler = new RayHandler(screen.getWorld());
         rayHandler.setAmbientLight(0, 0.2f, 0, 0.1f);

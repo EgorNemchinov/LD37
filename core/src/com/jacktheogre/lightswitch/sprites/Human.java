@@ -167,7 +167,8 @@ public class Human extends Actor {
         fixtureDef.filter.categoryBits = Constants.ACTOR_BIT;
         fixtureDef.filter.maskBits = Constants.WALLS_BIT |
                 Constants.OBJECT_BIT |
-                Constants.ACTOR_BIT;
+                Constants.ACTOR_BIT |
+                Constants.INTERACTIVE_BIT;
         filter = fixtureDef.filter;
         fixture = b2body.createFixture(fixtureDef);
         fixture.setUserData(this);

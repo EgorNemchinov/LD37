@@ -3,6 +3,7 @@ package com.jacktheogre.lightswitch.sprites;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.jacktheogre.lightswitch.ai.Agent;
+import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
 
 /**
@@ -11,10 +12,10 @@ import com.jacktheogre.lightswitch.screens.PlayScreen;
 public class EnemyPlayer {
 
     private Enemy enemy;
-    private PlayScreen screen;
+    private GeneratingScreen screen;
     private Agent agent;
 
-    public EnemyPlayer(PlayScreen screen) {
+    public EnemyPlayer(GeneratingScreen screen) {
         this.screen = screen;
         agent = new Agent(screen.getWorld());
     }
@@ -31,6 +32,7 @@ public class EnemyPlayer {
 
     public void setEnemy(Enemy enemy) {
         this.enemy = enemy;
+        this.enemy.agent = agent;
     }
 
     public void setTarget(Vector2 target) {

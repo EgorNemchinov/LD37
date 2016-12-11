@@ -13,6 +13,9 @@ public class GraphGenerator {
 
 
     public static GraphImp generateGraph(TiledMap map) {
+        // TODO: 11.12.16 if need to generate again, nullify indexes
+        if(LevelManager.graph != null)
+            return LevelManager.graph;
         Array<Node> nodes = new Array<Node>();
         TiledMapTileLayer tiles = (TiledMapTileLayer) map.getLayers().get(1); // FIXME: 21.10.16 layer num
         int mapHeight = LevelManager.lvlTileHeight;
@@ -47,7 +50,6 @@ public class GraphGenerator {
 
                     }
                 }
-                // TODO: 21.10.16 check the type of tile cz right now only null-tiles are walkable
             }
         }
 

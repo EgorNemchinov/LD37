@@ -1,5 +1,8 @@
 package com.jacktheogre.lightswitch;
 
+import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
+import com.jacktheogre.lightswitch.ai.Node;
+
 /**
  * Created by luna on 19.10.16.
  */
@@ -15,5 +18,5 @@ public class Constants {
     public static final float LIGHT_DISTANCE = 90f;
     public static final int LIGHT_RAYS = 50;
 
-    public static float TELEPORT_INTERVAL = 1.5f;
+    public static float TELEPORT_INTERVAL = 5f;
 }

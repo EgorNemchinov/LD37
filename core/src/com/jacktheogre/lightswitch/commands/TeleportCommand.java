@@ -27,6 +27,8 @@ public class TeleportCommand extends ActorCommand {
         if(actor.isTeleportReady()) {
             actor.b2body.setTransform(new Vector2(destination.getX(), destination.getY()), 0);
             actor.setTeleportReady(false);
+            actor.setCollideTeleport(false);
+            actor.remakePath();
         }
         executed = true;
         return true;
