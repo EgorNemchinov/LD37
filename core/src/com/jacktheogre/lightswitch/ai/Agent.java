@@ -27,29 +27,13 @@ public class Agent implements Telegraph {
     private Actor actor;
     private HeuristicImp heuristicImp;
 
-    public Agent(Actor actor, World world) {
-        this.actor = actor;
-
+    public Agent(World world) {
         heuristicImp = new HeuristicImp();
         detectorImp = new RayCastCollisionDetectorImp(world);
         pathSmoother = new PathSmootherImp(detectorImp);
         pathFinder = new IndexedAStarPathFinder<Node>(LevelManager.graph, false);
-
-        int startX = (int) actor.b2body.getPosition().x;
-        int startY = (int) actor.b2body.getPosition().y;
-
-        int endX = (int) actor.getTarget().x;
-        int endY = (int) actor.getTarget().y;
-
-        Node startNode = LevelManager.graph.getNodeByXY(startX, startY);
-        Node endNode = LevelManager.graph.getNodeByXY(endX, endY);
-
-        Gdx.app.log("StartNode", startNode.toString());
-        Gdx.app.log("EndNode", endNode.toString());
-        pathFinder.searchNodePath(startNode, endNode, heuristicImp, resultPath);
 //        pathSmoother.smoothPath(resultPath);
 //        Gdx.app.log("New path:", resultPath.toString());
-        actor.setPath(resultPath);
     }
 
     public void makePath(Actor actor) {

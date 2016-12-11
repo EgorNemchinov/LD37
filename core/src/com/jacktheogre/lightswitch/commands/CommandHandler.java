@@ -38,7 +38,10 @@ public class CommandHandler {
         for (int i = pointer; i < commands.size(); i++) {
             if(commands.get(i) != null) {
                 if(ActorCommand.class.isInstance(commands.get(i))){
-                    ((ActorCommand)commands.get(i)).execute(screen.getPlayer().getActor());
+                    ActorCommand cmd = (ActorCommand)commands.get(i);
+                    if(cmd.actor == null)
+                        cmd.execute(screen.getPlayer().getActor());
+                    else cmd.execute(cmd.actor);
                 } else if(GlobalCommand.class.isInstance(commands.get(i))){
                     ((GlobalCommand)commands.get(i)).execute();
                 }

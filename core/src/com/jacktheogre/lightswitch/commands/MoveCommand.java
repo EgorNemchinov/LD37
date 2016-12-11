@@ -13,13 +13,11 @@ public class MoveCommand extends ActorCommand {
 
     private int startX, startY;
     private int destinX, destinY;
-    private Agent agent;
 
     public MoveCommand(int x, int y) {
         destinX = x;
         destinY = y;
         executed = false;
-        agent = PlayScreen.getAgent();
     }
 
     public MoveCommand(float x, float y) {
@@ -33,7 +31,7 @@ public class MoveCommand extends ActorCommand {
         startX = (int) actor.getX();
         startY = (int) actor.getY();
         actor.setTarget(new Vector2(destinX, destinY));
-        agent.makePath(actor);
+        actor.getAgent().makePath(actor);
         executed = true;
         return true;
     }
@@ -41,14 +39,14 @@ public class MoveCommand extends ActorCommand {
     @Override
     public void undo() {
         actor.setTarget(new Vector2(startX, startY));
-        agent.makePath(actor);
+        actor.getAgent().makePath(actor);
         Gdx.app.log("MoveCommand", "Undone. Moving back to (" + startX + ", " + startY + ")");
     }
 
     @Override
     public void redo() {
         actor.setTarget(new Vector2(destinX, destinY));
-        agent.makePath(actor);
+        actor.getAgent().makePath(actor);
         Gdx.app.log("MoveCommand", "Redone. Moving to (" + destinX+ ", " + destinY + ")");
     }
 

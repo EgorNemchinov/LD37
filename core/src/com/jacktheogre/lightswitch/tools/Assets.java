@@ -8,8 +8,10 @@ public class Assets {
     public static AssetLoader assetLoader;
 
     public static AssetLoader getAssetLoader() {
-        if(assetLoader == null)
+        if(assetLoader == null) {
             assetLoader = new AssetLoader();
+            assetLoader.load();
+        }
         return assetLoader;
     }
 }

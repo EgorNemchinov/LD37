@@ -7,6 +7,9 @@ import com.jacktheogre.lightswitch.LightSwitch;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		new LwjglApplication(new LightSwitch(), config);
+        config.width = 2 * LightSwitch.WIDTH;
+        config.height = 2 * LightSwitch.HEIGHT;
+        config.title = "Who switched the lights off?";
+        new LwjglApplication(new LightSwitch(), config);
 	}
 }

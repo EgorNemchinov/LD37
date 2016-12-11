@@ -8,8 +8,12 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.Filter;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.jacktheogre.lightswitch.Constants;
+import com.jacktheogre.lightswitch.ai.Agent;
 import com.jacktheogre.lightswitch.ai.GraphPathImp;
 import com.jacktheogre.lightswitch.ai.LevelManager;
 import com.jacktheogre.lightswitch.ai.Node;
@@ -18,18 +22,23 @@ import com.jacktheogre.lightswitch.ai.Node;
  * Created by luna on 19.10.16.
  */
 public abstract class Actor extends Sprite {
-    protected boolean active;
+    protected float teleportTime;
+    protected boolean teleportReady;
 
-    public enum Direction {RIGHT, LEFT, UP, DOWN}
+    protected Fixture fixture;
+    protected Agent agent;
 
+    public enum Direction {RIGHT, LEFT, UP, DOWN;}
     protected Direction direction;
+
     protected Direction lastDirection;
-
-
     public Body b2body;
-    protected World world;
 
+    protected Filter filter, transparent;
+
+    protected World world;
     protected float stateTimer;
+
     protected Animation playerRunLeft;
     protected Animation playerRunRight;
     protected Animation playerRunUp;
@@ -38,12 +47,11 @@ public abstract class Actor extends Sprite {
     protected TextureRegion playerStandLeft;
     protected TextureRegion playerStandUp;
     protected TextureRegion playerStandDown;
-
     protected Vector2 target;
+
     protected int currentNodePointer;
     protected GraphPathImp path;
     protected Vector2 curPosition, nextPosition;
-
     protected Texture texture;
 
     protected float xVel, yVel;
@@ -53,6 +61,11 @@ public abstract class Actor extends Sprite {
         setPosition(x, y);
         this.world = world;
         stateTimer = 0;
+        teleportTime = 0;
+        teleportReady = true;
+        transparent = new Filter();
+        transparent.maskBits = 0;
+        transparent.categoryBits = Constants.TRANSPARENT_BIT;
 
         direction = Direction.RIGHT;
         lastDirection = Direction.RIGHT;
@@ -62,24 +75,22 @@ public abstract class Actor extends Sprite {
         setPath(new GraphPathImp());
         curPosition = new Vector2(x,y);
         nextPosition = curPosition;
+        agent = new Agent(world);
     }
+
     public void update(float dt) {
-//        Gdx.app.log("Update", toString());
+        if(!teleportReady)
+            teleportTime += dt;
+
         curPosition = b2body.getPosition();
-        active = true;
-        if(!active) {
-            nextPosition = curPosition;
-        }
-        else if(nextPosition.cpy().sub(curPosition).len() < 2) {
+        if(nextPosition.cpy().sub(curPosition).len() < 2) {
             nextPosition = getNextPosition();
         }
         Vector2 step = nextPosition.cpy().sub(curPosition).nor().scl(getSpeed());
         b2body.setLinearVelocity(step);
         setPosition(b2body.getPosition().x - getWidth() / 2 , b2body.getPosition().y - getHeight() / 2 );
         setRegion(getFrame(dt));
-//        Gdx.app.log(toString(),"moving from "+curPosition + " to " + nextPosition);
     }
-
     public Direction getDirection() {
         xVel = b2body.getLinearVelocity().x;
         yVel = b2body.getLinearVelocity().y;
@@ -107,15 +118,11 @@ public abstract class Actor extends Sprite {
         return lastDirection;
     }
 
-    public void setActive(boolean value) {
-        active = value;
-    }
-
-
     public void setVelocity(Vector2 velocity) {
         this.setVelocity(velocity);
         b2body.setLinearVelocity(velocity);
     }
+
 
     public Vector2 getVelocity() {
         return b2body.getLinearVelocity();
@@ -134,6 +141,7 @@ public abstract class Actor extends Sprite {
     }
 
     public void setPath(GraphPathImp path) {
+//        Gdx.app.log(toString(), "set path");
         this.path = path;
         currentNodePointer = 0;
     }
@@ -141,9 +149,10 @@ public abstract class Actor extends Sprite {
     public void setTarget(Vector2 target) {
         stop();
         this.target = target;
-        Gdx.app.log("Location", "is " + b2body.getPosition());
-        Gdx.app.log("Target", toString() + " is set to " + target);
+//        Gdx.app.log("Location", "is " + b2body.getPosition());
+//        Gdx.app.log("Target", toString() + " is set to " + target);
         currentNodePointer = 0;
+        agent.makePath(this);
     }
 
     public Vector2 getTarget() {
@@ -154,12 +163,38 @@ public abstract class Actor extends Sprite {
         return path;
     }
 
+    public void setTeleportReady(boolean ready) {
+        this.teleportReady = ready;
+    }
+
     public abstract TextureRegion getFrame(float dt);
 
     protected abstract void initGraphics();
+
+    public Agent getAgent() {
+        return agent;
+    }
+
+    public boolean isTeleportReady() {
+        if(teleportTime > Constants.TELEPORT_INTERVAL) {
+            teleportTime = 0;
+            teleportReady = true;
+        }
+        return teleportReady;
+    }
+
     public abstract void dispose();
     public abstract int getSpeed();
     protected abstract void initialize();
+
+
+    private void setTransparent() {
+        fixture.setFilterData(transparent);
+    }
+
+    private void setSolid() {
+        fixture.setFilterData(filter);
+    }
 
     public void stop() {
         b2body.setLinearVelocity(0, 0);

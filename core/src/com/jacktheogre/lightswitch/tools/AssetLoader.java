@@ -13,7 +13,7 @@ public class AssetLoader {
 
     private AssetManager manager;
 
-    public Texture link;
+    public Texture link, zelda, teleport;
     public TiledMap map;
     private TmxMapLoader mapLoader;
 
@@ -25,9 +25,13 @@ public class AssetLoader {
 
     public void load() {
         manager.load("link.png", Texture.class);
+        manager.load("zelda.gif", Texture.class);
+        manager.load("teleport.png", Texture.class);
         manager.finishLoading();
-        map = mapLoader.load("labyrinth.tmx");
+        map = mapLoader.load("small.tmx");
+        zelda = manager.get("zelda.gif",Texture.class);
         link = manager.get("link.png", Texture.class);
+        teleport = manager.get("teleport.png", Texture.class);
     }
 
     public void dispose() {

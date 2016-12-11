@@ -56,7 +56,6 @@ public class Lighting {
         for (PointLight light : pointLights) {
             transformAboveLight(light);
         }
-        actorLight.setActive(false);
     }
 
     private void transformAboveLight(PointLight light) {

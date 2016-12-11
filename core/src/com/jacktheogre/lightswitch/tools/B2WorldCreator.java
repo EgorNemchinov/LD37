@@ -11,8 +11,11 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.jacktheogre.lightswitch.Constants;
+import com.jacktheogre.lightswitch.objects.InteractiveObject;
+import com.jacktheogre.lightswitch.objects.Teleport;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
 import com.jacktheogre.lightswitch.sprites.Actor;
+import com.jacktheogre.lightswitch.sprites.Enemy;
 import com.jacktheogre.lightswitch.sprites.Human;
 
 /**
@@ -20,20 +23,20 @@ import com.jacktheogre.lightswitch.sprites.Human;
  */
 public class B2WorldCreator {
 
-    public Array<Actor> actors;
+    public Array<InteractiveObject> objects;
     private World world;
     private TiledMap map;
 
     public B2WorldCreator(PlayScreen screen) {
         world = screen.getWorld();
         map = Assets.getAssetLoader().map;
+        objects = new Array<InteractiveObject>();
 
         int actorCount = 0;
         BodyDef bodyDef = new BodyDef();
         PolygonShape shape = new PolygonShape();
         FixtureDef fixtureDef = new FixtureDef();
         Body body;
-        actors = new Array<Actor>();
 
         //walls
         for (MapObject object : map.getLayers().get(3).getObjects().getByType(RectangleMapObject.class)) {
@@ -58,7 +61,9 @@ public class B2WorldCreator {
         for (MapObject object : map.getLayers().get(4).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle bounds = ((RectangleMapObject) object).getRectangle();
 
-            bodyDef.type = BodyDef.BodyType.StaticBody;
+            objects.add(new Teleport(screen, (int) bounds.getX(), (int) bounds.getY()));
+
+            /*bodyDef.type = BodyDef.BodyType.StaticBody;
             bodyDef.position.set(bounds.getX() + bounds.getWidth() / 2, bounds.getY() + bounds.getHeight() / 2);
 
             body = world.createBody(bodyDef);
@@ -70,15 +75,10 @@ public class B2WorldCreator {
                     Constants.OBJECT_BIT |
                     Constants.ACTOR_BIT;
 //            fixtureDef.filter.maskBits |= Constants.LIGHT_BIT;
-            body.createFixture(fixtureDef);
+            body.createFixture(fixtureDef);*/
         }
+        makeTeleportConnections();
 
-        //lights
-        for (MapObject object : map.getLayers().get(6).getObjects().getByType(RectangleMapObject.class)) {
-            Rectangle bounds = ((RectangleMapObject) object).getRectangle();
-
-            screen.getLighting().addLight(bounds.getX() + bounds.getWidth() / 2, bounds.getY() + bounds.getHeight() / 2);
-        }
 
         //actors
         for (MapObject object : map.getLayers().get(5).getObjects().getByType(RectangleMapObject.class)) {
@@ -86,5 +86,36 @@ public class B2WorldCreator {
             screen.getPlayer().setActor(new Human(world, bounds.getX(), bounds.getY()));
         }
 
+        //enemies
+        for (MapObject object : map.getLayers().get(6).getObjects().getByType(RectangleMapObject.class)) {
+            Rectangle bounds = ((RectangleMapObject) object).getRectangle();
+            screen.getEnemyPlayer().setEnemy(new Enemy(world, bounds.getX(), bounds.getY()));
+        }
+
+        //lights
+        for (MapObject object : map.getLayers().get(7).getObjects().getByType(RectangleMapObject.class)) {
+            Rectangle bounds = ((RectangleMapObject) object).getRectangle();
+
+            screen.getLighting().addLight(bounds.getX() + bounds.getWidth() / 2, bounds.getY() + bounds.getHeight() / 2);
+        }
+
+        screen.setObjects(objects);
+    }
+
+    private void makeTeleportConnections() {
+
+        ((Teleport)objects.get(0)).addTeleport((Teleport)objects.get(1));
+        ((Teleport)objects.get(1)).addTeleport((Teleport)objects.get(0));
+        /*for (int i = 0; i < objects.size; i++) {
+            if(Teleport.class.isInstance(objects.get(i))) {
+                Teleport tp = (Teleport) objects.get(i);
+                for (int j = 0; j < objects.size && j != i; j++) {
+                    if(Teleport.class.isInstance(objects.get(j))) {
+                        Teleport tpIns = (Teleport) objects.get(j);
+                        tp.addTeleport(tpIns);
+                    }
+                }
+            }
+        }*/
     }
 }

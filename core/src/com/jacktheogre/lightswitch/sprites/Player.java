@@ -11,13 +11,9 @@ import com.jacktheogre.lightswitch.screens.PlayScreen;
  * Created by luna on 18.10.16.
  */
 public class Player {
-    public World world;
-    private PlayScreen screen;
     private Actor actor;
 
-    public Player(PlayScreen screen) {
-        this.screen = screen;
-        this.world = screen.getWorld();
+    public Player() {
     }
 
     public void update(float dt) {

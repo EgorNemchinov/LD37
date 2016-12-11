@@ -8,7 +8,9 @@ import com.jacktheogre.lightswitch.screens.*;
 
 public class LightSwitch extends Game {
 
-    // TODO: 10.12.16 на полтайла выше воспринимаетсяя касание. важно!
+    // TODO: 11.12.16 make generating teleports, new screen
+    // TODO: 11.12.16 pathfinding: zelda cuts corners(hi russian)
+    // TODO: 10.12.16 replays
     public SpriteBatch batch;
     public static final int WIDTH = 400;
     public static final int HEIGHT = 240;

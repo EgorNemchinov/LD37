@@ -3,6 +3,7 @@ package com.jacktheogre.lightswitch.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -13,28 +14,30 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.jacktheogre.lightswitch.Hud;
 import com.jacktheogre.lightswitch.LightSwitch;
 import com.jacktheogre.lightswitch.ai.Agent;
 import com.jacktheogre.lightswitch.ai.LevelManager;
-import com.jacktheogre.lightswitch.commands.Command;
 import com.jacktheogre.lightswitch.commands.CommandHandler;
-import com.jacktheogre.lightswitch.commands.MoveCommand;
+import com.jacktheogre.lightswitch.objects.InteractiveObject;
+import com.jacktheogre.lightswitch.sprites.EnemyPlayer;
 import com.jacktheogre.lightswitch.sprites.Player;
 import com.jacktheogre.lightswitch.tools.AssetLoader;
 import com.jacktheogre.lightswitch.tools.Assets;
 import com.jacktheogre.lightswitch.tools.B2WorldCreator;
 import com.jacktheogre.lightswitch.tools.InputHandler;
 import com.jacktheogre.lightswitch.tools.Lighting;
+import com.jacktheogre.lightswitch.tools.WorldContactListener;
 
 /**
  * Created by luna on 10.12.16.
  */
 public class PlayScreen implements Screen{
     private AssetLoader loader;
-    private Rectangle buttonBounds; // FIXME: 22.10.16 circle
+    public Array<InteractiveObject> objects;
 
     private LightSwitch game;
     private OrthographicCamera gameCam;
@@ -51,20 +54,21 @@ public class PlayScreen implements Screen{
 
     private Player player;
 
-    private static Agent agent;
-
     private Lighting lighting;
     private CommandHandler commandHandler;
 
     private float runTime;
 
     private FPSLogger fpsLogger;
+    private EnemyPlayer enemyPlayer;
+    private Vector2 touchPoint;
+
     public PlayScreen(LightSwitch game) {
         this.game = game;
         gameCam = new OrthographicCamera();
         gamePort = new FitViewport(LightSwitch.WIDTH, LightSwitch.HEIGHT, gameCam);
         gameCam.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
-        gameCam.zoom -= 0.3f;
+        gameCam.zoom -= 0.4f;
 
         loader = Assets.getAssetLoader();
         loader.load();
@@ -73,11 +77,12 @@ public class PlayScreen implements Screen{
         world = new World(new Vector2(0, 0), true);
         lighting = new Lighting(this);
         b2dRenderer = new Box2DDebugRenderer();
+        objects = new Array<InteractiveObject>();
 
         LevelManager.loadLevel(loader.map);
-        player = new Player(this);
+        player = new Player();
+        enemyPlayer = new EnemyPlayer(this);
         new B2WorldCreator(this);
-        agent = new Agent(player.getActor(), world);
 
         hud = new Hud(game.batch);
         hud.setActor(player.getActor().toString());
@@ -90,6 +95,8 @@ public class PlayScreen implements Screen{
 
         commandHandler = new CommandHandler(this);
         Gdx.input.setInputProcessor(new InputHandler(this));
+        world.setContactListener(new WorldContactListener());
+        lighting.turnOff();
         runTime = 0;
     }
 
@@ -98,10 +105,11 @@ public class PlayScreen implements Screen{
         if(commandHandler.newCommands())
             commandHandler.executeCommands();
         player.update(dt);
+        enemyPlayer.update(dt);
         world.step(1/60f, 6, 2);
 
-        lerpCamera(player.getActor().b2body.getPosition().x, player.getActor().b2body.getPosition().y , dt);
-
+//        lerpCamera(player.getActor().b2body.getPosition().x, player.getActor().b2body.getPosition().y , dt);
+        lerpCamera(gamePort.getWorldWidth() / 4, gamePort.getWorldHeight() / 4, dt);
         gameCam.update();
 
         mapRenderer.setView(gameCam);
@@ -133,18 +141,34 @@ public class PlayScreen implements Screen{
 
         game.batch.setProjectionMatrix(gameCam.combined);
         game.batch.begin();
+        for (InteractiveObject object : objects) {
+            object.render(game.batch);
+        }
+        game.batch.end();
+
+        game.batch.setProjectionMatrix(gameCam.combined);
+        game.batch.begin();
         player.getActor().draw(game.batch);
+        if(lighting.lightsOn())
+            enemyPlayer.getEnemy().draw(game.batch);
 
         game.batch.end();
+
+        shapeRenderer.begin();
+        shapeRenderer.setColor(Color.RED);
+        if(touchPoint != null)
+            shapeRenderer.circle(touchPoint.x, touchPoint.y, 2);
+        shapeRenderer.end();
 
         lighting.render();
 
         game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
-        hud.stage.draw();
+//        hud.stage.draw();
 
 //        LevelManager.graph.render(shapeRenderer);
 //        b2dRenderer.render(world, gameCam.combined);
 //        player.getActor().getPath().render(shapeRenderer);
+//        enemyPlayer.getEnemy().getPath().render(shapeRenderer);
 
         //fpsLogger.log();
     }
@@ -176,6 +200,10 @@ public class PlayScreen implements Screen{
 //                Gdx.app.log("ResultPath", agent.getResultPath().toString());
         }
     }*/
+
+    public void setTouchPoint(int x, int y) {
+        touchPoint = new Vector2(x, y);
+    }
 
     @Override
     public void resize(int width, int height) {
@@ -222,15 +250,19 @@ public class PlayScreen implements Screen{
         return player;
     }
 
-    public static Agent getAgent() {
-        return agent;
-    }
-
     public Lighting getLighting() {
         return lighting;
     }
 
     public Viewport getGamePort() {
         return gamePort;
+    }
+
+    public EnemyPlayer getEnemyPlayer() {
+        return enemyPlayer;
+    }
+
+    public void setObjects(Array<InteractiveObject> objects) {
+        this.objects = objects;
     }
 }

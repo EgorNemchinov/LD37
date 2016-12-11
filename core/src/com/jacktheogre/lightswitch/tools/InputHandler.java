@@ -3,9 +3,7 @@ package com.jacktheogre.lightswitch.tools;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import com.jacktheogre.lightswitch.commands.MoveCommand;
 import com.jacktheogre.lightswitch.commands.TurnOffCommand;
 import com.jacktheogre.lightswitch.commands.TurnOnCommand;
@@ -24,10 +22,8 @@ public class InputHandler implements InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
-        if(keycode == Input.Keys.DPAD_UP) {
+        if(keycode == Input.Keys.SPACE) {
             screen.getCommandHandler().addCommand(new TurnOnCommand(screen));
-        } if(keycode == Input.Keys.DPAD_DOWN) {
-            screen.getCommandHandler().addCommand(new TurnOffCommand(screen));
         }
 
         return true;
@@ -35,7 +31,10 @@ public class InputHandler implements InputProcessor {
 
     @Override
     public boolean keyUp(int keycode) {
-        return false;
+        if(keycode == Input.Keys.SPACE) {
+            screen.getCommandHandler().addCommand(new TurnOffCommand(screen));
+        }
+        return true;
     }
 
     @Override
@@ -49,6 +48,7 @@ public class InputHandler implements InputProcessor {
         Vector3 point = screen.getGamePort().unproject(screenTouch.cpy());
         screenTouch.y = screen.getGamePort().getScreenHeight() - screenTouch.y;
         screen.getCommandHandler().addCommand(new MoveCommand(point.x, point.y));
+        screen.setTouchPoint((int)point.x, (int)point.y);
         return true;
     }
 

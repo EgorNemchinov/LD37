@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
@@ -24,7 +25,7 @@ public class Human extends Actor {
     private State currentState;
     private State previousState;
 
-    public static final int MAX_SPEED = 64;
+    public static final int MAX_SPEED = 80;
 
     public Human(World world, float x, float y) {
         super(world, x, y, Assets.getAssetLoader().link); // TODO: 18.10.16 get texture from atlas
@@ -167,8 +168,9 @@ public class Human extends Actor {
         fixtureDef.filter.maskBits = Constants.WALLS_BIT |
                 Constants.OBJECT_BIT |
                 Constants.ACTOR_BIT;
-        b2body.createFixture(fixtureDef);
-
+        filter = fixtureDef.filter;
+        fixture = b2body.createFixture(fixtureDef);
+        fixture.setUserData(this);
     }
 
     @Override
