@@ -1,5 +1,6 @@
 package com.jacktheogre.lightswitch.commands;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
 import com.jacktheogre.lightswitch.tools.Lighting;
@@ -25,6 +26,7 @@ public class TurnOnCommand extends GlobalCommand{
     public boolean execute() {
         if(executed)
             return false;
+        Gdx.app.log("Space", "2");
         activeBefore = lighting.lightsOn();
         lighting.turnOn();
         executed = true;

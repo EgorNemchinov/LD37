@@ -19,6 +19,7 @@ import com.jacktheogre.lightswitch.sprites.Actor;
 public class PlayInputHandler implements InputProcessor {
 
     private PlayScreen screen;
+    private float lastMakingPathTime = 0;
 
     public PlayInputHandler(PlayScreen playScreen) {
         this.screen = playScreen;
@@ -89,6 +90,7 @@ public class PlayInputHandler implements InputProcessor {
         screenTouch.y = screen.getGamePort().getScreenHeight() - screenTouch.y;
         screen.getCommandHandler().addCommand(new MoveToCommand(point.x, point.y));
         screen.setTouchPoint((int)point.x, (int)point.y);
+        lastMakingPathTime = screen.getRunTime();
         return true;
     }
 
@@ -99,7 +101,10 @@ public class PlayInputHandler implements InputProcessor {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        return false;
+        if(screen.getRunTime() - lastMakingPathTime > 0.4f) {
+            return touchDown(screenX, screenY, pointer, 0);
+        } else
+            return false;
     }
 
     @Override

@@ -1,9 +1,11 @@
 package com.jacktheogre.lightswitch.tools;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.utils.Array;
 import com.jacktheogre.lightswitch.Constants;
+import com.jacktheogre.lightswitch.commands.TurnOffCommand;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
 
@@ -26,6 +28,7 @@ public class Lighting {
     private Array<PointLight> pointLights;
     private PointLight actorLight;
     private GeneratingScreen screen;
+    private PlayScreen playScreen;
     private Filter aboveLightFilter, actorLightFilter;
     private boolean lightsOn = true;
 
@@ -33,7 +36,7 @@ public class Lighting {
     public Lighting(GeneratingScreen screen) {
         this.screen = screen;
         rayHandler = new RayHandler(screen.getWorld());
-        rayHandler.setAmbientLight(0, 0.2f, 0, 0.1f);
+        rayHandler.setAmbientLight(0, 0.15f, 0, 0.20f);
         rayHandler.setBlurNum(3);
         pointLights = new Array<PointLight>();
         /*pointLights.add(new PointLight(rayHandler, Constants.LIGHT_RAYS, Color.BLUE, Constants.LIGHT_DISTANCE, 64, 64));
@@ -42,7 +45,7 @@ public class Lighting {
         pointLights.add(new PointLight(rayHandler, Constants.LIGHT_RAYS, Color.FOREST, Constants.LIGHT_DISTANCE, 400, 120));
         pointLights.add(new PointLight(rayHandler, Constants.LIGHT_RAYS, Color.OLIVE, Constants.LIGHT_DISTANCE, 550, 100));*/
 
-        actorLight = new PointLight(rayHandler, Constants.LIGHT_RAYS, new Color(0xF1/255f, 0x91/255f, 0x22/255f, 0.8f), 0.4f*Constants.LIGHT_DISTANCE , 550, 100);
+        actorLight = new PointLight(rayHandler, Constants.LIGHT_RAYS, new Color(0xF1/255f, 0x91/255f, 0x22/255f, 0.8f), 0.6f*Constants.LIGHT_DISTANCE , 550, 100);
         transformActorLight(actorLight);
 
         actorLightFilter = new Filter();
@@ -70,7 +73,15 @@ public class Lighting {
         light.setSoftnessLength(0);
     }
 
-    public void render() {
+    public void setPlayScreen(PlayScreen playScreen) {
+        this.playScreen = playScreen;
+    }
+
+    public void render(float dt) {
+        if(lightsOn && playScreen != null) {
+            if(!playScreen.subEnergy(30*dt))
+                playScreen.getCommandHandler().addCommand(new TurnOffCommand(playScreen));
+        }
         rayHandler.setCombinedMatrix(screen.getGameCam());
         actorLight.setPosition(screen.getPlayer().getActor().b2body.getPosition());
         rayHandler.updateAndRender();
@@ -92,6 +103,8 @@ public class Lighting {
 
     public void turnOn() {
 //        rayHandler.setAmbientLight(251/255f,239/255f,100/255f, 0.5f);
+        if(!playScreen.subEnergy(20))
+            return;
         lightsOn = true;
         actorLight.setActive(!lightsOn);
         setPointLightsActive(lightsOn);

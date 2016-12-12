@@ -35,7 +35,8 @@ public class Teleport extends InteractiveObject {
 //        Gdx.app.log("Teleport", "Activated");
 
         // TODO: 11.12.16 choose out of list of teleportation points
-        screen.getCommandHandler().addCommand(new TeleportCommand(actor, this, randomTeleport()));
+        if(others.size > 0)
+            screen.getCommandHandler().addCommand(new TeleportCommand(actor, this, randomTeleport()));
     }
 
     @Override

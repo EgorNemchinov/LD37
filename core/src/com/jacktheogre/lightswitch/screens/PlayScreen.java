@@ -18,6 +18,7 @@ import com.jacktheogre.lightswitch.Hud;
 import com.jacktheogre.lightswitch.LightSwitch;
 import com.jacktheogre.lightswitch.ai.LevelManager;
 import com.jacktheogre.lightswitch.commands.CommandHandler;
+import com.jacktheogre.lightswitch.commands.StopCommand;
 import com.jacktheogre.lightswitch.objects.InteractiveObject;
 import com.jacktheogre.lightswitch.objects.Teleport;
 import com.jacktheogre.lightswitch.sprites.EnemyPlayer;
@@ -53,29 +54,13 @@ public class PlayScreen implements Screen{
     private CommandHandler commandHandler;
 
     private float runTime;
+    private float energy;
 
     private FPSLogger fpsLogger;
     private EnemyPlayer enemyPlayer;
     private Vector2 touchPoint;
 
     public PlayScreen(GeneratingScreen screen) {
-        /*this.game = game;
-        gameCam = new OrthographicCamera();
-        gamePort = new FitViewport(LightSwitch.WIDTH, LightSwitch.HEIGHT, gameCam);
-        gameCam.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
-        gameCam.zoom -= 0.4f;
-
-        loader = Assets.getAssetLoader();
-        loader.load();
-        mapRenderer = new OrthogonalTiledMapRenderer(loader.map);
-
-        world = new World(new Vector2(0, 0), true);
-        lighting = new Lighting(this);
-        b2dRenderer = new Box2DDebugRenderer();
-        objects = new Array<InteractiveObject>();
-
-        LevelManager.loadLevel(loader.map);
-        */
         this.game = screen.getGame();
         gameCam = screen.getGameCam();
         gamePort = screen.getGamePort();
@@ -86,13 +71,10 @@ public class PlayScreen implements Screen{
 
         player = screen.getPlayer();
         enemyPlayer = screen.getEnemyPlayer();
-        // TODO: 11.12.16 maybe set screen for them if it helps
 
-        hud = new Hud(game.batch);
-        hud.setActor(player.getActor().toString());
+        hud = new Hud(this);
 
         fpsLogger = new FPSLogger();
-        // TODO: 10.12.16 finish
         shapeRenderer = new ShapeRenderer();
         shapeRenderer.setProjectionMatrix(gameCam.combined);
         shapeRenderer.setAutoShapeType(true);
@@ -103,10 +85,13 @@ public class PlayScreen implements Screen{
         commandHandler.setScreen(this);
 
         lighting = screen.getLighting();
+        lighting.setPlayScreen(this);
         Gdx.input.setInputProcessor(new PlayInputHandler(this));
         world.setContactListener(new WorldContactListener());
         lighting.turnOff();
         makeTeleportConnections();
+        commandHandler.addCommand(new StopCommand());
+        energy = 100f;
         runTime = 0;
     }
 
@@ -126,11 +111,14 @@ public class PlayScreen implements Screen{
     }
 
     public void update(float dt) {
+        runTime += dt;
+        addEnergy(5*dt);
         commandHandler.update(dt);
-        if(commandHandler.newCommands())
+        if(commandHandler.newCommands()) {
             commandHandler.executeCommandsPlay();
+        }
         player.update(dt);
-//        enemyPlayer.update(dt);
+        enemyPlayer.update(dt);
         world.step(1/60f, 6, 2);
 
 //        lerpCamera(player.getActor().b2body.getPosition().x, player.getActor().b2body.getPosition().y , dt);
@@ -138,7 +126,6 @@ public class PlayScreen implements Screen{
         gameCam.update();
 
         mapRenderer.setView(gameCam);
-        runTime += dt;
     }
 
     public void render(float dt) {
@@ -172,10 +159,11 @@ public class PlayScreen implements Screen{
             shapeRenderer.circle(touchPoint.x, touchPoint.y, 2);
         shapeRenderer.end();
 
-        lighting.render();
+        lighting.render(dt);
 
-//        game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
-//        hud.stage.draw();
+        hud.render();
+
+        game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
 
 //        LevelManager.graph.render(shapeRenderer);
 //        b2dRenderer.render(world, gameCam.combined);
@@ -191,6 +179,24 @@ public class PlayScreen implements Screen{
         Vector3 position = gameCam.position;
         position.x += (targetX - position.x) * lerp * dt;
         position.y += (targetY - position.y) * lerp * dt;
+    }
+
+    public void addEnergy(float addition) {
+        energy += addition;
+        if(energy > 100)
+            energy = 100;
+    }
+
+    public boolean subEnergy(float sub) {
+        if(energy < sub) {
+            return false;
+        }
+        energy -= sub;
+        return true;
+    }
+
+    public float getEnergy() {
+        return energy;
     }
 
     @Override
@@ -241,6 +247,10 @@ public class PlayScreen implements Screen{
 
     public CommandHandler getCommandHandler() {
         return commandHandler;
+    }
+
+    public LightSwitch getGame() {
+        return game;
     }
 
     @Override

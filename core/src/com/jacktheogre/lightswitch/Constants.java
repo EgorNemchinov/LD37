@@ -19,4 +19,6 @@ public class Constants {
     public static final int LIGHT_RAYS = 50;
 
     public static float TELEPORT_INTERVAL = 5f;
+    public static float PLAYTIME = 30f;
+
 }

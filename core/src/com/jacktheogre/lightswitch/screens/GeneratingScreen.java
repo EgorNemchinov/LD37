@@ -57,8 +57,9 @@ public class GeneratingScreen implements Screen{
         this.game = game;
         gameCam = new OrthographicCamera();
         gamePort = new FitViewport(LightSwitch.WIDTH, LightSwitch.HEIGHT, gameCam);
+        // TODO: 12.12.16 make map in the middle
         gameCam.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
-        gameCam.zoom -= 0.3f;
+        gameCam.zoom -= 0.2f;
 
         loader = Assets.getAssetLoader();
         loader.load();
