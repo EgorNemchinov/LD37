@@ -38,7 +38,6 @@ public class Hud implements Disposable{
         fill.setScale(2f);
         viewport = new FitViewport(LightSwitch.WIDTH, LightSwitch.HEIGHT);
         stage = new Stage(viewport, screen.getGame().batch);
-        shapeRenderer = new ShapeRenderer();
 
         Table table = new Table();
         table.setFillParent(true);
