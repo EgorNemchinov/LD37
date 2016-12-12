@@ -35,7 +35,6 @@ public class Lighting {
         rayHandler = new RayHandler(screen.getWorld());
         rayHandler.setAmbientLight(0, 0.2f, 0, 0.1f);
         rayHandler.setBlurNum(3);
-        // TODO: 20.10.16 add generating lights to worldcreator
         pointLights = new Array<PointLight>();
         /*pointLights.add(new PointLight(rayHandler, Constants.LIGHT_RAYS, Color.BLUE, Constants.LIGHT_DISTANCE, 64, 64));
         pointLights.add(new PointLight(rayHandler, Constants.LIGHT_RAYS, Color.BROWN, Constants.LIGHT_DISTANCE, 200, 112));
@@ -43,7 +42,7 @@ public class Lighting {
         pointLights.add(new PointLight(rayHandler, Constants.LIGHT_RAYS, Color.FOREST, Constants.LIGHT_DISTANCE, 400, 120));
         pointLights.add(new PointLight(rayHandler, Constants.LIGHT_RAYS, Color.OLIVE, Constants.LIGHT_DISTANCE, 550, 100));*/
 
-        actorLight = new PointLight(rayHandler, Constants.LIGHT_RAYS, new Color(0xF1/255f, 0x91/255f, 0x22/255f, 0.8f), Constants.LIGHT_DISTANCE * 0.4f, 550, 100);
+        actorLight = new PointLight(rayHandler, Constants.LIGHT_RAYS, new Color(0xF1/255f, 0x91/255f, 0x22/255f, 0.8f), 0.4f*Constants.LIGHT_DISTANCE , 550, 100);
         transformActorLight(actorLight);
 
         actorLightFilter = new Filter();

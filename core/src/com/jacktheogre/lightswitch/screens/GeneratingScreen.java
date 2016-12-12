@@ -58,7 +58,7 @@ public class GeneratingScreen implements Screen{
         gameCam = new OrthographicCamera();
         gamePort = new FitViewport(LightSwitch.WIDTH, LightSwitch.HEIGHT, gameCam);
         gameCam.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
-        gameCam.zoom -= 0.4f;
+        gameCam.zoom -= 0.3f;
 
         loader = Assets.getAssetLoader();
         loader.load();

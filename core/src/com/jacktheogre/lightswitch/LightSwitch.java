@@ -12,7 +12,6 @@ public class LightSwitch extends Game {
     // TODO: 11.12.16 pathfinding: zelda cuts corners(hi russian)
     // TODO: 11.12.16 spawn-in-the-stone problem
     // TODO: 11.12.16 energy scale
-    // TODO: 11.12.16 come up with a story, find artist
     // TODO: 10.12.16 replays
     public SpriteBatch batch;
     public static final int WIDTH = 400;

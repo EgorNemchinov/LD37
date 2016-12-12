@@ -57,6 +57,8 @@ public abstract class Actor extends Sprite {
 
     protected float xVel, yVel;
 
+    protected boolean keyboardControl;
+
     public Actor(World world, float x, float y, Texture texture) {
         super(texture);
         setPosition(x, y);
@@ -78,6 +80,7 @@ public abstract class Actor extends Sprite {
         nextPosition = curPosition;
         agent = new Agent(world);
         teleportCollide = true;
+        keyboardControl = false;
     }
 
     public void update(float dt) {
@@ -89,13 +92,29 @@ public abstract class Actor extends Sprite {
                 setCollideTeleport(true);
             }
         }
-
-        curPosition = b2body.getPosition();
-        if(nextPosition.cpy().sub(curPosition).len() < 2) {
-            nextPosition = getNextPosition();
+        if(keyboardControl) {
+            switch(direction) {
+                case DOWN:
+                    b2body.setLinearVelocity(0, -getSpeed());
+                    break;
+                case UP:
+                    b2body.setLinearVelocity(0, getSpeed());
+                    break;
+                case RIGHT:
+                    b2body.setLinearVelocity(getSpeed(), 0);
+                    break;
+                case LEFT:
+                    b2body.setLinearVelocity(-getSpeed(), 0);
+                    break;
+            }
+        } else {
+            curPosition = b2body.getPosition();
+            if(nextPosition.cpy().sub(curPosition).len() < 2) {
+                nextPosition = getNextPosition();
+            }
+            Vector2 step = nextPosition.cpy().sub(curPosition).nor().scl(getSpeed());
+            b2body.setLinearVelocity(step);
         }
-        Vector2 step = nextPosition.cpy().sub(curPosition).nor().scl(getSpeed());
-        b2body.setLinearVelocity(step);
         setPosition(b2body.getPosition().x - getWidth() / 2 , b2body.getPosition().y - getHeight() / 2 );
         setRegion(getFrame(dt));
     }
@@ -124,6 +143,14 @@ public abstract class Actor extends Sprite {
                 return Direction.DOWN;
         }
         return lastDirection;
+    }
+
+    public Direction getCurDirection() {
+        return direction;
+    }
+
+    public void setDirection(Direction direction) {
+        this.direction = direction;
     }
 
     public void setVelocity(Vector2 velocity) {
@@ -164,6 +191,14 @@ public abstract class Actor extends Sprite {
 //        Gdx.app.log("Target", toString() + " is set to " + target);
         currentNodePointer = 0;
         agent.makePath(this);
+    }
+
+    public void setKeyboardControl(boolean control) {
+        this.keyboardControl = control;
+    }
+
+    public boolean isKeyboardControl() {
+        return keyboardControl;
     }
 
     public void setAgent(Agent agent) {
@@ -224,11 +259,31 @@ public abstract class Actor extends Sprite {
     }
 
     public void stop() {
+        target = b2body.getPosition();
         b2body.setLinearVelocity(0, 0);
         path.clear();
         curPosition = b2body.getPosition();
         nextPosition = curPosition;
     }
+
+    public Vector2 getCurPos() {
+        return curPosition;
+    }
+
+    public Vector2 getNextPos() {
+        return nextPosition;
+    }
+
+    public void setCurPosition(Vector2 curPosition) {
+        this.curPosition = curPosition;
+    }
+
+    public void setNextPosition(Vector2 nextPosition) {
+        this.nextPosition = nextPosition;
+    }
+
+
+
     public String toString() {
         return "Actor";
     }

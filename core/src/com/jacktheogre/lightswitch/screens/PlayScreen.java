@@ -130,7 +130,7 @@ public class PlayScreen implements Screen{
         if(commandHandler.newCommands())
             commandHandler.executeCommandsPlay();
         player.update(dt);
-        enemyPlayer.update(dt);
+//        enemyPlayer.update(dt);
         world.step(1/60f, 6, 2);
 
 //        lerpCamera(player.getActor().b2body.getPosition().x, player.getActor().b2body.getPosition().y , dt);

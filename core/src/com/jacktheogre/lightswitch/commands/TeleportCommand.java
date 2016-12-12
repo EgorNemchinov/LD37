@@ -20,7 +20,6 @@ public class TeleportCommand extends ActorCommand {
 
     @Override
     public boolean execute(Actor actor) {
-        Gdx.app.log("TeleportCommand", "Executing");
         if(executed)
             return false;
 //        actor.moveTo(destination.getX(), destination.getY());

@@ -28,7 +28,7 @@ public class AssetLoader {
         manager.load("zelda.gif", Texture.class);
         manager.load("teleport.png", Texture.class);
         manager.finishLoading();
-        map = mapLoader.load("small.tmx");
+        map = mapLoader.load("big.tmx");
         zelda = manager.get("zelda.gif",Texture.class);
         link = manager.get("link.png", Texture.class);
         teleport = manager.get("teleport.png", Texture.class);

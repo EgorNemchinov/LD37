@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
+import com.jacktheogre.lightswitch.sprites.Actor;
 
 import java.util.Stack;
 
@@ -72,6 +73,39 @@ public class CommandHandler {
         if(commands.size() > 0)
             pointer = commands.size();
         newCommands = false;
+    }
+
+    public Stack<Command> getCommands() {
+        return commands;
+    }
+
+    public void stopMoving(Actor.Direction direction) {
+        for (int i = commands.size() - 1; i >= 0 ; i--) {
+            Command cmd = commands.get(i);
+            if(StartMovingCommand.class.isInstance(cmd)) {
+                if (((StartMovingCommand) cmd).getDirection() == direction) {
+                    if (!((StartMovingCommand) cmd).disabled)
+                        ((StartMovingCommand) cmd).disabled = true;
+                }
+            }
+        }
+        for (int i = commands.size() - 1; i >= 0 ; i--) {
+            Command cmd = commands.get(i);
+            if(StopCommand.class.isInstance(cmd) || MoveToCommand.class.isInstance(cmd)) {
+                addCommand(new StopCommand());
+                return;
+            } else if(StartMovingCommand.class.isInstance(cmd)) {
+                if(((StartMovingCommand) cmd).getDirection() != direction) {
+                    if(((StartMovingCommand) cmd).disabled) {
+                        continue;
+                    } else {
+                        commands.add(new StartMovingCommand(((StartMovingCommand) cmd).getDirection()));
+                        return;
+                    }
+                }
+            }
+        }
+        addCommand(new StopCommand());
     }
 
     public boolean undo() {

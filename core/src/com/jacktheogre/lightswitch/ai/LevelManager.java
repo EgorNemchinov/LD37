@@ -1,5 +1,6 @@
 package com.jacktheogre.lightswitch.ai;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -25,6 +26,7 @@ public class LevelManager {
         lvlTileHeight = properties.get("height", Integer.class);
         tilePixelHeight = properties.get("tilewidth", Integer.class);
         tilePixelWidth = properties.get("tileheight", Integer.class);
+        Gdx.app.log("levelmanager", "" +tilePixelWidth);
         lvlPixelWidth = tilePixelWidth * lvlTileWidth;
         lvlPixelHeight = tilePixelHeight * lvlTileHeight;
 
