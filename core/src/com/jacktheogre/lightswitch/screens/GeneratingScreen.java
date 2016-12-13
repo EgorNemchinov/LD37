@@ -1,8 +1,6 @@
 package com.jacktheogre.lightswitch.screens;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -11,7 +9,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -22,6 +19,7 @@ import com.jacktheogre.lightswitch.ai.Node;
 import com.jacktheogre.lightswitch.commands.CommandHandler;
 import com.jacktheogre.lightswitch.objects.InteractiveObject;
 import com.jacktheogre.lightswitch.objects.Teleport;
+import com.jacktheogre.lightswitch.sprites.Button;
 import com.jacktheogre.lightswitch.sprites.EnemyPlayer;
 import com.jacktheogre.lightswitch.sprites.Player;
 import com.jacktheogre.lightswitch.tools.AssetLoader;
@@ -29,7 +27,6 @@ import com.jacktheogre.lightswitch.tools.Assets;
 import com.jacktheogre.lightswitch.tools.B2WorldCreator;
 import com.jacktheogre.lightswitch.tools.GenerateInputHandler;
 import com.jacktheogre.lightswitch.tools.Lighting;
-import com.jacktheogre.lightswitch.tools.PlayInputHandler;
 
 /**
  * Created by luna on 10.12.16.
@@ -42,6 +39,7 @@ public class GeneratingScreen implements Screen{
     private final Player player;
     private Lighting lighting;
     private OrthographicCamera gameCam;
+//    private OrthographicCamera staticCam;
     private Viewport gamePort;
     private LightSwitch game;
     public Array<InteractiveObject> objects;
@@ -50,21 +48,33 @@ public class GeneratingScreen implements Screen{
     private OrthogonalTiledMapRenderer mapRenderer;
     private World world;
     private CommandHandler commandHandler;
+    private Button undo, redo, start, teleportButton;
 
     private Node selectedNode;
+
+    private final Color BACKGROUND_COLOR = new Color(56/255f, 56/255f, 113/255f, 1f);
 
     public GeneratingScreen(LightSwitch game) {
         this.game = game;
         gameCam = new OrthographicCamera();
+//        staticCam = new OrthographicCamera();
         gamePort = new FitViewport(LightSwitch.WIDTH, LightSwitch.HEIGHT, gameCam);
         // TODO: 12.12.16 make map in the middle
         gameCam.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
         gameCam.zoom -= 0.2f;
 
         loader = Assets.getAssetLoader();
-        loader.load();
         LevelManager.loadLevel(loader.map);
         mapRenderer = new OrthogonalTiledMapRenderer(loader.map);
+
+        undo = new Button(Assets.getAssetLoader().undo_button, Button.State.ACTIVE);
+        redo = new Button(Assets.getAssetLoader().redo_button, Button.State.ACTIVE);
+        start = new Button(Assets.getAssetLoader().start_button, Button.State.ACTIVE);
+        teleportButton = new Button(Assets.getAssetLoader().teleport_button, Button.State.ACTIVE);
+        undo.setPosition(10, -30);
+        redo.setPosition(undo.getX() + undo.getWidth()+10, undo.getY());
+        start.setPosition(redo.getX() + redo.getWidth()+10, redo.getY());
+        teleportButton.setPosition(20, 100);
 
         world = new World(new Vector2(0, 0), true);
         objects = new Array<InteractiveObject>();
@@ -80,7 +90,10 @@ public class GeneratingScreen implements Screen{
         shapeRenderer.setProjectionMatrix(gameCam.combined);
         shapeRenderer.setAutoShapeType(true);
         commandHandler = new CommandHandler(this);
+        Node.Indexer.nullify();
         Gdx.input.setInputProcessor(new GenerateInputHandler(this));
+        // TODO: 12.12.16 look next string 
+//        player.update(0);
     }
 
     public void update(float dt){
@@ -109,13 +122,20 @@ public class GeneratingScreen implements Screen{
         shapeRenderer.setAutoShapeType(true);
         update(delta);
 
-        Gdx.gl.glClearColor(0f, 0f, 0.1f, 1);
+        Gdx.gl.glClearColor(BACKGROUND_COLOR.r,BACKGROUND_COLOR.g, BACKGROUND_COLOR.b, BACKGROUND_COLOR.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         mapRenderer.render();
 
         game.batch.setProjectionMatrix(gameCam.combined);
         game.batch.begin();
+        game.batch.draw(Assets.getAssetLoader().moon, Assets.getAssetLoader().moon.getWidth()-gamePort.getWorldWidth() / 4, -gameCam.position.y / 2);
+        //buttons
+        undo.draw(game.batch);
+        redo.draw(game.batch);
+        start.draw(game.batch);
+        teleportButton.draw(game.batch);
+
         for (InteractiveObject object : objects) {
             object.render(game.batch);
         }
@@ -151,6 +171,22 @@ public class GeneratingScreen implements Screen{
         shapeRenderer.rect(selectedNode.getWorldX() - LevelManager.tilePixelWidth / 2, selectedNode.getWorldY() - LevelManager.tilePixelHeight / 2,
                 LevelManager.tilePixelWidth, LevelManager.tilePixelHeight);
         shapeRenderer.end();
+    }
+
+    public Button getUndo() {
+        return undo;
+    }
+
+    public Button getRedo() {
+        return redo;
+    }
+
+    public Button getStart() {
+        return start;
+    }
+
+    public Button getTeleportButton() {
+        return teleportButton;
     }
 
     public void setSelectedNode(Node selectedNode) {

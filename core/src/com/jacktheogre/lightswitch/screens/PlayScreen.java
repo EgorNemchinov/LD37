@@ -14,6 +14,7 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.jacktheogre.lightswitch.Constants;
 import com.jacktheogre.lightswitch.Hud;
 import com.jacktheogre.lightswitch.LightSwitch;
 import com.jacktheogre.lightswitch.ai.LevelManager;
@@ -59,6 +60,7 @@ public class PlayScreen implements Screen{
     private FPSLogger fpsLogger;
     private EnemyPlayer enemyPlayer;
     private Vector2 touchPoint;
+    private boolean gameOver;
 
     public PlayScreen(GeneratingScreen screen) {
         this.game = screen.getGame();
@@ -87,11 +89,12 @@ public class PlayScreen implements Screen{
         lighting = screen.getLighting();
         lighting.setPlayScreen(this);
         Gdx.input.setInputProcessor(new PlayInputHandler(this));
-        world.setContactListener(new WorldContactListener());
+        world.setContactListener(new WorldContactListener(this));
         lighting.turnOff();
         makeTeleportConnections();
         commandHandler.addCommand(new StopCommand());
         energy = 100f;
+        gameOver = false;
         runTime = 0;
     }
 
@@ -112,20 +115,31 @@ public class PlayScreen implements Screen{
 
     public void update(float dt) {
         runTime += dt;
-        addEnergy(5*dt);
+        if (runTime > Constants.PLAYTIME) {
+            endGame(true);
+        }
+
+        addEnergy(5 * dt);
         commandHandler.update(dt);
-        if(commandHandler.newCommands()) {
+        if (commandHandler.newCommands()) {
             commandHandler.executeCommandsPlay();
         }
         player.update(dt);
         enemyPlayer.update(dt);
-        world.step(1/60f, 6, 2);
+        world.step(1 / 60f, 6, 2);
 
 //        lerpCamera(player.getActor().b2body.getPosition().x, player.getActor().b2body.getPosition().y , dt);
         lerpCamera(gamePort.getWorldWidth() / 4, gamePort.getWorldHeight() / 4, dt);
         gameCam.update();
 
         mapRenderer.setView(gameCam);
+    }
+
+    public void endGame(boolean win) {
+        if(win)
+            game.setScreen(new GameOverScreen(game, GameOverScreen.State.WIN));
+        else
+            game.setScreen(new GameOverScreen(game, GameOverScreen.State.LOSE));
     }
 
     public void render(float dt) {
@@ -299,5 +313,9 @@ public class PlayScreen implements Screen{
 
     public void setObjects(Array<InteractiveObject> objects) {
         this.objects = objects;
+    }
+
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
     }
 }

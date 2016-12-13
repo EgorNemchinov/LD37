@@ -31,11 +31,12 @@ public class Hud implements Disposable{
     public Hud(PlayScreen screen) {
         this.screen = screen;
         scale = new Sprite(Assets.getAssetLoader().scale);
-        scale.setPosition(scale.getWidth() / 2 + 20, scale.getHeight() / 2 + 40);
-        scale.setScale(2.5f);
+        scale.setPosition(scale.getWidth() / 2, 20);
+        scale.setScale(1f);
         fill = new Sprite(Assets.getAssetLoader().scale_fill);
         fill.setPosition(scale.getX() + 2, scale.getY() + 2);
-        fill.setScale(2f);
+        fill.setSize(scale.getWidth() - 4, scale.getHeight() - 4);
+        fill.setOrigin(fill.getWidth() / 2, 0);
         viewport = new FitViewport(LightSwitch.WIDTH, LightSwitch.HEIGHT);
         stage = new Stage(viewport, screen.getGame().batch);
 

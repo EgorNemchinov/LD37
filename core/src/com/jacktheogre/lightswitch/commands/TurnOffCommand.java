@@ -26,8 +26,6 @@ public class TurnOffCommand extends GlobalCommand{
     public boolean execute() {
         if(executed)
             return false;
-        Gdx.app.log("Space", "1");
-
         activeBefore = lighting.lightsOn();
         lighting.turnOff();
         executed = true;

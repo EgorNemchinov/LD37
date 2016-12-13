@@ -19,7 +19,7 @@ public class LightSwitch extends Game {
     @Override
 	public void create () {
 		batch = new SpriteBatch();
-		this.setScreen(new GeneratingScreen(this));
+		this.setScreen(new MainMenuScreen(this));
 	}
 
 	@Override

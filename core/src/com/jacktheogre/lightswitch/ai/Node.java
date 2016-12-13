@@ -38,8 +38,15 @@ public class Node {
             return index++;
         }
 
+        public static void nullify(){
+            index = 0;
+        }
+
     }
 
+    public static void nullify() {
+        Indexer.nullify();
+    }
 
     public float getWorldX() {
         float x = (index % LevelManager.lvlTileWidth) * LevelManager.tilePixelWidth + LevelManager.tilePixelWidth * 0.5f;

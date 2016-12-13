@@ -25,6 +25,8 @@ public class Human extends Actor {
     private State currentState;
     private State previousState;
 
+    private final int WIDTH = 22;
+    private final int HEIGHT = 26;
     public static final int MAX_SPEED = 80;
 
     public Human(World world, float x, float y) {
@@ -36,7 +38,7 @@ public class Human extends Actor {
         initGraphics();
 
         texture = getTexture();
-        setBounds(getX(), getY(), 21, 21);
+        setBounds(getX(), getY(), 22, 26);
         setRegion(playerStandRight);
 
         initialize();
@@ -49,28 +51,27 @@ public class Human extends Actor {
 
         float frameTime = 0.1f;
         for (int i = 0; i < 4; i++) {
-            frames.add(new TextureRegion(getTexture(), 22 + i*20, 0, 20, 21));
+            frames.add(new TextureRegion(getTexture(), 33 + i*(WIDTH + 5), 1, WIDTH, HEIGHT));
         }
         playerRunDown = new Animation(0.1f, frames);
         frames.clear();
 
         for (int i = 0; i < 4; i++) {
-            frames.add(new TextureRegion(getTexture(), 22 + i*20, 21, 20, 21));
+            frames.add(new TextureRegion(getTexture(), 33 + i*(WIDTH+5), 1 + 29, WIDTH, HEIGHT));
         }
         playerRunUp = new Animation(frameTime, frames);
         frames.clear();
 
         for (int i = 0; i < 4; i++) {
-            frames.add(new TextureRegion(getTexture(), 22 + i*20, 44, 20, 21));
+            frames.add(new TextureRegion(getTexture(), 33 + i*(WIDTH+5), 1 + 2*29, WIDTH, HEIGHT));
         }
-        playerRunLeft = new Animation(frameTime, frames);
+        playerRunRight = new Animation(frameTime, frames);
         frames.clear();
 
         for (int i = 0; i < 4; i++) {
-            frames.add(new TextureRegion(getTexture(), 22 + i*20, 44, 20, 21));
-            frames.get(i).flip(true, false);
+            frames.add(new TextureRegion(getTexture(), 33 + i*(WIDTH+5), 1 + 3*29, WIDTH, HEIGHT));
         }
-        playerRunRight = new Animation(frameTime, frames);
+        playerRunLeft = new Animation(frameTime, frames);
         frames.clear();
 
         //set looping
@@ -79,9 +80,10 @@ public class Human extends Actor {
         playerRunLeft.setPlayMode(Animation.PlayMode.LOOP);
         playerRunUp.setPlayMode(Animation.PlayMode.LOOP);
 
-        playerStandDown = new TextureRegion(getTexture(), 0, 0, 20, 21);
-        playerStandUp = new TextureRegion(getTexture(), 0, 21, 20, 21);
-        playerStandLeft = new TextureRegion(getTexture(), 0, 44, 20, 21);
+        playerStandDown = new TextureRegion(getTexture(), 1, 1, WIDTH, HEIGHT);
+        playerStandUp = new TextureRegion(getTexture(), 1, 30, WIDTH, HEIGHT);
+        playerStandRight = new TextureRegion(getTexture(), 1, 59, WIDTH, HEIGHT);
+        playerStandLeft = new TextureRegion(getTexture(), 1, 88, WIDTH, HEIGHT);
         playerStandRight = new TextureRegion(playerStandLeft);
         playerStandRight.flip(true, false);
     }
