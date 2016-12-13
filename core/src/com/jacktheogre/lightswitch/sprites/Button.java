@@ -106,6 +106,11 @@ public class Button extends Sprite {
         setState(State.DISABLED);
     }
 
+    public void enable() {
+        disabled = false;
+        setState(State.ACTIVE);
+    }
+
     public void focused() {
         focused = true;
         if(!disabled) {

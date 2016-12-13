@@ -101,7 +101,7 @@ public class PlayInputHandler implements InputProcessor {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        if(screen.getRunTime() - lastMakingPathTime > 0.4f) {
+        if(screen.getRunTime() - lastMakingPathTime > 0.2f) {
             return touchDown(screenX, screenY, pointer, 0);
         } else
             return false;

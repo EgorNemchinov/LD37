@@ -88,7 +88,7 @@ public class Human extends Actor {
 
     @Override
     public void dispose() {
-
+        // TODO: 13.12.16 all the disposes
     }
 
 

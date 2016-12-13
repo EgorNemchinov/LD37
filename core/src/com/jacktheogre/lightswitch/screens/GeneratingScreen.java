@@ -135,7 +135,7 @@ public class GeneratingScreen implements Screen{
         undo.draw(game.batch);
         redo.draw(game.batch);
         start.draw(game.batch);
-        teleportButton.draw(game.batch);
+//        teleportButton.draw(game.batch);
 
         for (InteractiveObject object : objects) {
             object.render(game.batch);

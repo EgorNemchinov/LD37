@@ -109,23 +109,31 @@ public class CommandHandler {
     }
 
     public boolean undo() {
-        Gdx.app.log("cmdhndlr", "undone");
         if(pointer >= 1) {
             pointer--;
-            Gdx.app.log("GameWorld", "Undoing "+commands.get(pointer));
+//            Gdx.app.log("GameWorld", "Undoing "+commands.get(pointer));
             commands.get(pointer).undo();
+//            if(pointer == 0)
+//                ((GeneratingScreen)screen).getUndo().disable();
+//            else
+//                ((GeneratingScreen)screen).getUndo().enable();
             return true;
-        } else
+        } else {
+//            ((GeneratingScreen)screen).getUndo().disable();
             return false;
+        }
     }
 
 
     public boolean redo() {
-        Gdx.app.log("cmdhndlr", "redone");
         if(pointer < commands.size()) {
             Gdx.app.log("GameWorld", "Redoing "+commands.get(pointer));
             commands.get(pointer).redo();
             pointer++;
+//            if(pointer == commands.size()-1)
+//                ((GeneratingScreen)screen).getRedo().disable();
+//            else
+//                ((GeneratingScreen)screen).getRedo().enable();
             return true;
         } else
             return false;

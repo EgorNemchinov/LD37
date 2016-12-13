@@ -19,7 +19,7 @@ import com.jacktheogre.lightswitch.tools.Assets;
  * Created by luna on 10.12.16.
  */
 public class MainMenuScreen implements Screen{
-    private final Color BACKGROUND_COLOR = new Color(56/255f, 56/255f, 113/255f, 1f);
+    private final Color BACKGROUND_COLOR = new Color(31/255f, 24/255f, 44/255f, 1f);
 
     private OrthographicCamera gameCam;
     private Viewport gamePort;
