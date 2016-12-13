@@ -109,6 +109,7 @@ public class CommandHandler {
     }
 
     public boolean undo() {
+        Gdx.app.log("cmdhndlr", "undone");
         if(pointer >= 1) {
             pointer--;
             Gdx.app.log("GameWorld", "Undoing "+commands.get(pointer));
@@ -120,6 +121,7 @@ public class CommandHandler {
 
 
     public boolean redo() {
+        Gdx.app.log("cmdhndlr", "redone");
         if(pointer < commands.size()) {
             Gdx.app.log("GameWorld", "Redoing "+commands.get(pointer));
             commands.get(pointer).redo();

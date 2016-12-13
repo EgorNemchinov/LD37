@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import com.jacktheogre.lightswitch.screens.GeneratingScreen;
+import com.jacktheogre.lightswitch.screens.PlayScreen;
 
 /**
  * Created by luna on 13.12.16.
@@ -22,6 +24,8 @@ public class Button extends Sprite {
     private boolean pressed = false;
     private boolean focused = false;
 
+    private GeneratingScreen screen;
+
     public Button(TextureRegion texture) {
         super(new TextureRegion(texture, 0, 0, texture.getRegionWidth() / 4, texture.getRegionHeight()));
         this.textureReg = texture;
@@ -32,6 +36,10 @@ public class Button extends Sprite {
     public Button(TextureRegion textureRegion, State state) {
         this(textureRegion);
         this.state = state;
+    }
+
+    public void setScreen(GeneratingScreen screen) {
+        this.screen = screen;
     }
 
     public void initGraphics(TextureRegion textureRegion) {
@@ -68,11 +76,14 @@ public class Button extends Sprite {
         return region;
     }
 
-    public void press(){
+    public boolean press(){
+        pressed = true;
         if(!disabled) {
             setState(State.PRESSED);
+            return true;
         } else {
             setState(State.DISABLED);
+            return false;
         }
     }
 

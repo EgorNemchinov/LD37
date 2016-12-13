@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.jacktheogre.lightswitch.LightSwitch;
 import com.jacktheogre.lightswitch.ai.LevelManager;
 import com.jacktheogre.lightswitch.ai.Node;
+import com.jacktheogre.lightswitch.commands.AddTeleportCommand;
 import com.jacktheogre.lightswitch.commands.CommandHandler;
 import com.jacktheogre.lightswitch.objects.InteractiveObject;
 import com.jacktheogre.lightswitch.objects.Teleport;
@@ -72,9 +73,9 @@ public class GeneratingScreen implements Screen{
         start = new Button(Assets.getAssetLoader().start_button, Button.State.ACTIVE);
         teleportButton = new Button(Assets.getAssetLoader().teleport_button, Button.State.ACTIVE);
         undo.setPosition(10, -30);
-        redo.setPosition(undo.getX() + undo.getWidth()+10, undo.getY());
-        start.setPosition(redo.getX() + redo.getWidth()+10, redo.getY());
-        teleportButton.setPosition(20, 100);
+        redo.setPosition(undo.getX() + undo.getWidth()+15, undo.getY());
+        start.setPosition(redo.getX() + redo.getWidth()+15, redo.getY());
+        teleportButton.setPosition(-teleportButton.getWidth() - 10, 100);
 
         world = new World(new Vector2(0, 0), true);
         objects = new Array<InteractiveObject>();
@@ -195,7 +196,7 @@ public class GeneratingScreen implements Screen{
 
     public void addTeleport() {
         if(selectedNode.getConnections().size > 0)
-            objects.add(new Teleport(this, (int) selectedNode.getWorldX() - LevelManager.tilePixelWidth / 2, (int)selectedNode.getWorldY() - LevelManager.tilePixelHeight / 2));
+            commandHandler.addCommand(new AddTeleportCommand(this, (int) selectedNode.getWorldX() - LevelManager.tilePixelWidth / 2, (int)selectedNode.getWorldY() - LevelManager.tilePixelHeight / 2, objects));
         Gdx.app.log("objects", ""+objects.size);
     }
 

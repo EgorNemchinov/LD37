@@ -1,12 +1,10 @@
 package com.jacktheogre.lightswitch.sprites;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
@@ -18,6 +16,7 @@ import com.jacktheogre.lightswitch.tools.Assets;
  */
 public class Enemy extends Actor {
     private static final int MAX_SPEED = 64;
+    private final int WIDTH = 30, HEIGHT = 30;
 
     public enum State {RUNNING, STANDING}
     private State currentState;
@@ -25,7 +24,7 @@ public class Enemy extends Actor {
 
 
     public Enemy(World world, float x, float y) {
-        super(world, x, y, Assets.getAssetLoader().zelda);
+        super(world, x, y, Assets.getAssetLoader().ghost);
 
         currentState = State.STANDING;
         previousState = State.STANDING;
@@ -33,9 +32,13 @@ public class Enemy extends Actor {
         initGraphics();
 
         texture = getTexture();
-        playerStandRight = new TextureRegion(texture, 0, 0, 21, 21);
-        setBounds(getX(), getY(), 21, 21);
-        setRegion(playerStandRight);
+//        playerStandRight = new TextureRegion(texture, 1, 1, 30, 30);
+        playerStandDown = new TextureRegion(getTexture(), 1, 1, WIDTH, HEIGHT);
+        playerStandUp = new TextureRegion(getTexture(), 1, 34, WIDTH, HEIGHT);
+        playerStandRight = new TextureRegion(getTexture(), 1, 1, WIDTH, HEIGHT);
+        playerStandLeft = new TextureRegion(getTexture(), 1, 100, WIDTH, HEIGHT);
+        setBounds(getX(), getY(), 30, 30);
+        setRegion(playerStandLeft);
 
         initialize();
         target = new Vector2(b2body.getPosition());
@@ -129,30 +132,28 @@ public class Enemy extends Actor {
 
         float frameTime = 0.2f;
         for (int i = 0; i < 2; i++) {
-            frames.add(new TextureRegion(getTexture(), i*20, 0, 20, 21));
+            frames.add(new TextureRegion(getTexture(), 42 + i*(WIDTH + 3), 1, WIDTH, HEIGHT));
         }
-        playerRunDown = new Animation(frameTime, frames);
+        playerRunDown = new Animation(0.1f, frames);
         frames.clear();
 
         for (int i = 0; i < 2; i++) {
-            frames.add(new TextureRegion(getTexture(), 40 + i*20, 0, 20, 21));
+            frames.add(new TextureRegion(getTexture(), 42 + i*(WIDTH+3), 1 + 33, WIDTH, HEIGHT));
+        }
+        playerRunUp = new Animation(frameTime, frames);
+        frames.clear();
+
+        for (int i = 0; i < 2; i++) {
+            frames.add(new TextureRegion(getTexture(), 42 + i*(WIDTH+3), 1 + 2*33, WIDTH, HEIGHT));
         }
         playerRunRight = new Animation(frameTime, frames);
         frames.clear();
 
         for (int i = 0; i < 2; i++) {
-            frames.add(new TextureRegion(getTexture(), 40 + i*20, 0, 20, 21));
-            frames.get(i).flip(true, false);
+            frames.add(new TextureRegion(getTexture(), 42 + i*(WIDTH+3), 1 + 3*33, WIDTH, HEIGHT));
         }
         playerRunLeft = new Animation(frameTime, frames);
         frames.clear();
-
-        for (int i = 0; i < 2; i++) {
-            frames.add(new TextureRegion(getTexture(), 115 + i*20, 0, 20, 21));
-        }
-        playerRunUp = new Animation(frameTime, frames);
-        frames.clear();
-
 
         //set looping
         playerRunDown.setPlayMode(Animation.PlayMode.LOOP);
@@ -160,11 +161,6 @@ public class Enemy extends Actor {
         playerRunLeft.setPlayMode(Animation.PlayMode.LOOP);
         playerRunUp.setPlayMode(Animation.PlayMode.LOOP);
 
-        playerStandDown = new TextureRegion(getTexture(), 0, 0, 20, 21);
-        playerStandUp = new TextureRegion(getTexture(), 115, 0, 20, 21);
-        playerStandRight = new TextureRegion(getTexture(), 40, 0, 20, 21);
-        playerStandLeft = new TextureRegion(playerStandRight);
-        playerStandLeft.flip(true, false);
     }
 
     @Override

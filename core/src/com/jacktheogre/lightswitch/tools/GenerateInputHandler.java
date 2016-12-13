@@ -46,12 +46,16 @@ public class GenerateInputHandler implements InputProcessor{
         Vector3 screenTouch = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
         Vector3 point = screen.getGamePort().unproject(screenTouch.cpy());
         screenTouch.y = screen.getGamePort().getScreenHeight() - screenTouch.y;
-        if(screen.getUndo().getBoundingRectangle().contains(point.x, point.y))
-            screen.getUndo().press();
+        if(screen.getUndo().getBoundingRectangle().contains(point.x, point.y)) {
+            if(screen.getUndo().press())
+                screen.getCommandHandler().undo();
+        }
         if(screen.getRedo().getBoundingRectangle().contains(point.x, point.y))
-            screen.getRedo().press();
+            if(screen.getRedo().press())
+                screen.getCommandHandler().redo();
         if(screen.getStart().getBoundingRectangle().contains(point.x, point.y))
-            screen.getStart().press();
+            if(screen.getStart().press())
+                screen.getGame().setScreen(new PlayScreen(screen));
         if(screen.getTeleportButton().getBoundingRectangle().contains(point.x, point.y))
             screen.getTeleportButton().press();
         screen.setSelectedNode(LevelManager.graph.getNodeByXY((int) point.x, (int)point.y));

@@ -84,8 +84,6 @@ public class Human extends Actor {
         playerStandUp = new TextureRegion(getTexture(), 1, 30, WIDTH, HEIGHT);
         playerStandRight = new TextureRegion(getTexture(), 1, 59, WIDTH, HEIGHT);
         playerStandLeft = new TextureRegion(getTexture(), 1, 88, WIDTH, HEIGHT);
-        playerStandRight = new TextureRegion(playerStandLeft);
-        playerStandRight.flip(true, false);
     }
 
     @Override

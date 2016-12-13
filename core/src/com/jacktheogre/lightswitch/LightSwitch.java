@@ -9,7 +9,7 @@ import com.jacktheogre.lightswitch.screens.*;
 public class LightSwitch extends Game {
 
     // TODO: 11.12.16 move camera
-    // TODO: 11.12.16 pathfinding: zelda cuts corners(hi russian)
+    // TODO: 11.12.16 pathfinding: ghost cuts corners(hi russian)
     // TODO: 11.12.16 energy scale
     // TODO: 12.12.16 gameover screen
     public SpriteBatch batch;
