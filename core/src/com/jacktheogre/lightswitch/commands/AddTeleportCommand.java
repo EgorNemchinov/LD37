@@ -1,5 +1,6 @@
 package com.jacktheogre.lightswitch.commands;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.jacktheogre.lightswitch.objects.InteractiveObject;
 import com.jacktheogre.lightswitch.objects.Teleport;
@@ -19,24 +20,38 @@ public class AddTeleportCommand extends GlobalCommand {
         this.x = x;
         this.y = y;
         this.objects = objects;
-        teleport = new Teleport((GeneratingScreen) screen, x, y);
+        teleport = new Teleport((GeneratingScreen) screen, x, y, false);
     }
 
     @Override
     public boolean execute() {
         if(executed)
             return false;
-        objects.add(teleport);
+        if(((GeneratingScreen)screen).addable()) {
+            objects.add(teleport);
+            if(!((GeneratingScreen)screen).addable())
+                ((GeneratingScreen)screen).getTeleportButton().disable();
+        }
+//        Gdx.app.log("objects", ""+objects.size);
         return true;
     }
 
     @Override
     public void undo() {
+        if(!((GeneratingScreen)screen).addable()) {
+            ((GeneratingScreen)screen).getTeleportButton().enable();
+        }
         objects.removeValue(teleport, true);
+        if(((GeneratingScreen)screen).getObjects().size == 0)
+            ((GeneratingScreen)screen).getUndo().disable();
     }
 
     @Override
     public void redo() {
-        objects.add(teleport);
+        if(((GeneratingScreen)screen).addable()) {
+            objects.add(teleport);
+            if(!((GeneratingScreen)screen).addable())
+                ((GeneratingScreen)screen).getTeleportButton().disable();
+        }
     }
 }

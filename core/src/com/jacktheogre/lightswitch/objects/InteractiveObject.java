@@ -1,7 +1,9 @@
 package com.jacktheogre.lightswitch.objects;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
@@ -31,17 +33,29 @@ public abstract class InteractiveObject {
     protected Body body;
     protected GeneratingScreen screen;
     protected Fixture fixture;
+    protected  boolean open;
+    protected float timeSinceClosure, stateTimer;
+    protected Animation openAnimation, closingAnimation;
 
-    // TODO: 10.12.16 may be animation
-    public abstract void render(SpriteBatch spriteBatch);
+    public abstract void render(SpriteBatch spriteBatch, float dt);
     public abstract void activate(Actor actor);
 
     public InteractiveObject(GeneratingScreen screen, int x, int y) {
+        this(screen, x, y, true);
+    }
+
+    public InteractiveObject(GeneratingScreen screen, int x, int y, boolean initPhysics) {
         this.screen = screen;
         this.world = screen.getWorld();
         this.x = x;
         this.y = y;
         this.bounds = new Circle((x + LevelManager.tilePixelWidth / 2), (y + LevelManager.tilePixelHeight/ 2), LevelManager.tilePixelWidth / 2);
+
+        if(initPhysics)
+            initPhysics();
+    }
+
+    public void initPhysics(){
 
         BodyDef bdef = new BodyDef();
         FixtureDef fdef = new FixtureDef();
@@ -54,7 +68,42 @@ public abstract class InteractiveObject {
         shape.setRadius(bounds.radius);
         fdef.shape = shape;
         fixture = body.createFixture(fdef);
+        fixture.setUserData(this);
+        setCategoryFilter(Constants.INTERACTIVE_BIT);
     }
+
+    protected abstract void initGraphics();
+    protected abstract TextureRegion getFrame(float dt);
+
+    public boolean isOpen() {
+        return open;
+    }
+
+    public void setOpen(boolean open) {
+        this.open = open;
+    }
+
+
+
+    public void open() {
+        setOpen(true);
+        Filter filter = fixture.getFilterData();
+        filter.categoryBits = Constants.INTERACTIVE_BIT;
+        filter.maskBits = Constants.ACTOR_BIT;
+        fixture.setFilterData(filter);
+        stateTimer = 0;
+    }
+
+    public void close() {
+        setOpen(false);
+        Filter filter = fixture.getFilterData();
+        filter.categoryBits = Constants.TRANSPARENT_BIT;
+        filter.maskBits = 0;
+        fixture.setFilterData(filter);
+        stateTimer = 0;
+    }
+
+    public abstract void update(float dt);
 
     public void setCategoryFilter(short filterBit) {
         Filter filter = new Filter();

@@ -12,15 +12,18 @@ import com.jacktheogre.lightswitch.screens.PlayScreen;
 import com.jacktheogre.lightswitch.sprites.Actor;
 import com.jacktheogre.lightswitch.sprites.Enemy;
 
+import java.util.HashMap;
+
 /**
  * Created by luna on 11.12.16.
  */
 public class WorldContactListener implements ContactListener {
 
     private PlayScreen screen;
-
+    private HashMap<Fixture, Fixture> fixtures;
     public WorldContactListener(PlayScreen screen) {
         this.screen = screen;
+        fixtures = new HashMap<Fixture, Fixture>();
     }
 
     @Override
@@ -41,6 +44,10 @@ public class WorldContactListener implements ContactListener {
                 screen.endGame(false);
 
         }
+    }
+
+    public void update() {
+
     }
 
     @Override

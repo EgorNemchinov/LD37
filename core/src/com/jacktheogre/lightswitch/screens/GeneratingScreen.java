@@ -33,14 +33,20 @@ import com.jacktheogre.lightswitch.tools.Lighting;
  * Created by luna on 10.12.16.
  */
 public class GeneratingScreen implements Screen{
-    private final Color CORRECT = new Color(0, 1, 0, 0.5f);
-    private final Color WRONG = new Color(1, 0, 0, 0.5f);
+    private final Color DEFAULT = new Color(0.2f, 0.1f, 0.2f, 0.3f);
+    private final Color CORRECT = new Color(0, 1, 0, 0.3f);
+    private final Color WRONG = new Color(1, 0, 0, 0.3f);
+    private final Color BACKGROUND_COLOR = new Color(56/255f, 56/255f, 113/255f, 1f);
+//    private final Color BACKGROUND_COLOR = Color.BLACK;
 
+    public enum State {DEFAULT, SETTING_TELEPORT}
+
+    private State state;
     private final EnemyPlayer enemyPlayer;
     private final Player player;
     private Lighting lighting;
     private OrthographicCamera gameCam;
-//    private OrthographicCamera staticCam;
+    //    private OrthographicCamera staticCam;
     private Viewport gamePort;
     private LightSwitch game;
     public Array<InteractiveObject> objects;
@@ -49,11 +55,10 @@ public class GeneratingScreen implements Screen{
     private OrthogonalTiledMapRenderer mapRenderer;
     private World world;
     private CommandHandler commandHandler;
+
     private Button undo, redo, start, teleportButton;
 
     private Node selectedNode;
-
-    private final Color BACKGROUND_COLOR = new Color(56/255f, 56/255f, 113/255f, 1f);
 
     public GeneratingScreen(LightSwitch game) {
         this.game = game;
@@ -65,8 +70,10 @@ public class GeneratingScreen implements Screen{
         gameCam.zoom -= 0.2f;
 
         loader = Assets.getAssetLoader();
-        LevelManager.loadLevel(loader.map);
-        mapRenderer = new OrthogonalTiledMapRenderer(loader.map);
+        LevelManager.loadLevel(loader.getMap());
+        mapRenderer = new OrthogonalTiledMapRenderer(loader.getMap());
+
+        state = State.DEFAULT;
 
         undo = new Button(Assets.getAssetLoader().undo_button, Button.State.ACTIVE);
         redo = new Button(Assets.getAssetLoader().redo_button, Button.State.ACTIVE);
@@ -76,6 +83,9 @@ public class GeneratingScreen implements Screen{
         redo.setPosition(undo.getX() + undo.getWidth()+15, undo.getY());
         start.setPosition(redo.getX() + redo.getWidth()+15, redo.getY());
         teleportButton.setPosition(-teleportButton.getWidth() - 10, 100);
+        undo.disable();
+        redo.disable();
+        teleportButton.setAutoUnpress(false);
 
         world = new World(new Vector2(0, 0), true);
         objects = new Array<InteractiveObject>();
@@ -83,7 +93,7 @@ public class GeneratingScreen implements Screen{
         player = new Player(this);
         enemyPlayer = new EnemyPlayer(this);
 
-        LevelManager.loadLevel(loader.map);
+        LevelManager.loadLevel(loader.getMap());
         lighting = new Lighting(this);
         new B2WorldCreator(this);
 
@@ -135,18 +145,14 @@ public class GeneratingScreen implements Screen{
         undo.draw(game.batch);
         redo.draw(game.batch);
         start.draw(game.batch);
-//        teleportButton.draw(game.batch);
-
-        for (InteractiveObject object : objects) {
-            object.render(game.batch);
-        }
+        teleportButton.draw(game.batch);
         game.batch.end();
 
         renderSelected();
 
         game.batch.begin();
         for (InteractiveObject object :objects) {
-            object.render(game.batch);
+            object.render(game.batch, delta);
         }
         player.getActor().draw(game.batch);
         if(lighting.lightsOn())
@@ -161,10 +167,14 @@ public class GeneratingScreen implements Screen{
         if(selectedNode == null) {
             return;
         }
-        if(selectedNode.getConnections().size > 0) {
-            shapeRenderer.setColor(CORRECT);
+        if(state == State.DEFAULT) {
+            shapeRenderer.setColor(DEFAULT);
         } else {
-            shapeRenderer.setColor(WRONG);
+            if(selectedNode.getConnections().size > 0) {
+                shapeRenderer.setColor(CORRECT);
+            } else {
+                shapeRenderer.setColor(WRONG);
+            }
         }
         if(!shapeRenderer.isDrawing())
             shapeRenderer.begin();
@@ -172,6 +182,21 @@ public class GeneratingScreen implements Screen{
         shapeRenderer.rect(selectedNode.getWorldX() - LevelManager.tilePixelWidth / 2, selectedNode.getWorldY() - LevelManager.tilePixelHeight / 2,
                 LevelManager.tilePixelWidth, LevelManager.tilePixelHeight);
         shapeRenderer.end();
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public boolean addable() {
+        if(objects.size >= Assets.getAssetLoader().getAmountOfTeleports())
+            return false;
+        else
+            return true;
+    }
+
+    public void setState(State state) {
+        this.state = state;
     }
 
     public Button getUndo() {
@@ -195,9 +220,12 @@ public class GeneratingScreen implements Screen{
     }
 
     public void addTeleport() {
-        if(selectedNode.getConnections().size > 0)
+        if(selectedNode.getConnections().size > 0 && state == State.SETTING_TELEPORT) {
             commandHandler.addCommand(new AddTeleportCommand(this, (int) selectedNode.getWorldX() - LevelManager.tilePixelWidth / 2, (int)selectedNode.getWorldY() - LevelManager.tilePixelHeight / 2, objects));
-        Gdx.app.log("objects", ""+objects.size);
+            undo.enable();
+            state = State.DEFAULT;
+            teleportButton.touchUp();
+        }
     }
 
     public EnemyPlayer getEnemyPlayer() {

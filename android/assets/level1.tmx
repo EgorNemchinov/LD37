@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="15" height="10" tilewidth="16" tileheight="16" nextobjectid="73">
+ <tileset firstgid="1" name="tiles" tilewidth="16" tileheight="16" tilecount="9" columns="9">
+  <image source="tiles.png" width="144" height="16"/>
+ </tileset>
+ <layer name="background" width="15" height="10">
+  <data encoding="base64" compression="zlib">
+   eJxjYKAMMAMxC5QmhGHqkPXiU4cNE9KLzxwYYMGjhlx7qeVmWuglxo+4wopcAAB+RwFC
+  </data>
+ </layer>
+ <layer name="walls" width="15" height="10">
+  <data encoding="base64" compression="zlib">
+   eJxjZ2BgYCIDswExOwN5gBS9jAT0MqKpQeajy2HTi88+ZP3U9C8he4nRi+5PZDFquZkTiFnJwBxADAD1RAD2
+  </data>
+ </layer>
+ <layer name="static_objects" width="15" height="10">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo4D6AAACWAAB
+  </data>
+ </layer>
+ <objectgroup name="walls">
+  <object id="16" x="0" y="0" width="240" height="16"/>
+  <object id="17" x="224" y="16" width="16" height="144"/>
+  <object id="18" x="16" y="144" width="208" height="16"/>
+  <object id="19" x="0" y="16" width="16" height="144"/>
+  <object id="32" x="48" y="48" width="32" height="16"/>
+  <object id="34" x="80" y="112" width="32" height="16"/>
+  <object id="37" x="112" y="48" width="32" height="16"/>
+  <object id="39" x="160" y="112" width="48" height="16"/>
+  <object id="68" x="128" y="64" width="16" height="16"/>
+  <object id="69" x="128" y="96" width="16" height="32"/>
+  <object id="70" x="48" y="64" width="16" height="16"/>
+  <object id="71" x="48" y="96" width="16" height="32"/>
+ </objectgroup>
+ <objectgroup name="static_objects"/>
+ <objectgroup name="actors">
+  <object id="66" x="16" y="112" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup name="enemies">
+  <object id="72" x="192" y="32" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup name="lights">
+  <object id="47" x="64" y="80" width="16" height="16"/>
+  <object id="48" x="112" y="80" width="16" height="16"/>
+  <object id="49" x="64" y="16" width="16" height="16"/>
+  <object id="51" x="112" y="16" width="16" height="16"/>
+  <object id="54" x="192" y="32" width="16" height="16"/>
+  <object id="55" x="160" y="80" width="16" height="16"/>
+  <object id="57" x="112" y="128" width="16" height="16"/>
+  <object id="63" x="48" y="128" width="16" height="16"/>
+  <object id="65" x="176" y="128" width="16" height="16"/>
+ </objectgroup>
+</map>

@@ -47,17 +47,21 @@ public class GenerateInputHandler implements InputProcessor{
         Vector3 point = screen.getGamePort().unproject(screenTouch.cpy());
         screenTouch.y = screen.getGamePort().getScreenHeight() - screenTouch.y;
         if(screen.getUndo().getBoundingRectangle().contains(point.x, point.y)) {
-            if(screen.getUndo().press())
+            if(screen.getUndo().press()) {
                 screen.getCommandHandler().undo();
+            }
         }
+        // TODO: 14.12.16 mb enable undo?
         if(screen.getRedo().getBoundingRectangle().contains(point.x, point.y))
             if(screen.getRedo().press())
                 screen.getCommandHandler().redo();
         if(screen.getStart().getBoundingRectangle().contains(point.x, point.y))
             if(screen.getStart().press())
                 screen.getGame().setScreen(new PlayScreen(screen));
-        if(screen.getTeleportButton().getBoundingRectangle().contains(point.x, point.y))
-            screen.getTeleportButton().press();
+        if(screen.getTeleportButton().getBoundingRectangle().contains(point.x, point.y)) {
+            if(screen.getTeleportButton().press())
+                screen.setState(GeneratingScreen.State.SETTING_TELEPORT);
+        }
         screen.setSelectedNode(LevelManager.graph.getNodeByXY((int) point.x, (int)point.y));
         screen.addTeleport();
         return true;
@@ -68,13 +72,13 @@ public class GenerateInputHandler implements InputProcessor{
         Vector3 screenTouch = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
         Vector3 point = screen.getGamePort().unproject(screenTouch.cpy());
         screenTouch.y = screen.getGamePort().getScreenHeight() - screenTouch.y;
-        if(screen.getUndo().getBoundingRectangle().contains(point.x, point.y))
+        if(screen.getUndo().isAutoUnpress() && screen.getUndo().getBoundingRectangle().contains(point.x, point.y))
             screen.getUndo().touchUp();
-        if(screen.getRedo().getBoundingRectangle().contains(point.x, point.y))
+        if(screen.getRedo().isAutoUnpress() && screen.getRedo().getBoundingRectangle().contains(point.x, point.y))
             screen.getRedo().touchUp();
-        if(screen.getStart().getBoundingRectangle().contains(point.x, point.y))
+        if(screen.getStart().isAutoUnpress() && screen.getStart().getBoundingRectangle().contains(point.x, point.y))
             screen.getStart().touchUp();
-        if(screen.getTeleportButton().getBoundingRectangle().contains(point.x, point.y))
+        if(screen.getTeleportButton().isAutoUnpress() && screen.getTeleportButton().getBoundingRectangle().contains(point.x, point.y))
             screen.getTeleportButton().touchUp();
         return true;
     }
@@ -101,8 +105,9 @@ public class GenerateInputHandler implements InputProcessor{
             screen.getStart().focused();
         else
             screen.getStart().unfocused();
-        if(screen.getTeleportButton().getBoundingRectangle().contains(point.x, point.y))
+        if(screen.getTeleportButton().getBoundingRectangle().contains(point.x, point.y)) {
             screen.getTeleportButton().focused();
+        }
         else
             screen.getTeleportButton().unfocused();
         screen.setSelectedNode(LevelManager.graph.getNodeByXY((int) point.x, (int)point.y));

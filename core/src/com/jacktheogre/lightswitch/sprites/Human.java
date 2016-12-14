@@ -1,6 +1,7 @@
 package com.jacktheogre.lightswitch.sprites;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -27,7 +28,7 @@ public class Human extends Actor {
 
     private final int WIDTH = 22;
     private final int HEIGHT = 26;
-    public static final int MAX_SPEED = 80;
+    public static final int MAX_SPEED = 75;
 
     public Human(World world, float x, float y) {
         super(world, x, y, Assets.getAssetLoader().link); // TODO: 18.10.16 get texture from atlas
@@ -142,10 +143,15 @@ public class Human extends Actor {
     }
 
     public State getState() {
-        if(b2body.getLinearVelocity().x == 0 && b2body.getLinearVelocity().y == 0)
+        if(b2body.getLinearVelocity().x == 0 && b2body.getLinearVelocity().y == 0) {
+//            Assets.getAssetLoader().runningSound.pause();
             return State.STANDING;
-        else
+        }
+        else {
+//            if(previousState == State.STANDING)
+//                Assets.getAssetLoader().runningSound.setVolume(Assets.getAssetLoader().runningSound.loop(), 0.3f);
             return State.RUNNING;
+        }
     }
 
 

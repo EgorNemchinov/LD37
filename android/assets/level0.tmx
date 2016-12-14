@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="15" height="10" tilewidth="16" tileheight="16" nextobjectid="31">
- <tileset firstgid="1" name="tiles" tilewidth="16" tileheight="16" tilecount="3" columns="3">
-  <image source="tiles.png" width="48" height="16"/>
+ <tileset firstgid="1" name="tiles" tilewidth="16" tileheight="16" tilecount="9" columns="9">
+  <image source="tiles.png" width="144" height="16"/>
  </tileset>
  <layer name="background" width="15" height="10">
   <data encoding="base64" compression="zlib">
-   eJxjZmBgYB7Fo5jKGAAVUgHD
+   eJxjYKAMMAMxC5QmhGHqkPXiU4cNE9KLzxwYYMGjhlx7qeVmWuglxo+4wopcAAB+RwFC
   </data>
  </layer>
  <layer name="walls" width="15" height="10">
   <data encoding="base64" compression="zlib">
-   eJxjYmBgYKIAkwOQ9TKiYQY0cXQ2ul5cgBGLGmrpJRWQYy8u/xITVtjsJRVQkiZAGACM+AB2
+   eJxjZ2BgYCIDswExOwN5AFkvIxpmQBNHZ6PrxQUYsaihll5SATn24vIvMWGFzV5SAUgvJxCzkoE5gBgA/ZwA+w==
   </data>
  </layer>
  <layer name="static_objects" width="15" height="10">

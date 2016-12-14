@@ -17,7 +17,7 @@ public class LevelManager {
     public static GraphImp graph;
     public static int tilePixelWidth;
     public static int tilePixelHeight;
-
+    
     public static void loadLevel(TiledMap map) {
         tiledMap = map;
 

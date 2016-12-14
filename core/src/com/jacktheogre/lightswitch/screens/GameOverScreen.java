@@ -23,6 +23,8 @@ public class GameOverScreen implements Screen{
     private LightSwitch game;
     private OrthographicCamera gameCam;
     private Viewport gamePort;
+    private Sprite next_level;
+
     public enum State {WIN, LOSE}
     private State state;
 
@@ -35,9 +37,13 @@ public class GameOverScreen implements Screen{
         gameCam = new OrthographicCamera();
         gamePort = new FitViewport(LightSwitch.WIDTH, LightSwitch.HEIGHT, gameCam);
         gameCam.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
+
         replay = new Sprite(Assets.getAssetLoader().replay_button);
-        replay.setPosition(gamePort.getWorldWidth() / 2 - replay.getWidth() / 2, gamePort.getWorldHeight() / 2 - replay.getHeight() / 2 - 80);
+        replay.setPosition(gamePort.getWorldWidth() / 2 - replay.getWidth() - 5, gamePort.getWorldHeight() / 2 - replay.getHeight() / 2 - 80);
         replay.setScale(2, 2);
+        next_level = new Sprite(Assets.getAssetLoader().next_level_button);
+        next_level.setPosition(replay.getX()+2*replay.getWidth() + 5, replay.getY());
+        next_level.setScale(1);
     }
 
     @Override
@@ -53,6 +59,8 @@ public class GameOverScreen implements Screen{
         game.batch.setProjectionMatrix(gameCam.combined);
         game.batch.begin();
         replay.draw(game.batch);
+        if(!Assets.getAssetLoader().isMaxLevel() && state == State.WIN)
+            next_level.draw(game.batch);
         switch (state) {
             case WIN:
                 Assets.getAssetLoader().font.draw(game.batch, "YOU",
@@ -87,6 +95,12 @@ public class GameOverScreen implements Screen{
             Vector3 point = gamePort.unproject(screenTouch.cpy());
             if(replay.getBoundingRectangle().contains(point.x,point.y))
                 game.setScreen(new GeneratingScreen(game));
+            else if(next_level.getBoundingRectangle().contains(point.x,point.y)) {
+                if(!Assets.getAssetLoader().isMaxLevel() && state == State.WIN)
+                    Assets.getAssetLoader().nextLevel();
+                game.setScreen(new GeneratingScreen(game));
+            }
+
         }
     }
 

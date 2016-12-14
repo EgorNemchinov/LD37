@@ -30,7 +30,7 @@ public class B2WorldCreator {
 
     public B2WorldCreator(GeneratingScreen screen) {
         world = screen.getWorld();
-        map = Assets.getAssetLoader().map;
+        map = Assets.getAssetLoader().getMap();
         objects = new Array<InteractiveObject>();
 
         int actorCount = 0;

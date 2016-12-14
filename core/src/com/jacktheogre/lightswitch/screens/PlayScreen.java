@@ -82,6 +82,10 @@ public class PlayScreen implements Screen{
         shapeRenderer.setAutoShapeType(true);
 
         objects = screen.getObjects();
+        for (InteractiveObject obj : objects) {
+            obj.initPhysics();
+        }
+
 
         commandHandler = screen.getCommandHandler();
         commandHandler.setScreen(this);
@@ -124,6 +128,10 @@ public class PlayScreen implements Screen{
         if (commandHandler.newCommands()) {
             commandHandler.executeCommandsPlay();
         }
+        for (InteractiveObject object :objects) {
+            object.update(dt);
+        }
+
         player.update(dt);
         enemyPlayer.update(dt);
         world.step(1 / 60f, 6, 2);
@@ -155,7 +163,7 @@ public class PlayScreen implements Screen{
         game.batch.setProjectionMatrix(gameCam.combined);
         game.batch.begin();
         for (InteractiveObject object : objects) {
-            object.render(game.batch);
+            object.render(game.batch, dt);
         }
         game.batch.end();
 
@@ -181,7 +189,7 @@ public class PlayScreen implements Screen{
 
 //        LevelManager.graph.render(shapeRenderer);
 //        b2dRenderer.render(world, gameCam.combined);
-//        player.getActor().getPath().render(shapeRenderer);
+        player.getActor().getPath().render(shapeRenderer);
 //        enemyPlayer.getEnemy().getPath().render(shapeRenderer);
 
         //fpsLogger.log();

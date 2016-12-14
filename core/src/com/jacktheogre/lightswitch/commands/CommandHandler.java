@@ -35,7 +35,9 @@ public class CommandHandler {
     }
 
     public void addCommand(Command command) {
-        for (int i = 0; i < (commands.size() - pointer); i++) {
+        int pops = commands.size() - pointer;
+//        Gdx.app.log("iterations", ""+(commands.size()-pointer));
+        for (int i = 0; i < pops; i++) {
             commands.pop();
         }
         commands.push(command);
@@ -113,6 +115,7 @@ public class CommandHandler {
             pointer--;
 //            Gdx.app.log("GameWorld", "Undoing "+commands.get(pointer));
             commands.get(pointer).undo();
+            ((GeneratingScreen)screen).getRedo().enable();
 //            if(pointer == 0)
 //                ((GeneratingScreen)screen).getUndo().disable();
 //            else
@@ -127,9 +130,12 @@ public class CommandHandler {
 
     public boolean redo() {
         if(pointer < commands.size()) {
-            Gdx.app.log("GameWorld", "Redoing "+commands.get(pointer));
+//            Gdx.app.log("GameWorld", "Redoing "+commands.get(pointer));
             commands.get(pointer).redo();
             pointer++;
+            ((GeneratingScreen)screen).getUndo().enable();
+            if(commands.size() == pointer)
+                ((GeneratingScreen)screen).getRedo().disable();
 //            if(pointer == commands.size()-1)
 //                ((GeneratingScreen)screen).getRedo().disable();
 //            else

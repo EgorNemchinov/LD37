@@ -27,7 +27,6 @@ public abstract class Actor extends Sprite {
 
     protected Fixture fixture;
     protected Agent agent;
-    protected boolean teleportCollide;
 
     public enum Direction {RIGHT, LEFT, UP, DOWN;}
     protected Direction direction;
@@ -79,7 +78,6 @@ public abstract class Actor extends Sprite {
         curPosition = new Vector2(x,y);
         nextPosition = curPosition;
         agent = new Agent(world);
-        teleportCollide = true;
         keyboardControl = false;
     }
 
@@ -89,7 +87,6 @@ public abstract class Actor extends Sprite {
             if(teleportTime > Constants.TELEPORT_INTERVAL) {
                 teleportTime = 0;
                 teleportReady = true;
-                setCollideTeleport(true);
             }
         }
         if(keyboardControl) {
@@ -159,6 +156,7 @@ public abstract class Actor extends Sprite {
     }
 
     public void remakePath() {
+        currentNodePointer = 0;
         agent.makePath(this);
     }
 
@@ -213,36 +211,12 @@ public abstract class Actor extends Sprite {
         return path;
     }
 
-    public void setTeleportReady(boolean ready) {
-        this.teleportReady = ready;
-    }
-
     public abstract TextureRegion getFrame(float dt);
 
     protected abstract void initGraphics();
 
     public Agent getAgent() {
         return agent;
-    }
-
-    public boolean isTeleportReady() {
-        return teleportReady;
-    }
-
-    public void setCollideTeleport(boolean collide) {
-        if(collide != teleportCollide) {
-            Filter filter = fixture.getFilterData();
-            if(teleportCollide)
-                filter.maskBits ^= Constants.INTERACTIVE_BIT;
-            else
-                filter.maskBits |= Constants.INTERACTIVE_BIT;
-            fixture.setFilterData(filter);
-        }
-        teleportCollide = collide;
-    }
-
-    public boolean isTeleportCollide() {
-        return teleportCollide;
     }
 
     public abstract void dispose();

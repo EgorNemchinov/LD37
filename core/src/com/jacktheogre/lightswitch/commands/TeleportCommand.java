@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.jacktheogre.lightswitch.objects.Teleport;
 import com.jacktheogre.lightswitch.sprites.Actor;
+import com.jacktheogre.lightswitch.tools.Assets;
 
 /**
  * Created by luna on 11.12.16.
@@ -23,11 +24,11 @@ public class TeleportCommand extends ActorCommand {
         if(executed)
             return false;
 //        actor.moveTo(destination.getX(), destination.getY());
-        if(actor.isTeleportReady()) {
+        if(start.isOpen() && destination.isOpen()) {
             actor.b2body.setTransform(new Vector2(destination.getX(), destination.getY()), 0);
-            actor.setTeleportReady(false);
-            actor.setCollideTeleport(false);
             actor.remakePath();
+            start.close();
+            destination.close();
         }
         executed = true;
         return true;

@@ -20,7 +20,7 @@ import box2dLight.RayHandler;
 public class Lighting {
 
     private final Color[] COLORS = {
-        new Color(0xFF/255f, 0xEF/255f, 0x8F/255f, 0.8f), new Color(0xF7/255f, 0xF0/255f, 0x97/255f, 0.8f)
+        new Color(0xed/255f, 0x8a/255f, 0x00/255f, 0.6f), new Color(0xed/255f, 0x8a/255f, 0x00/255f, 0.6f)
     };
 
     //box2dlights
@@ -36,16 +36,11 @@ public class Lighting {
     public Lighting(GeneratingScreen screen) {
         this.screen = screen;
         rayHandler = new RayHandler(screen.getWorld());
-        rayHandler.setAmbientLight(0, 0.15f, 0, 0.20f);
+        rayHandler.setAmbientLight(0.05f, 0.15f, 0.05f, 0.20f);
         rayHandler.setBlurNum(3);
         pointLights = new Array<PointLight>();
-        /*pointLights.add(new PointLight(rayHandler, Constants.LIGHT_RAYS, Color.BLUE, Constants.LIGHT_DISTANCE, 64, 64));
-        pointLights.add(new PointLight(rayHandler, Constants.LIGHT_RAYS, Color.BROWN, Constants.LIGHT_DISTANCE, 200, 112));
-        pointLights.add(new PointLight(rayHandler, Constants.LIGHT_RAYS, Color.PINK, Constants.LIGHT_DISTANCE, 300, 64));
-        pointLights.add(new PointLight(rayHandler, Constants.LIGHT_RAYS, Color.FOREST, Constants.LIGHT_DISTANCE, 400, 120));
-        pointLights.add(new PointLight(rayHandler, Constants.LIGHT_RAYS, Color.OLIVE, Constants.LIGHT_DISTANCE, 550, 100));*/
 
-        actorLight = new PointLight(rayHandler, Constants.LIGHT_RAYS, new Color(0xF1/255f, 0x91/255f, 0x22/255f, 0.8f), 0.6f*Constants.LIGHT_DISTANCE , 550, 100);
+        actorLight = new PointLight(rayHandler, Constants.LIGHT_RAYS, new Color(0xb6/255f, 0xFF/255f, 0xDB/255f, 0.8f), 0.6f*Constants.LIGHT_DISTANCE , 550, 100);
         transformActorLight(actorLight);
 
         actorLightFilter = new Filter();

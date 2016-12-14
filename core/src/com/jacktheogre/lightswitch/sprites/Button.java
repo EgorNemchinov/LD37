@@ -1,5 +1,6 @@
 package com.jacktheogre.lightswitch.sprites;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -23,6 +24,7 @@ public class Button extends Sprite {
     private boolean disabled = false;
     private boolean pressed = false;
     private boolean focused = false;
+    private boolean autoUnpress = true;
 
     private GeneratingScreen screen;
 
@@ -69,11 +71,21 @@ public class Button extends Sprite {
                 region = pressedTexture;
                 break;
             case DISABLED:
+                region = disabledTexture;
+                break;
             default:
                 region = disabledTexture;
                 break;
         }
         return region;
+    }
+
+    public void setAutoUnpress(boolean autoUnpress) {
+        this.autoUnpress = autoUnpress;
+    }
+
+    public boolean isAutoUnpress() {
+        return autoUnpress;
     }
 
     public boolean press(){
@@ -125,12 +137,16 @@ public class Button extends Sprite {
     }
 
     public void unfocused() {
+        if(!focused)
+            return;
         focused = false;
         if(!disabled) {
-            if(!pressed)
+            if(!pressed) {
                 setState(State.ACTIVE);
-            else
+            }
+            else {
                 setState(State.PRESSED);
+            }
         }
         else {
             setState(State.DISABLED);
@@ -148,7 +164,9 @@ public class Button extends Sprite {
     }
 
     public void setState(State state) {
-        if(state != State.DISABLED)
+        if(!disabled)
             this.state = state;
+        else
+            this.state = State.DISABLED;
     }
 }
