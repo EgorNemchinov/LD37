@@ -15,7 +15,7 @@ import com.jacktheogre.lightswitch.tools.Assets;
  * Created by luna on 10.12.16.
  */
 public class Enemy extends Actor {
-    private static final int MAX_SPEED = 70 + 10*Assets.getAssetLoader().getLevelNum();
+    private static final int SPEED_BASE = 70 ;
     private final int WIDTH = 30, HEIGHT = 30;
 
     public enum State {RUNNING, STANDING}
@@ -175,6 +175,6 @@ public class Enemy extends Actor {
 
     @Override
     public int getSpeed() {
-        return MAX_SPEED;
+        return SPEED_BASE+8*Assets.getAssetLoader().getLevelNum();
     }
 }

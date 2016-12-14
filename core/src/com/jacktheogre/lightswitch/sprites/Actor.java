@@ -27,19 +27,21 @@ public abstract class Actor extends Sprite {
 
     protected Fixture fixture;
     protected Agent agent;
+    private boolean remakingPath;
 
     public enum Direction {RIGHT, LEFT, UP, DOWN;}
+
     protected Direction direction;
-
     protected Direction lastDirection;
-    public Body b2body;
 
+    public Body b2body;
     protected Filter filter, transparent;
 
     protected World world;
-    protected float stateTimer;
 
+    protected float stateTimer;
     protected Animation playerRunLeft;
+
     protected Animation playerRunRight;
     protected Animation playerRunUp;
     protected Animation playerRunDown;
@@ -48,12 +50,11 @@ public abstract class Actor extends Sprite {
     protected TextureRegion playerStandUp;
     protected TextureRegion playerStandDown;
     protected Vector2 target;
-
     protected int currentNodePointer;
+
     protected GraphPathImp path;
     protected Vector2 curPosition, nextPosition;
     protected Texture texture;
-
     protected float xVel, yVel;
 
     protected boolean keyboardControl;
@@ -112,9 +113,10 @@ public abstract class Actor extends Sprite {
             Vector2 step = nextPosition.cpy().sub(curPosition).nor().scl(getSpeed());
             b2body.setLinearVelocity(step);
         }
-        setPosition(b2body.getPosition().x - getWidth() / 2 , b2body.getPosition().y - getHeight() / 2 );
+        setPosition(b2body.getPosition().x - getWidth() / 2 , b2body.getPosition().y - getHeight() / 2 + 4 );
         setRegion(getFrame(dt));
     }
+
     public Direction getDirection() {
         xVel = b2body.getLinearVelocity().x;
         yVel = b2body.getLinearVelocity().y;
@@ -141,7 +143,6 @@ public abstract class Actor extends Sprite {
         }
         return lastDirection;
     }
-
     public Direction getCurDirection() {
         return direction;
     }
@@ -156,8 +157,12 @@ public abstract class Actor extends Sprite {
     }
 
     public void remakePath() {
-        currentNodePointer = 0;
-        agent.makePath(this);
+        if(remakingPath)
+        {
+            currentNodePointer = 0;
+            agent.makePath(this);
+            setRemakingPath(false);
+        }
     }
 
     public Vector2 getVelocity() {
@@ -220,13 +225,13 @@ public abstract class Actor extends Sprite {
     }
 
     public abstract void dispose();
+
     public abstract int getSpeed();
     protected abstract void initialize();
-
-
     private void setTransparent() {
         fixture.setFilterData(transparent);
     }
+
 
     private void setSolid() {
         fixture.setFilterData(filter);
@@ -254,6 +259,10 @@ public abstract class Actor extends Sprite {
 
     public void setNextPosition(Vector2 nextPosition) {
         this.nextPosition = nextPosition;
+    }
+
+    public void setRemakingPath(boolean remakingPath) {
+        this.remakingPath = remakingPath;
     }
 
 

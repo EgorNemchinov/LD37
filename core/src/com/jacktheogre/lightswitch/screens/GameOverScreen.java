@@ -64,7 +64,7 @@ public class GameOverScreen implements Screen{
         switch (state) {
             case WIN:
                 Assets.getAssetLoader().font.draw(game.batch, "YOU",
-                        gamePort.getWorldWidth() / 2 - 1.5f* AssetLoader.LETTER_WIDTH,
+                        gamePort.getWorldWidth() / 2 - 2f* AssetLoader.LETTER_WIDTH,
                         gamePort.getWorldHeight() / 2 + 1.2f * AssetLoader.LETTER_HEIGHT);
                 Assets.getAssetLoader().font.draw(game.batch, "WIN!",
                         gamePort.getWorldWidth() / 2 - 2f* AssetLoader.LETTER_WIDTH,
@@ -73,7 +73,7 @@ public class GameOverScreen implements Screen{
             case LOSE:
                 Assets.getAssetLoader().font.draw(game.batch, "GAME",
                         gamePort.getWorldWidth() / 2 - 2f* AssetLoader.LETTER_WIDTH,
-                        gamePort.getWorldHeight() / 2 + 1.2f * AssetLoader.LETTER_HEIGHT);
+                        gamePort.getWorldHeight() / 2 + 1.3f * AssetLoader.LETTER_HEIGHT);
                 Assets.getAssetLoader().font.draw(game.batch, "OVER",
                         gamePort.getWorldWidth() / 2 - 2f* AssetLoader.LETTER_WIDTH,
                         gamePort.getWorldHeight() / 2);

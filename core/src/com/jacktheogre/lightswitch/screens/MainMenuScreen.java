@@ -35,6 +35,7 @@ public class MainMenuScreen implements Screen{
 
         loader = Assets.getAssetLoader();
         loader.load();
+        loader.nullifyLevel();
 
         play_button = new Button(Assets.getAssetLoader().play_button, Button.State.ACTIVE);
         play_button.setPosition(gamePort.getWorldWidth() / 2 - play_button.getWidth() / 2, gamePort.getWorldHeight() / 2 - play_button.getHeight() / 2);

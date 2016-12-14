@@ -96,6 +96,9 @@ public class GeneratingScreen implements Screen{
         LevelManager.loadLevel(loader.getMap());
         lighting = new Lighting(this);
         new B2WorldCreator(this);
+        if(!addable()) {
+            teleportButton.disable();
+        }
 
         shapeRenderer = new ShapeRenderer();
         shapeRenderer.setProjectionMatrix(gameCam.combined);

@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.jacktheogre.lightswitch.Constants;
 import com.jacktheogre.lightswitch.Hud;
@@ -105,10 +106,10 @@ public class PlayScreen implements Screen{
     private void makeTeleportConnections() {
 
         for (int i = 0; i < objects.size; i++) {
-            if(Teleport.class.isInstance(objects.get(i))) {
+            if(ClassReflection.isInstance(Teleport.class, objects.get(i))) {
                 Teleport tp = (Teleport) objects.get(i);
                 for (int j = 0; j < objects.size; j++) {
-                    if(Teleport.class.isInstance(objects.get(j)) && j != i) {
+                    if(ClassReflection.isInstance(Teleport.class, objects.get(j)) && j != i) {
                         Teleport tpIns = (Teleport) objects.get(j);
                         tp.addTeleport(tpIns);
                     }
@@ -135,6 +136,7 @@ public class PlayScreen implements Screen{
         player.update(dt);
         enemyPlayer.update(dt);
         world.step(1 / 60f, 6, 2);
+        player.getActor().remakePath();
 
 //        lerpCamera(player.getActor().b2body.getPosition().x, player.getActor().b2body.getPosition().y , dt);
         lerpCamera(gamePort.getWorldWidth() / 4, gamePort.getWorldHeight() / 4, dt);
@@ -189,7 +191,7 @@ public class PlayScreen implements Screen{
 
 //        LevelManager.graph.render(shapeRenderer);
 //        b2dRenderer.render(world, gameCam.combined);
-        player.getActor().getPath().render(shapeRenderer);
+//        player.getActor().getPath().render(shapeRenderer);
 //        enemyPlayer.getEnemy().getPath().render(shapeRenderer);
 
         //fpsLogger.log();
