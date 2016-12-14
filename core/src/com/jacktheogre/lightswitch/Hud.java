@@ -50,7 +50,7 @@ public class Hud implements Disposable{
         table.setFillParent(true);
         table.top();
 
-        timeLabel = new Label(String.format("%d", (int) Constants.PLAYTIME), new Label.LabelStyle(Assets.getAssetLoader().font, new Color(0xb6/255F, 0XFf/255f, 0xcb/255f, 1f)));
+        timeLabel = new Label(Constants.PLAYTIME+"", new Label.LabelStyle(Assets.getAssetLoader().font, new Color(0xb6/255F, 0XFf/255f, 0xcb/255f, 1f)));
         timeLabel.setFontScale(0.6f);
 //        timeLabel.setPosition(timer.getX() + 2, timer.getY() - 4 );
         timeLabel.setBounds(timer.getX() + 5, timer.getY() + 2, timer.getWidth() - 6, timer.getHeight() - 4);
@@ -82,7 +82,7 @@ public class Hud implements Disposable{
 //    }
 
     public void update() {
-        timeLabel.setText(String.format("%d", (int)(Constants.PLAYTIME - screen.getRunTime())));
+        timeLabel.setText(((int)(Constants.PLAYTIME - screen.getRunTime()))+"");
         fill.setScale(scale.getScaleX(), scale.getScaleY()*screen.getEnergy()/100f);
     }
 

@@ -15,8 +15,8 @@ import com.jacktheogre.lightswitch.ai.LevelManager;
  */
 public class AssetLoader {
 
-    public static final float FONT_SCALE = 1f;
-    public static final float LETTER_WIDTH = 15f * FONT_SCALE;
+    public static final float FONT_SCALE = 1.5f;
+    public static final float LETTER_WIDTH = 20f * FONT_SCALE;
     public static final float LETTER_HEIGHT = 15 * FONT_SCALE;
     public static final int LEVEL_AMOUNT = 2;
     private AssetManager manager;
@@ -55,7 +55,7 @@ public class AssetLoader {
         manager.finishLoading();
 
         for (int i = 0; i < LEVEL_AMOUNT; i++) {
-            maps[i] = mapLoader.load(String.format("level%d.tmx", i));
+            maps[i] = mapLoader.load("level"+i+".tmx");
         }
         ghost = manager.get("ghost.png",Texture.class);
         link = manager.get("char.png", Texture.class);

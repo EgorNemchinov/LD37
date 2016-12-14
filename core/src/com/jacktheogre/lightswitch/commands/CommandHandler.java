@@ -2,6 +2,7 @@ package com.jacktheogre.lightswitch.commands;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
 import com.jacktheogre.lightswitch.sprites.Actor;
@@ -26,9 +27,9 @@ public class CommandHandler {
 
     public void update(float dt) {
         if(newCommands) {
-            if (PlayScreen.class.isInstance(screen)) {
+            if (ClassReflection.isInstance(PlayScreen.class, screen)) {
                 executeCommandsPlay();
-            } else if (GeneratingScreen.class.isInstance(screen)) {
+            } else if (ClassReflection.isInstance(GeneratingScreen.class, screen)) {
                 executeCommandsGenerate();
             }
         }
@@ -48,12 +49,12 @@ public class CommandHandler {
         PlayScreen screen = (PlayScreen) this.screen;
         for (int i = pointer; i < commands.size(); i++) {
             if(commands.get(i) != null) {
-                if(ActorCommand.class.isInstance(commands.get(i))){
+                if(ClassReflection.isInstance(ActorCommand.class, commands.get(i))){
                     ActorCommand cmd = (ActorCommand)commands.get(i);
                     if(cmd.actor == null)
                         cmd.execute(screen.getPlayer().getActor());
                     else cmd.execute(cmd.actor);
-                } else if(GlobalCommand.class.isInstance(commands.get(i))){
+                } else if(ClassReflection.isInstance(GlobalCommand.class, commands.get(i))){
                     ((GlobalCommand)commands.get(i)).execute();
                 }
             }
@@ -67,7 +68,7 @@ public class CommandHandler {
         GeneratingScreen screen = (GeneratingScreen) this.screen;
         for (int i = pointer; i < commands.size(); i++) {
             if(commands.get(i) != null) {
-                 if(GlobalCommand.class.isInstance(commands.get(i))){
+                 if(ClassReflection.isInstance(GlobalCommand.class, commands.get(i))){
                     ((GlobalCommand)commands.get(i)).execute();
                 }
             }
@@ -84,7 +85,7 @@ public class CommandHandler {
     public void stopMoving(Actor.Direction direction) {
         for (int i = commands.size() - 1; i >= 0 ; i--) {
             Command cmd = commands.get(i);
-            if(StartMovingCommand.class.isInstance(cmd)) {
+            if(ClassReflection.isInstance(StartMovingCommand.class, cmd)) {
                 if (((StartMovingCommand) cmd).getDirection() == direction) {
                     if (!((StartMovingCommand) cmd).disabled)
                         ((StartMovingCommand) cmd).disabled = true;
@@ -93,10 +94,10 @@ public class CommandHandler {
         }
         for (int i = commands.size() - 1; i >= 0 ; i--) {
             Command cmd = commands.get(i);
-            if(StopCommand.class.isInstance(cmd) || MoveToCommand.class.isInstance(cmd)) {
+            if(ClassReflection.isInstance(StopCommand.class, cmd) || ClassReflection.isInstance(MoveToCommand.class, cmd)) {
                 addCommand(new StopCommand());
                 return;
-            } else if(StartMovingCommand.class.isInstance(cmd)) {
+            } else if(ClassReflection.isInstance(StartMovingCommand.class, cmd)) {
                 if(((StartMovingCommand) cmd).getDirection() != direction) {
                     if(((StartMovingCommand) cmd).disabled) {
                         continue;

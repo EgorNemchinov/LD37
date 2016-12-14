@@ -2,6 +2,7 @@ package com.jacktheogre.lightswitch.commands;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
 import com.jacktheogre.lightswitch.tools.Lighting;
 
@@ -16,7 +17,7 @@ public class TurnOffCommand extends GlobalCommand{
 
     public TurnOffCommand(Screen screen) {
         super(screen);
-        if(PlayScreen.class.isInstance(screen)) {
+        if(ClassReflection.isInstance(PlayScreen.class, screen)) {
             this.screen = (PlayScreen) screen;
         }
         this.lighting = this.screen.getLighting();

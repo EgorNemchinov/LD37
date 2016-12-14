@@ -26,7 +26,7 @@ public class TeleportCommand extends ActorCommand {
 //        actor.moveTo(destination.getX(), destination.getY());
         if(start.isOpen() && destination.isOpen()) {
             actor.b2body.setTransform(new Vector2(destination.getX(), destination.getY()), 0);
-            actor.remakePath();
+            actor.setRemakingPath(true);
             start.close();
             destination.close();
         }
