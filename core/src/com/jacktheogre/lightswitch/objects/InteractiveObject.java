@@ -49,7 +49,7 @@ public abstract class InteractiveObject {
         this.world = screen.getWorld();
         this.x = x;
         this.y = y;
-        this.bounds = new Circle((x + LevelManager.tilePixelWidth / 2), (y + LevelManager.tilePixelHeight/ 2), LevelManager.tilePixelWidth / 2);
+        this.bounds = new Circle((x + LevelManager.tilePixelWidth / 2), (y + LevelManager.tilePixelHeight/ 2), LevelManager.tilePixelWidth / 2 - 1);
 
         if(initPhysics)
             initPhysics();

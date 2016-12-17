@@ -41,4 +41,10 @@ public class StartMovingCommand extends ActorCommand{
         actor.setKeyboardControl(true);
         actor.setDirection(direction);
     }
+
+
+    @Override
+    public String toString() {
+        return "StartMovingCommand. Direction: "+direction;
+    }
 }

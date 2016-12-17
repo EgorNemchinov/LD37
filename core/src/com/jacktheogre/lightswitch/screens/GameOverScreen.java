@@ -6,30 +6,37 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.jacktheogre.lightswitch.LightSwitch;
+import com.jacktheogre.lightswitch.sprites.Button;
 import com.jacktheogre.lightswitch.tools.AssetLoader;
 import com.jacktheogre.lightswitch.tools.Assets;
+import com.jacktheogre.lightswitch.tools.GameOverInputHandler;
 
 /**
  * Created by luna on 10.12.16.
  */
 public class GameOverScreen implements Screen{
 
+    private static final float INTERVAL = 10;
+    private static final float SCALE = 1.5f;
+
     private LightSwitch game;
     private OrthographicCamera gameCam;
     private Viewport gamePort;
-    private Sprite next_level;
+
+    public State getState() {
+        return state;
+    }
 
     public enum State {WIN, LOSE}
     private State state;
-
-    private Sprite replay;
-    private Rectangle bounds;
+    private Button next_level, replay, home;
 
     public GameOverScreen(LightSwitch game, State state) {
         this.game = game;
@@ -38,12 +45,24 @@ public class GameOverScreen implements Screen{
         gamePort = new FitViewport(LightSwitch.WIDTH, LightSwitch.HEIGHT, gameCam);
         gameCam.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
 
-        replay = new Sprite(Assets.getAssetLoader().replay_button);
-        replay.setPosition(gamePort.getWorldWidth() / 2 - replay.getWidth() - 5, gamePort.getWorldHeight() / 2 - replay.getHeight() / 2 - 80);
-        replay.setScale(2, 2);
-        next_level = new Sprite(Assets.getAssetLoader().next_level_button);
-        next_level.setPosition(replay.getX()+2*replay.getWidth() + 5, replay.getY());
-        next_level.setScale(1);
+        replay = new Button(Assets.getAssetLoader().replay_button, Button.State.ACTIVE);
+        replay.setPosition(gamePort.getWorldWidth() / 2 - 2f*replay.getWidth()-INTERVAL, gamePort.getWorldHeight() / 2 - replay.getHeight() / 2 - 80);
+        replay.setScale(SCALE);
+
+        next_level = new Button(Assets.getAssetLoader().next_level_button);
+        next_level.setPosition(replay.getBoundingRectangle().getX()+replay.getBoundingRectangle().getWidth() + INTERVAL, replay.getY());
+        if(!Assets.getAssetLoader().isMaxLevel() && state == State.WIN)
+            next_level.enable();
+        else
+            next_level.disable();
+        next_level.setScale(SCALE);
+
+
+        home = new Button(Assets.getAssetLoader().home_button, Button.State.ACTIVE);
+        home.setPosition(next_level.getBoundingRectangle().getX()+next_level.getBoundingRectangle().getWidth() + INTERVAL, next_level.getY());
+        home.setScale(SCALE);
+
+        Gdx.input.setInputProcessor(new GameOverInputHandler(this));
     }
 
     @Override
@@ -51,29 +70,45 @@ public class GameOverScreen implements Screen{
 
     }
 
+    public Viewport getGamePort() {
+        return gamePort;
+    }
+
+    public LightSwitch getGame() {
+        return game;
+    }
+
     @Override
     public void render(float delta) {
-        handleInput(delta);
         Gdx.gl.glClearColor(0f, 0f, 0.1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         game.batch.setProjectionMatrix(gameCam.combined);
         game.batch.begin();
         replay.draw(game.batch);
-        if(!Assets.getAssetLoader().isMaxLevel() && state == State.WIN)
-            next_level.draw(game.batch);
+        next_level.draw(game.batch);
+        home.draw(game.batch);
         switch (state) {
             case WIN:
-                Assets.getAssetLoader().font.draw(game.batch, "YOU",
-                        gamePort.getWorldWidth() / 2 - 2f* AssetLoader.LETTER_WIDTH,
-                        gamePort.getWorldHeight() / 2 + 1.2f * AssetLoader.LETTER_HEIGHT);
-                Assets.getAssetLoader().font.draw(game.batch, "WIN!",
-                        gamePort.getWorldWidth() / 2 - 2f* AssetLoader.LETTER_WIDTH,
-                        gamePort.getWorldHeight() / 2);
+                if(Assets.getAssetLoader().isMaxLevel()) {
+                    Assets.getAssetLoader().font.getData().setScale(1f);
+                    Assets.getAssetLoader().font.draw(game.batch, "CONGRATULATIONS!",
+                            gamePort.getWorldWidth() / 2 - 7.5f* Assets.getAssetLoader().getLetterWidth(),
+                            gamePort.getWorldHeight() / 2);
+                    Assets.getAssetLoader().font.getData().setScale(Assets.getAssetLoader().FONT_SCALE);
+                } else {
+
+                    Assets.getAssetLoader().font.draw(game.batch, "YOU",
+                            gamePort.getWorldWidth() / 2 - 2f* AssetLoader.LETTER_WIDTH,
+                            gamePort.getWorldHeight() / 2 + 1.2f * AssetLoader.LETTER_HEIGHT);
+                    Assets.getAssetLoader().font.draw(game.batch, "WIN!",
+                            gamePort.getWorldWidth() / 2 - 2f* AssetLoader.LETTER_WIDTH,
+                            gamePort.getWorldHeight() / 2);
+                }
                 break;
             case LOSE:
                 Assets.getAssetLoader().font.draw(game.batch, "GAME",
-                        gamePort.getWorldWidth() / 2 - 2f* AssetLoader.LETTER_WIDTH,
-                        gamePort.getWorldHeight() / 2 + 1.3f * AssetLoader.LETTER_HEIGHT);
+                                gamePort.getWorldWidth() / 2 - 2f* AssetLoader.LETTER_WIDTH,
+                                gamePort.getWorldHeight() / 2 + 1.3f * AssetLoader.LETTER_HEIGHT);
                 Assets.getAssetLoader().font.draw(game.batch, "OVER",
                         gamePort.getWorldWidth() / 2 - 2f* AssetLoader.LETTER_WIDTH,
                         gamePort.getWorldHeight() / 2);
@@ -89,19 +124,16 @@ public class GameOverScreen implements Screen{
         shapeRenderer.end();*/
     }
 
-    private void handleInput(float dt) {
-        if(Gdx.input.justTouched()) {
-            Vector3 screenTouch = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-            Vector3 point = gamePort.unproject(screenTouch.cpy());
-            if(replay.getBoundingRectangle().contains(point.x,point.y))
-                game.setScreen(new GeneratingScreen(game));
-            else if(next_level.getBoundingRectangle().contains(point.x,point.y)) {
-                if(!Assets.getAssetLoader().isMaxLevel() && state == State.WIN)
-                    Assets.getAssetLoader().nextLevel();
-                game.setScreen(new GeneratingScreen(game));
-            }
+    public Button getNext_level() {
+        return next_level;
+    }
 
-        }
+    public Button getReplay() {
+        return replay;
+    }
+
+    public Button getHome() {
+        return home;
     }
 
     @Override

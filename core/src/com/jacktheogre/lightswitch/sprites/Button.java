@@ -99,7 +99,8 @@ public class Button extends Sprite {
         }
     }
 
-    public void touchUp() {
+    public boolean touchUp() {
+        boolean wasPressed = pressed;
         pressed = false;
         if(!disabled) {
             if(focused) {
@@ -111,6 +112,7 @@ public class Button extends Sprite {
         } else {
             setState(State.DISABLED);
         }
+        return wasPressed;
     }
 
     public void disable() {
@@ -137,16 +139,13 @@ public class Button extends Sprite {
     }
 
     public void unfocused() {
+        if(pressed)
+            touchUp();
         if(!focused)
             return;
         focused = false;
         if(!disabled) {
-            if(!pressed) {
-                setState(State.ACTIVE);
-            }
-            else {
-                setState(State.PRESSED);
-            }
+            setState(State.ACTIVE);
         }
         else {
             setState(State.DISABLED);
@@ -155,8 +154,8 @@ public class Button extends Sprite {
 
     @Override
     public void draw(Batch batch) {
-        TextureRegion region =getFrame();
-        batch.draw(region, getX(), getY(), region.getRegionWidth(), region.getRegionHeight());
+        TextureRegion region = getFrame();
+        batch.draw(region, getX(), getY(), getBoundingRectangle().getWidth(), getBoundingRectangle().getHeight());
     }
 
     public State getState() {

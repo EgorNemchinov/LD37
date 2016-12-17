@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.jacktheogre.lightswitch.ai.LevelManager;
 import com.jacktheogre.lightswitch.ai.Node;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
+import com.jacktheogre.lightswitch.screens.MainMenuScreen;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
 import com.jacktheogre.lightswitch.sprites.Button;
 
@@ -25,14 +26,41 @@ public class GenerateInputHandler implements InputProcessor{
 
     @Override
     public boolean keyDown(int keycode) {
-        if(Gdx.input.isKeyJustPressed(Input.Keys.ENTER))
-            screen.getGame().setScreen(new PlayScreen(screen));
+        if(keycode == Input.Keys.ENTER) {
+            screen.getStart().press();
+        }
+        if(keycode == Input.Keys.R) {
+            screen.getRedo().press();
+        }
+        if(keycode == Input.Keys.U) {
+            screen.getUndo().press();
+        }
+        if(keycode == Input.Keys.T) {
+            screen.getTeleportButton().press();
+        }
         return true;
     }
 
     @Override
     public boolean keyUp(int keycode) {
-        return false;
+        if(keycode == Input.Keys.ENTER) {
+            if(screen.getStart().touchUp()) {
+                screen.getGame().setScreen(new PlayScreen(screen));
+            }
+        }
+        if(keycode == Input.Keys.R) {
+            if(screen.getRedo().touchUp())
+                screen.getCommandHandler().redo();
+        }
+        if(keycode == Input.Keys.U) {
+            if(screen.getUndo().touchUp())
+                screen.getCommandHandler().undo();
+        }
+        if(keycode == Input.Keys.T) {
+            if(screen.getTeleportButton().touchUp())
+                screen.setState(GeneratingScreen.State.SETTING_TELEPORT);
+        }
+        return true;
     }
 
     @Override
@@ -47,17 +75,12 @@ public class GenerateInputHandler implements InputProcessor{
         Vector3 point = screen.getGamePort().unproject(screenTouch.cpy());
         screenTouch.y = screen.getGamePort().getScreenHeight() - screenTouch.y;
         if(screen.getUndo().getBoundingRectangle().contains(point.x, point.y)) {
-            if(screen.getUndo().press()) {
-                screen.getCommandHandler().undo();
-            }
+            screen.getUndo().press();
         }
-        // TODO: 14.12.16 mb enable undo?
         if(screen.getRedo().getBoundingRectangle().contains(point.x, point.y))
-            if(screen.getRedo().press())
-                screen.getCommandHandler().redo();
+            screen.getRedo().press();
         if(screen.getStart().getBoundingRectangle().contains(point.x, point.y))
-            if(screen.getStart().press())
-                screen.getGame().setScreen(new PlayScreen(screen));
+            screen.getStart().press();
         if(screen.getTeleportButton().getBoundingRectangle().contains(point.x, point.y)) {
             if(screen.getTeleportButton().press())
                 screen.setState(GeneratingScreen.State.SETTING_TELEPORT);
@@ -73,13 +96,22 @@ public class GenerateInputHandler implements InputProcessor{
         Vector3 point = screen.getGamePort().unproject(screenTouch.cpy());
         screenTouch.y = screen.getGamePort().getScreenHeight() - screenTouch.y;
         if(screen.getUndo().isAutoUnpress() && screen.getUndo().getBoundingRectangle().contains(point.x, point.y))
-            screen.getUndo().touchUp();
+            if(screen.getUndo().touchUp())
+                screen.getCommandHandler().undo();
         if(screen.getRedo().isAutoUnpress() && screen.getRedo().getBoundingRectangle().contains(point.x, point.y))
-            screen.getRedo().touchUp();
+            if(screen.getRedo().touchUp()) {
+                screen.getCommandHandler().redo();
+            }
         if(screen.getStart().isAutoUnpress() && screen.getStart().getBoundingRectangle().contains(point.x, point.y))
-            screen.getStart().touchUp();
-        if(screen.getTeleportButton().isAutoUnpress() && screen.getTeleportButton().getBoundingRectangle().contains(point.x, point.y))
-            screen.getTeleportButton().touchUp();
+            if(screen.getStart().touchUp()) {
+                screen.getGame().setScreen(new PlayScreen(screen));
+            }
+        if(screen.getTeleportButton().isAutoUnpress() && screen.getTeleportButton().getBoundingRectangle().contains(point.x, point.y)) {
+            // TODO: 15.12.16 make it work
+        }
+//            if(screen.getTeleportButton().touchUp()) {
+//                screen.setState(GeneratingScreen.State.SETTING_TELEPORT);
+//            }
         return true;
     }
 

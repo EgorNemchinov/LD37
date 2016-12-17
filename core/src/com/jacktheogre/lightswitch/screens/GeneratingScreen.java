@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.jacktheogre.lightswitch.LightSwitch;
@@ -28,6 +29,7 @@ import com.jacktheogre.lightswitch.tools.Assets;
 import com.jacktheogre.lightswitch.tools.B2WorldCreator;
 import com.jacktheogre.lightswitch.tools.GenerateInputHandler;
 import com.jacktheogre.lightswitch.tools.Lighting;
+import com.jacktheogre.lightswitch.screens.PlayScreen;
 
 /**
  * Created by luna on 10.12.16.
@@ -61,11 +63,11 @@ public class GeneratingScreen implements Screen{
     private Node selectedNode;
 
     public GeneratingScreen(LightSwitch game) {
+        Gdx.app.log("GeneratingScreen", "Constructor called");
         this.game = game;
         gameCam = new OrthographicCamera();
 //        staticCam = new OrthographicCamera();
         gamePort = new FitViewport(LightSwitch.WIDTH, LightSwitch.HEIGHT, gameCam);
-        // TODO: 12.12.16 make map in the middle
         gameCam.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
         gameCam.zoom -= 0.2f;
 
@@ -79,7 +81,7 @@ public class GeneratingScreen implements Screen{
         redo = new Button(Assets.getAssetLoader().redo_button, Button.State.ACTIVE);
         start = new Button(Assets.getAssetLoader().start_button, Button.State.ACTIVE);
         teleportButton = new Button(Assets.getAssetLoader().teleport_button, Button.State.ACTIVE);
-        undo.setPosition(10, -30);
+        undo.setPosition(30, -25);
         redo.setPosition(undo.getX() + undo.getWidth()+15, undo.getY());
         start.setPosition(redo.getX() + redo.getWidth()+15, redo.getY());
         teleportButton.setPosition(-teleportButton.getWidth() - 10, 100);
@@ -173,7 +175,7 @@ public class GeneratingScreen implements Screen{
         if(state == State.DEFAULT) {
             shapeRenderer.setColor(DEFAULT);
         } else {
-            if(selectedNode.getConnections().size > 0) {
+            if(selectedNode.getConnections().size > 0 && !existsTeleport()) {
                 shapeRenderer.setColor(CORRECT);
             } else {
                 shapeRenderer.setColor(WRONG);
@@ -223,12 +225,27 @@ public class GeneratingScreen implements Screen{
     }
 
     public void addTeleport() {
-        if(selectedNode.getConnections().size > 0 && state == State.SETTING_TELEPORT) {
+        if(selectedNode.getConnections().size > 0 && state == State.SETTING_TELEPORT && !existsTeleport()) {
             commandHandler.addCommand(new AddTeleportCommand(this, (int) selectedNode.getWorldX() - LevelManager.tilePixelWidth / 2, (int)selectedNode.getWorldY() - LevelManager.tilePixelHeight / 2, objects));
             undo.enable();
             state = State.DEFAULT;
             teleportButton.touchUp();
         }
+    }
+
+    public boolean existsTeleport() {
+        return existsTeleport((int) selectedNode.getWorldX() - LevelManager.tilePixelWidth / 2, (int)selectedNode.getWorldY() - LevelManager.tilePixelHeight / 2);
+    }
+
+    public boolean existsTeleport(int x, int y) {
+        for (InteractiveObject obj : objects) {
+            if(ClassReflection.isInstance(Teleport.class, obj)) {
+                if(((Teleport)obj).getX() == x && ((Teleport)obj).getY() == y) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public EnemyPlayer getEnemyPlayer() {

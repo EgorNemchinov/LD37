@@ -92,6 +92,11 @@ public class Human extends Actor {
         // TODO: 13.12.16 all the disposes
     }
 
+    @Override
+    public void update(float dt) {
+        super.update(dt);
+        setPosition(b2body.getPosition().x - getWidth() / 2 , b2body.getPosition().y - getHeight() / 2 + 5);
+    }
 
     public TextureRegion getFrame(float dt) {
         currentState = getState();
@@ -162,12 +167,12 @@ public class Human extends Actor {
         CircleShape shape = new CircleShape();
         FixtureDef fixtureDef = new FixtureDef();
 
-        bodyDef.position.set(getX(), getY());
+        bodyDef.position.set(getX()+8, getY() +8);
         bodyDef.fixedRotation = true;
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         b2body = world.createBody(bodyDef);
         // TODO: 20.10.16 make good
-        shape.setRadius(8);
+        shape.setRadius(7);
 
         fixtureDef.shape = shape;
         fixtureDef.filter.categoryBits = Constants.ACTOR_BIT;

@@ -7,13 +7,16 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.jacktheogre.lightswitch.LightSwitch;
 import com.jacktheogre.lightswitch.sprites.Button;
 import com.jacktheogre.lightswitch.tools.AssetLoader;
 import com.jacktheogre.lightswitch.tools.Assets;
+import com.jacktheogre.lightswitch.tools.MainMenuInputHandler;
 
 /**
  * Created by luna on 10.12.16.
@@ -35,22 +38,20 @@ public class MainMenuScreen implements Screen{
 
         loader = Assets.getAssetLoader();
         loader.load();
-        loader.nullifyLevel();
+//        loader.nullifyLevel();
+
+//        RectangleMapObject rectangleMapObject = new RectangleMapObject();
+        MapObject object = loader.getMap().getLayers().get(3).getObjects().get(0);
+        if(ClassReflection.isInstance(RectangleMapObject.class, object))
+//            rectangleMapObject = (RectangleMapObject) object;
 
         play_button = new Button(Assets.getAssetLoader().play_button, Button.State.ACTIVE);
         play_button.setPosition(gamePort.getWorldWidth() / 2 - play_button.getWidth() / 2, gamePort.getWorldHeight() / 2 - play_button.getHeight() / 2);
         play_button.setScale(1);
+
+        Gdx.input.setInputProcessor(new MainMenuInputHandler(this));
     }
 
-    public void handleInput(float dt) {
-        if(Gdx.input.justTouched()) {
-            Vector3 screenTouch = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-            Vector3 point = gamePort.unproject(screenTouch.cpy());
-            play_button.press();
-            if(play_button.getBoundingRectangle().contains(point.x,point.y))
-                game.setScreen(new GeneratingScreen(game));
-        }
-    }
 
     @Override
     public void show() {
@@ -59,7 +60,6 @@ public class MainMenuScreen implements Screen{
 
     @Override
     public void render(float delta) {
-        handleInput(delta);
         Gdx.gl.glClearColor(BACKGROUND_COLOR.r,BACKGROUND_COLOR.g, BACKGROUND_COLOR.b, BACKGROUND_COLOR.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         game.batch.setProjectionMatrix(gameCam.combined);
@@ -91,5 +91,17 @@ public class MainMenuScreen implements Screen{
     @Override
     public void dispose() {
 
+    }
+
+    public Button getPlayButton() {
+        return play_button;
+    }
+
+    public LightSwitch getGame() {
+        return game;
+    }
+
+    public Viewport getGamePort() {
+        return gamePort;
     }
 }

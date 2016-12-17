@@ -42,6 +42,7 @@ public class CommandHandler {
             commands.pop();
         }
         commands.push(command);
+//        Gdx.app.log("CMNDHDLR", "COMMAND ADDED: "+commands.peek().toString());
         newCommands = true;
     }
 
@@ -102,7 +103,7 @@ public class CommandHandler {
                     if(((StartMovingCommand) cmd).disabled) {
                         continue;
                     } else {
-                        commands.add(new StartMovingCommand(((StartMovingCommand) cmd).getDirection()));
+                        addCommand(new StartMovingCommand(((StartMovingCommand) cmd).getDirection()));
                         return;
                     }
                 }

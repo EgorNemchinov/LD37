@@ -1,5 +1,6 @@
 package com.jacktheogre.lightswitch.tools;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -10,12 +11,10 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.jacktheogre.lightswitch.Constants;
 import com.jacktheogre.lightswitch.objects.InteractiveObject;
-import com.jacktheogre.lightswitch.objects.Teleport;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
-import com.jacktheogre.lightswitch.screens.PlayScreen;
-import com.jacktheogre.lightswitch.sprites.Actor;
 import com.jacktheogre.lightswitch.sprites.Enemy;
 import com.jacktheogre.lightswitch.sprites.Human;
 
@@ -40,7 +39,9 @@ public class B2WorldCreator {
         Body body;
 
         //walls
-        for (MapObject object : map.getLayers().get(3).getObjects().getByType(RectangleMapObject.class)) {
+        for (MapObject object : map.getLayers().get(3).getObjects()) {
+            if(!ClassReflection.isInstance(RectangleMapObject.class,object))
+                continue;
             Rectangle bounds = ((RectangleMapObject) object).getRectangle();
 
             bodyDef.type = BodyDef.BodyType.StaticBody;
@@ -59,7 +60,9 @@ public class B2WorldCreator {
         }
 
         //static objects
-        for (MapObject object : map.getLayers().get(4).getObjects().getByType(RectangleMapObject.class)) {
+        for (MapObject object : map.getLayers().get(4).getObjects()) {
+            if(!ClassReflection.isInstance(RectangleMapObject.class,object))
+                continue;
             Rectangle bounds = ((RectangleMapObject) object).getRectangle();
 
             bodyDef.type = BodyDef.BodyType.StaticBody;
@@ -78,19 +81,25 @@ public class B2WorldCreator {
         }
 
         //actors
-        for (MapObject object : map.getLayers().get(5).getObjects().getByType(RectangleMapObject.class)) {
+        for (MapObject object : map.getLayers().get(5).getObjects()) {
+            if(!ClassReflection.isInstance(RectangleMapObject.class,object))
+                continue;
             Rectangle bounds = ((RectangleMapObject) object).getRectangle();
             screen.getPlayer().setActor(new Human(world, bounds.getX(), bounds.getY()));
         }
 
         //enemies
-        for (MapObject object : map.getLayers().get(6).getObjects().getByType(RectangleMapObject.class)) {
+        for (MapObject object : map.getLayers().get(6).getObjects()) {
+            if(!ClassReflection.isInstance(RectangleMapObject.class,object))
+                continue;
             Rectangle bounds = ((RectangleMapObject) object).getRectangle();
             screen.getEnemyPlayer().setEnemy(new Enemy(world, bounds.getX(), bounds.getY()));
         }
 
         //lights
-        for (MapObject object : map.getLayers().get(7).getObjects().getByType(RectangleMapObject.class)) {
+        for (MapObject object : map.getLayers().get(7).getObjects()) {
+            if(!ClassReflection.isInstance(RectangleMapObject.class,object))
+                continue;
             Rectangle bounds = ((RectangleMapObject) object).getRectangle();
 
             screen.getLighting().addLight(bounds.getX() + bounds.getWidth() / 2, bounds.getY() + bounds.getHeight() / 2);

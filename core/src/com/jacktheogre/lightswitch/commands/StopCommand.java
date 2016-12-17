@@ -53,4 +53,9 @@ public class StopCommand extends ActorCommand {
         actor.setKeyboardControl(false);
         actor.stop();
     }
+
+    @Override
+    public String toString() {
+        return "StopCommand";
+    }
 }

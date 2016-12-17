@@ -18,7 +18,7 @@ public class StopMovingCommand extends ActorCommand {
         this.actor = actor;
     }
 
-    public  StopMovingCommand(CommandHandler commandHandler, Actor.Direction direction) {
+    public StopMovingCommand(CommandHandler commandHandler, Actor.Direction direction) {
         this.commandHandler = commandHandler;
         commands = commandHandler.getCommands();
         this.direction = direction;
@@ -29,7 +29,7 @@ public class StopMovingCommand extends ActorCommand {
     public boolean execute(Actor actor) {
         if(executed)
             return false;
-
+        commandHandler.stopMoving(direction);
         return true;
     }
 
@@ -41,5 +41,11 @@ public class StopMovingCommand extends ActorCommand {
     @Override
     public void redo() {
 
+    }
+
+
+    @Override
+    public String toString() {
+        return "StopMovingCommand. Direction:"+direction;
     }
 }

@@ -113,8 +113,8 @@ public abstract class Actor extends Sprite {
             Vector2 step = nextPosition.cpy().sub(curPosition).nor().scl(getSpeed());
             b2body.setLinearVelocity(step);
         }
-        setPosition(b2body.getPosition().x - getWidth() / 2 , b2body.getPosition().y - getHeight() / 2 + 4 );
         setRegion(getFrame(dt));
+        setPosition(b2body.getPosition().x - getWidth() / 2 , b2body.getPosition().y - getHeight() / 2 );
     }
 
     public Direction getDirection() {
