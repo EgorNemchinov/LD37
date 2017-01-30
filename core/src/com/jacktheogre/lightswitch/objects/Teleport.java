@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.Array;
 import com.jacktheogre.lightswitch.Constants;
 import com.jacktheogre.lightswitch.commands.TeleportCommand;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
-import com.jacktheogre.lightswitch.sprites.Actor;
+import com.jacktheogre.lightswitch.sprites.GameActor;
 import com.jacktheogre.lightswitch.tools.Assets;
 
 import java.util.Random;
@@ -34,12 +34,17 @@ public class Teleport extends InteractiveObject {
 
 
 
-    public void activate(Actor actor) {
+    public boolean activate(GameActor gameActor) {
         if(others.size > 0){
-            Teleport dest =randomTeleport();
-            if(dest != null)
-                screen.getCommandHandler().addCommand(new TeleportCommand(actor, this, randomTeleport()));
+            Teleport dest = randomTeleport();
+            if(dest != null) {
+                screen.getCommandHandler().addCommand(new TeleportCommand(gameActor, this, dest));
+                return true;
+            } else
+                return false;
         }
+        else
+            return false;
     }
 
     @Override

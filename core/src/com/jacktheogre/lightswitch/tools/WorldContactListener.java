@@ -9,10 +9,7 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 import com.jacktheogre.lightswitch.Constants;
 import com.jacktheogre.lightswitch.objects.InteractiveObject;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
-import com.jacktheogre.lightswitch.sprites.Actor;
-import com.jacktheogre.lightswitch.sprites.Enemy;
-
-import java.util.HashMap;
+import com.jacktheogre.lightswitch.sprites.GameActor;
 
 /**
  * Created by luna on 11.12.16.
@@ -20,10 +17,9 @@ import java.util.HashMap;
 public class WorldContactListener implements ContactListener {
 
     private PlayScreen screen;
-    private HashMap<Fixture, Fixture> fixtures;
+
     public WorldContactListener(PlayScreen screen) {
         this.screen = screen;
-        fixtures = new HashMap<Fixture, Fixture>();
     }
 
     @Override
@@ -35,15 +31,39 @@ public class WorldContactListener implements ContactListener {
         switch(cDef) {
             case Constants.INTERACTIVE_BIT | Constants.ACTOR_BIT:
                 if(fixA.getFilterData().categoryBits == Constants.ACTOR_BIT) {
-                    ((InteractiveObject) fixB.getUserData()).activate((Actor)fixA.getUserData());
+                    if(!((InteractiveObject) fixB.getUserData()).activate((GameActor)fixA.getUserData()))
+                        screen.addFixtureContact(contact);
                 } else {
-                    ((InteractiveObject) fixA.getUserData()).activate((Actor)fixB.getUserData());
+                    if(!((InteractiveObject) fixA.getUserData()).activate((GameActor)fixB.getUserData()))
+                        screen.addFixtureContact(contact);
                 }
                 break;
             case  Constants.ACTOR_BIT | Constants.ACTOR_BIT:
                 screen.endGame(false);
 
         }
+    }
+
+    public boolean checkContact(Contact contact) {
+        Gdx.app.log("ContactListener", "Checking contact");
+        Fixture fixA = contact.getFixtureA();
+        Fixture fixB = contact.getFixtureB();
+
+        int cDef = fixA.getFilterData().categoryBits | fixB.getFilterData().categoryBits;
+
+        switch(cDef) {
+            case Constants.INTERACTIVE_BIT | Constants.ACTOR_BIT:
+                if (fixA.getFilterData().categoryBits == Constants.ACTOR_BIT) {
+                    if (!((InteractiveObject) fixB.getUserData()).activate((GameActor) fixA.getUserData()))
+                        return false;
+                    else return true;
+                } else {
+                    if (!((InteractiveObject) fixA.getUserData()).activate((GameActor) fixB.getUserData()))
+                        return false;
+                    else return true;
+                }
+        }
+        return true;
     }
 
     public void update() {

@@ -1,6 +1,5 @@
 package com.jacktheogre.lightswitch.tools;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.utils.Array;
@@ -32,7 +31,6 @@ public class Lighting {
     private Filter aboveLightFilter, actorLightFilter;
     private boolean lightsOn = true;
 
-    // TODO: 24.10.16 probably make lights static
     public Lighting(GeneratingScreen screen) {
         this.screen = screen;
         rayHandler = new RayHandler(screen.getWorld());
@@ -74,11 +72,11 @@ public class Lighting {
 
     public void render(float dt) {
         if(lightsOn && playScreen != null) {
-            if(!playScreen.subEnergy(30*dt))
+            if(!playScreen.subEnergy(Constants.WASTE_ENERGY_PER_SEC *dt))
                 playScreen.getCommandHandler().addCommand(new TurnOffCommand(playScreen));
         }
         rayHandler.setCombinedMatrix(screen.getGameCam());
-        actorLight.setPosition(screen.getPlayer().getActor().b2body.getPosition());
+        actorLight.setPosition(screen.getPlayer().getGameActor().b2body.getPosition());
         rayHandler.updateAndRender();
     }
 
@@ -97,8 +95,7 @@ public class Lighting {
     }
 
     public void turnOn() {
-//        rayHandler.setAmbientLight(251/255f,239/255f,100/255f, 0.5f);
-        if(!playScreen.subEnergy(20))
+        if(!playScreen.subEnergy(Constants.WASTE_ENERGY_PER_SWITCH))
             return;
         lightsOn = true;
         actorLight.setActive(!lightsOn);
@@ -106,29 +103,11 @@ public class Lighting {
     }
 
     public void turnOff() {
-//        rayHandler.setAmbientLight(0, 0.2f, 0, 0.1f);
         lightsOn = false;
         actorLight.setActive(!lightsOn);
         setPointLightsActive(lightsOn);
     }
 
-
-    /*public void turnOn() {
-        if(!lightsOn())
-            switchLights();
-    }
-
-    public void turnOff(){
-        if(lightsOn())
-            switchLights();
-    }
-
-    public void switchLights() {
-        lightsOn = !lightsOn;
-        for (PointLight light : pointLights) {
-            light.setActive(lightsOn);
-        }
-    }*/
 
     public void setPointLightsActive(boolean active) {
         for (PointLight light : pointLights) {

@@ -1,24 +1,26 @@
 package com.jacktheogre.lightswitch;
 
+import com.badlogic.gdx.Application;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
+import com.badlogic.gdx.scenes.scene2d.ui.Touchpad.*;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
-import com.jacktheogre.lightswitch.tools.AssetLoader;
+import com.jacktheogre.lightswitch.sprites.Button;
 import com.jacktheogre.lightswitch.tools.Assets;
-
-import javax.swing.GroupLayout;
-
-import static javax.swing.GroupLayout.Alignment.CENTER;
 
 /**
  * Created by luna on 20.10.16.
@@ -27,72 +29,141 @@ public class Hud implements Disposable{
 
     public Stage stage;
     private Viewport viewport;
+    private Rectangle arrowsRect;
 
     private Label timeLabel;
     private PlayScreen screen;
-    private Sprite scale, fill, timer;
+    private Sprite energyBar, fill, timer;
+    private Button light_button, arrowUp, arrowRight, arrowDown, arrowLeft;
+    private float energyBarScale = 1f;
+
+    // FIXME: 29.01.17 TOUCHPAD
+    private Touchpad touchpad;
+    private Touchpad.TouchpadStyle touchpadStyle;
+    private Skin touchpadSkin;
+
 
     public Hud(PlayScreen screen) {
         this.screen = screen;
         viewport = new FitViewport(LightSwitch.WIDTH, LightSwitch.HEIGHT);
         stage = new Stage(viewport, screen.getGame().batch);
-        scale = new Sprite(Assets.getAssetLoader().scale);
-        scale.setPosition(scale.getWidth() / 2, 20);
-        scale.setScale(1f);
-        fill = new Sprite(Assets.getAssetLoader().scale_fill);
-        fill.setPosition(scale.getX() + 2, scale.getY() + 2);
-        fill.setSize(scale.getWidth() - 4, scale.getHeight() - 4);
-        fill.setOrigin(fill.getWidth() / 2, 0);
-        timer = new Sprite(Assets.getAssetLoader().timer);
-        timer.setPosition((viewport.getWorldWidth() - timer.getWidth()) / 2, viewport.getWorldHeight() - timer.getHeight());
 
-        Table table = new Table();
-        table.setFillParent(true);
-        table.top();
+        initializeGraphicElements();
 
         timeLabel = new Label(Constants.PLAYTIME+"", new Label.LabelStyle(Assets.getAssetLoader().font, new Color(0xb6/255F, 0XFf/255f, 0xcb/255f, 1f)));
         timeLabel.setFontScale(0.6f);
-//        timeLabel.setPosition(timer.getX() + 2, timer.getY() - 4 );
         timeLabel.setBounds(timer.getX() + 5, timer.getY() + 2, timer.getWidth() - 6, timer.getHeight() - 4);
         timeLabel.setWrap(true);
         timeLabel.setAlignment(Align.center);
-//        actorLabel = new Label(String.format(": %s", "-"), new Label.LabelStyle(new BitmapFont(), Color.GREEN));
 
-//        table.add(timeLabel).expandX().padBottom(10);
-//        table.add(timeLabel).align(Align.right).padTop(10);
-
-//        stage.addActor(table);
+        if(Gdx.app.getType() == Application.ApplicationType.Android) {
+            initializeTouchpad();
+        }
     }
 
-    public void render() {
-        update();
-//        stage.draw();
+    private void initializeTouchpad() {
+        touchpadSkin = new Skin();
+        //Set background image
+        touchpadSkin.add("touchBackground", Assets.getAssetLoader().touchBg);
+        //Set knob image
+        touchpadSkin.add("touchKnob", Assets.getAssetLoader().touchKnob);
+        //Create TouchPad Style
+        touchpadStyle = new TouchpadStyle();
+        touchpadStyle.background = touchpadSkin.getDrawable("touchBackground");
+        touchpadStyle.knob = touchpadSkin.getDrawable("touchKnob");
+        touchpad = new Touchpad(15, touchpadStyle);
+        touchpad.setBounds(viewport.getScreenWidth() - 400, 20 , 400, 400);
+
+        screen.getInputHandler().addActor(touchpad);
+    }
+
+    private void initializeGraphicElements() {
+        energyBar = new Sprite(Assets.getAssetLoader().scale);
+        energyBar.setPosition(energyBar.getWidth() / 2, 20);
+        energyBar.setScale(1f);
+        fill = new Sprite(Assets.getAssetLoader().scale_fill);
+        fill.setPosition(energyBar.getX() + 2, energyBar.getY() + 2);
+        fill.setSize(energyBar.getWidth() - 4, energyBar.getHeight() - 4);
+        fill.setOrigin(fill.getWidth() / 2, 0);
+        timer = new Sprite(Assets.getAssetLoader().timer);
+        timer.setPosition((viewport.getWorldWidth() - timer.getWidth()) / 2, viewport.getWorldHeight() - timer.getHeight());
+        if(Gdx.app.getType() == Application.ApplicationType.Android) {
+            light_button = new Button(Assets.getAssetLoader().light_button, com.jacktheogre.lightswitch.sprites.Button.State.ACTIVE);
+            energyBar.setPosition(energyBar.getX(), energyBar.getY() + light_button.getHeight() / 2 );
+            fill.setPosition(energyBar.getX() + 2, energyBar.getY() + 2);
+            light_button.setPosition(energyBar.getX(), energyBar.getY() - light_button.getHeight());
+        }
+    }
+
+    public Touchpad getTouchpad() {
+        return touchpad;
+    }
+
+    public void render(float dt) {
+        update(dt);
         screen.getGame().batch.begin();
         screen.getGame().batch.setProjectionMatrix(stage.getCamera().combined);
         fill.draw(screen.getGame().batch);
-        scale.draw(screen.getGame().batch);
+        energyBar.draw(screen.getGame().batch);
         timer.draw(screen.getGame().batch);
         timeLabel.draw(screen.getGame().batch, 1f);
+        if(Gdx.app.getType() == Application.ApplicationType.Android) {
+            light_button.draw(screen.getGame().batch);
+            //draws touchPad
+            screen.getInputHandler().act(dt);
+            screen.getGame().batch.setProjectionMatrix(screen.getInputHandler().getCamera().combined);
+            screen.getGame().batch.enableBlending();
+            touchpad.draw(screen.getGame().batch, 0.7f);
+            Color color = screen.getGame().batch.getColor();
+            screen.getGame().batch.setColor(color.r, color.g, color.b, 1);
+        }
         screen.getGame().batch.end();
+
+        /*ShapeRenderer sr = new ShapeRenderer();
+        sr.setAutoShapeType(true);
+        sr.setProjectionMatrix(stage.getCamera().combined);
+        sr.begin();
+        sr.rect(arrowsRect.x, arrowsRect.y,
+                arrowsRect.getWidth(), arrowsRect.getHeight());
+        sr.end();*/
     }
 
-//    public void addScore(int addition) {
-//        score += addition;
-//        timeLabel.setText(String.format("SCORE: %03d", score));
-//    }
+    public Camera getCamera() {
+        return stage.getCamera();
+    }
 
-    public void update() {
+    public void update(float dt) {
         timeLabel.setText(((int)(Constants.PLAYTIME - screen.getRunTime()))+"");
-        fill.setScale(scale.getScaleX(), scale.getScaleY()*screen.getEnergy()/100f);
+        interpolateScale(dt);
+        fill.setScale(energyBar.getScaleX(), energyBarScale);
     }
 
-//    public void setActor(String actor) {
-//        actorLabel.setText(String.format("PLAYER: %s", actor));
-//    }
-
-
+    private void interpolateScale(float dt) {
+        float lerp = 7f;
+        energyBarScale += ((screen.getEnergy() / 100f) - energyBarScale) * dt * lerp * energyBar.getScaleY();
+    }
 
     public void dispose() {
+        //nothing to dispose
+    }
 
+    public Button getLight_button() {
+        return light_button;
+    }
+
+    public Button getArrowUp() {
+        return arrowUp;
+    }
+
+    public Button getArrowRight() {
+        return arrowRight;
+    }
+
+    public Button getArrowDown() {
+        return arrowDown;
+    }
+
+    public Button getArrowLeft() {
+        return arrowLeft;
     }
 }

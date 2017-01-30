@@ -1,6 +1,6 @@
 package com.jacktheogre.lightswitch.commands;
 
-import com.jacktheogre.lightswitch.sprites.Actor;
+import com.jacktheogre.lightswitch.sprites.GameActor;
 
 /**
  * Created by luna on 12.12.16.
@@ -8,38 +8,39 @@ import com.jacktheogre.lightswitch.sprites.Actor;
 public class StartMovingCommand extends ActorCommand{
 
     boolean keyboardControl;
-    private Actor.Direction pastDirection, direction;
+    private GameActor.Direction pastDirection, direction;
     public boolean disabled = false;
 
-    public StartMovingCommand(Actor.Direction direction) {
+    public StartMovingCommand(GameActor.Direction direction) {
         this.direction = direction;
     }
 
+
     @Override
-    public boolean execute(Actor actor) {
+    public boolean execute(GameActor gameActor) {
         if(executed)
             return false;
-        keyboardControl = actor.isKeyboardControl();
-        actor.setKeyboardControl(true);
-        pastDirection = actor.getCurDirection();
-        actor.setDirection(direction);
+        keyboardControl = gameActor.isKeyboardControl();
+        gameActor.setKeyboardControl(true);
+        pastDirection = gameActor.getDirection();
+        gameActor.setDirection(direction);
         return true;
     }
 
-    public Actor.Direction getDirection() {
+    public GameActor.Direction getDirection() {
         return direction;
     }
 
     @Override
     public void undo() {
-        actor.setDirection(pastDirection);
-        actor.setKeyboardControl(keyboardControl);
+        gameActor.setDirection(pastDirection);
+        gameActor.setKeyboardControl(keyboardControl);
     }
 
     @Override
     public void redo() {
-        actor.setKeyboardControl(true);
-        actor.setDirection(direction);
+        gameActor.setKeyboardControl(true);
+        gameActor.setDirection(direction);
     }
 
 

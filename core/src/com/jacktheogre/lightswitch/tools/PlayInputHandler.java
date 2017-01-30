@@ -1,25 +1,26 @@
 package com.jacktheogre.lightswitch.tools;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.jacktheogre.lightswitch.commands.MoveToCommand;
 import com.jacktheogre.lightswitch.commands.StartMovingCommand;
 import com.jacktheogre.lightswitch.commands.StopCommand;
-import com.jacktheogre.lightswitch.commands.StopMovingCommand;
 import com.jacktheogre.lightswitch.commands.TurnOffCommand;
 import com.jacktheogre.lightswitch.commands.TurnOnCommand;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
-import com.jacktheogre.lightswitch.sprites.Actor;
+import com.jacktheogre.lightswitch.sprites.GameActor;
 
 /**
  * Created by luna on 10.12.16.
  */
-public class PlayInputHandler implements InputProcessor {
+public class PlayInputHandler extends Stage{
 
     private PlayScreen screen;
     private float lastMakingPathTime = 0;
+    private int lightPointer = -1, arrowsPointer = -1;
 
     public PlayInputHandler(PlayScreen playScreen) {
         this.screen = playScreen;
@@ -33,19 +34,19 @@ public class PlayInputHandler implements InputProcessor {
                 break;
             case Input.Keys.W:
             case Input.Keys.UP:
-                screen.getCommandHandler().addCommand(new StartMovingCommand(Actor.Direction.UP));
+                screen.getCommandHandler().addCommand(new StartMovingCommand(GameActor.Direction.UP));
                 break;
             case Input.Keys.A:
             case Input.Keys.LEFT:
-                screen.getCommandHandler().addCommand(new StartMovingCommand(Actor.Direction.LEFT));
+                screen.getCommandHandler().addCommand(new StartMovingCommand(GameActor.Direction.LEFT));
                 break;
             case Input.Keys.S:
             case Input.Keys.DOWN:
-                screen.getCommandHandler().addCommand(new StartMovingCommand(Actor.Direction.DOWN));
+                screen.getCommandHandler().addCommand(new StartMovingCommand(GameActor.Direction.DOWN));
                 break;
             case Input.Keys.D:
             case Input.Keys.RIGHT:
-                screen.getCommandHandler().addCommand(new StartMovingCommand(Actor.Direction.RIGHT));
+                screen.getCommandHandler().addCommand(new StartMovingCommand(GameActor.Direction.RIGHT));
                 break;
         }
         return true;
@@ -60,19 +61,19 @@ public class PlayInputHandler implements InputProcessor {
                 break;
             case Input.Keys.W:
             case Input.Keys.UP:
-                screen.getCommandHandler().stopMoving(Actor.Direction.UP);
+                screen.getCommandHandler().stopMoving(GameActor.Direction.UP);
                 break;
             case Input.Keys.A:
             case Input.Keys.LEFT:
-                screen.getCommandHandler().stopMoving(Actor.Direction.LEFT);
+                screen.getCommandHandler().stopMoving(GameActor.Direction.LEFT);
                 break;
             case Input.Keys.S:
             case Input.Keys.DOWN:
-                screen.getCommandHandler().stopMoving(Actor.Direction.DOWN);
+                screen.getCommandHandler().stopMoving(GameActor.Direction.DOWN);
                 break;
             case Input.Keys.D:
             case Input.Keys.RIGHT:
-                screen.getCommandHandler().stopMoving(Actor.Direction.RIGHT);
+                screen.getCommandHandler().stopMoving(GameActor.Direction.RIGHT);
                 break;
         }
         return true;
@@ -85,30 +86,67 @@ public class PlayInputHandler implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        Vector3 screenTouch = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-        Vector3 point = screen.getGamePort().unproject(screenTouch.cpy());
+        super.touchDown(screenX, screenY, pointer, button);
+        Vector3 screenTouch = new Vector3(screenX, screenY, 0);
+        Vector3 point = screen.getGamePort().getCamera().unproject(screenTouch.cpy());
+        Vector3 hudPoint = screen.getHud().getCamera().unproject(screenTouch.cpy());
         screenTouch.y = screen.getGamePort().getScreenHeight() - screenTouch.y;
-        screen.getCommandHandler().addCommand(new MoveToCommand(point.x, point.y));
-        screen.setTouchPoint((int)point.x, (int)point.y);
-        lastMakingPathTime = screen.getRunTime();
+        if(Gdx.app.getType() == Application.ApplicationType.Android) {
+            if(screen.getHud().getLight_button().getBoundingRectangle().contains(hudPoint.x, hudPoint.y)) {
+                if(!screen.getLighting().lightsOn())
+                    screen.getCommandHandler().addCommand(new TurnOnCommand(screen));
+                lightPointer = pointer;
+            }
+            /*else{
+                screen.getCommandHandler().addCommand(new MoveToCommand(point.x, point.y));
+                screen.setTouchPoint((int)point.x, (int)point.y);
+                lastMakingPathTime = screen.getRunTime();
+            }*/
+        } else {
+            screen.getCommandHandler().addCommand(new MoveToCommand(point.x, point.y));
+            screen.setTouchPoint((int)point.x, (int)point.y);
+            lastMakingPathTime = screen.getRunTime();
+        }
         return true;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        return false;
+        super.touchUp(screenX, screenY, pointer, button);
+        Vector3 screenTouch = new Vector3(screenX, screenY, 0);
+        Vector3 point = screen.getHud().getCamera().unproject(screenTouch.cpy());
+        screenTouch.y = screen.getGamePort().getScreenHeight() - screenTouch.y;
+        if(Gdx.app.getType() == Application.ApplicationType.Android) {
+            if(pointer == lightPointer) {
+                screen.getCommandHandler().addCommand(new TurnOffCommand(screen));
+            }
+        }
+        return true;
     }
+
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        if(screen.getRunTime() - lastMakingPathTime > 0.2f) {
+        super.touchDragged(screenX, screenY, pointer);
+        Vector3 screenTouch = new Vector3(screenX, screenY, 0);
+        Vector3 point = screen.getHud().getCamera().unproject(screenTouch.cpy());
+        if(pointer == lightPointer) {
+            if(!screen.getHud().getLight_button().getBoundingRectangle().contains(point.x, point.y)) {
+                if(screen.getLighting().lightsOn())
+                    screen.getCommandHandler().addCommand(new TurnOffCommand(screen));
+            }
+            return true;
+        }
+       /* if(screen.getRunTime() - lastMakingPathTime > 0.2f) {
             return touchDown(screenX, screenY, pointer, 0);
         } else
-            return false;
+            return false;*/
+        return true;
     }
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
+        super.mouseMoved(screenX, screenY);
         return false;
     }
 
@@ -116,4 +154,6 @@ public class PlayInputHandler implements InputProcessor {
     public boolean scrolled(int amount) {
         return false;
     }
+
+
 }

@@ -1,37 +1,31 @@
 package com.jacktheogre.lightswitch.sprites;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.jacktheogre.lightswitch.Constants;
-import com.jacktheogre.lightswitch.tools.AssetLoader;
 import com.jacktheogre.lightswitch.tools.Assets;
 
 /**
  * Created by luna on 19.10.16.
  */
-public class Human extends Actor {
+public class Human extends GameActor {
+    public static final int MAX_SPEED = 75;
+
+    private final int WIDTH = 22;
+    private final int HEIGHT = 26;
+
     public enum State {RUNNING, STANDING}
     private State currentState;
     private State previousState;
 
-    private final int WIDTH = 22;
-    private final int HEIGHT = 26;
-    public static final int MAX_SPEED = 75;
-
     public Human(World world, float x, float y) {
-        super(world, x, y, Assets.getAssetLoader().link); // TODO: 18.10.16 get texture from atlas
+        super(world, x, y, Assets.getAssetLoader().characters);
 
         currentState = State.STANDING;
         previousState = State.STANDING;
@@ -39,7 +33,7 @@ public class Human extends Actor {
         initGraphics();
 
         texture = getTexture();
-        setBounds(getX(), getY(), 22, 26);
+        setBounds(getX(), getY(), WIDTH, HEIGHT);
         setRegion(playerStandRight);
 
         initialize();
@@ -52,25 +46,25 @@ public class Human extends Actor {
 
         float frameTime = 0.1f;
         for (int i = 0; i < 4; i++) {
-            frames.add(new TextureRegion(getTexture(), 33 + i*(WIDTH + 5), 1, WIDTH, HEIGHT));
+            frames.add(new TextureRegion(getTexture(), 29 + i*(WIDTH+2), 113, WIDTH, HEIGHT));
         }
         playerRunDown = new Animation(0.1f, frames);
         frames.clear();
 
         for (int i = 0; i < 4; i++) {
-            frames.add(new TextureRegion(getTexture(), 33 + i*(WIDTH+5), 1 + 29, WIDTH, HEIGHT));
+            frames.add(new TextureRegion(getTexture(), 29 + i*(WIDTH+2), 113 + 28, WIDTH, HEIGHT));
         }
         playerRunUp = new Animation(frameTime, frames);
         frames.clear();
 
         for (int i = 0; i < 4; i++) {
-            frames.add(new TextureRegion(getTexture(), 33 + i*(WIDTH+5), 1 + 2*29, WIDTH, HEIGHT));
+            frames.add(new TextureRegion(getTexture(), 29 + i*(WIDTH+2), 113 + 2*28, WIDTH, HEIGHT));
         }
         playerRunRight = new Animation(frameTime, frames);
         frames.clear();
 
         for (int i = 0; i < 4; i++) {
-            frames.add(new TextureRegion(getTexture(), 33 + i*(WIDTH+5), 1 + 3*29, WIDTH, HEIGHT));
+            frames.add(new TextureRegion(getTexture(), 29 + i*(WIDTH+2), 113 + 3*28, WIDTH, HEIGHT));
         }
         playerRunLeft = new Animation(frameTime, frames);
         frames.clear();
@@ -81,15 +75,10 @@ public class Human extends Actor {
         playerRunLeft.setPlayMode(Animation.PlayMode.LOOP);
         playerRunUp.setPlayMode(Animation.PlayMode.LOOP);
 
-        playerStandDown = new TextureRegion(getTexture(), 1, 1, WIDTH, HEIGHT);
-        playerStandUp = new TextureRegion(getTexture(), 1, 30, WIDTH, HEIGHT);
-        playerStandRight = new TextureRegion(getTexture(), 1, 59, WIDTH, HEIGHT);
-        playerStandLeft = new TextureRegion(getTexture(), 1, 88, WIDTH, HEIGHT);
-    }
-
-    @Override
-    public void dispose() {
-        // TODO: 13.12.16 all the disposes
+        playerStandDown = new TextureRegion(getTexture(), 1, 113, WIDTH, HEIGHT);
+        playerStandUp = new TextureRegion(getTexture(), 1, 141, WIDTH, HEIGHT);
+        playerStandRight = new TextureRegion(getTexture(), 1, 169, WIDTH, HEIGHT);
+        playerStandLeft = new TextureRegion(getTexture(), 1, 197, WIDTH, HEIGHT);
     }
 
     @Override
@@ -98,9 +87,10 @@ public class Human extends Actor {
         setPosition(b2body.getPosition().x - getWidth() / 2 , b2body.getPosition().y - getHeight() / 2 + 5);
     }
 
+    @Override
     public TextureRegion getFrame(float dt) {
         currentState = getState();
-        direction = getDirection();
+        direction = calculateDirection();
 
         TextureRegion region;
         switch (currentState) {
@@ -159,9 +149,7 @@ public class Human extends Actor {
         }
     }
 
-
-
-    protected void initialize() {// TODO: 19.10.16 get this method to actor with x,y parameters
+    protected void initialize() {
 
         BodyDef bodyDef = new BodyDef();
         CircleShape shape = new CircleShape();
@@ -181,17 +169,25 @@ public class Human extends Actor {
                 Constants.ACTOR_BIT |
                 Constants.INTERACTIVE_BIT;
         filter = fixtureDef.filter;
+        fixtureDef.friction = 0;
         fixture = b2body.createFixture(fixtureDef);
         fixture.setUserData(this);
     }
 
+
+
     @Override
     public String toString() {
-        return "Link";
+        return "Hero";
     }
 
     public int getSpeed() {
         return MAX_SPEED;
+    }
+
+    @Override
+    public void dispose() {
+        // TODO: 13.12.16 all the disposes
     }
 
 }

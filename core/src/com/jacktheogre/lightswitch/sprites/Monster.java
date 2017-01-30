@@ -14,17 +14,18 @@ import com.jacktheogre.lightswitch.tools.Assets;
 /**
  * Created by luna on 10.12.16.
  */
-public class Enemy extends Actor {
-    private static final int SPEED_BASE = 70 ;
-    private final int WIDTH = 30, HEIGHT = 30;
+public class Monster extends GameActor {
+    private static final int SPEED_BASE = 64 ;
 
-    public enum State {RUNNING, STANDING}
+    private final int WIDTH = 22, HEIGHT = 26;
+
+    public enum State {RUNNING, STANDING;}
     private State currentState;
     private State previousState;
 
 
-    public Enemy(World world, float x, float y) {
-        super(world, x, y, Assets.getAssetLoader().ghost);
+    public Monster(World world, float x, float y) {
+        super(world, x, y, Assets.getAssetLoader().characters);
 
         currentState = State.STANDING;
         previousState = State.STANDING;
@@ -32,12 +33,8 @@ public class Enemy extends Actor {
         initGraphics();
 
         texture = getTexture();
-//        playerStandRight = new TextureRegion(texture, 1, 1, 30, 30);
-        playerStandDown = new TextureRegion(getTexture(), 1, 1, WIDTH, HEIGHT);
-        playerStandUp = new TextureRegion(getTexture(), 1, 34, WIDTH, HEIGHT);
-        playerStandRight = new TextureRegion(getTexture(), 1, 1, WIDTH, HEIGHT);
-        playerStandLeft = new TextureRegion(getTexture(), 1, 100, WIDTH, HEIGHT);
-        setBounds(getX(), getY(), 30, 30);
+//        playerStandRight = new TextureRegion(texture, 1, 1, 30, 30)
+        setBounds(getX(), getY(), WIDTH, HEIGHT);
         setRegion(playerStandLeft);
 
         initialize();
@@ -50,12 +47,12 @@ public class Enemy extends Actor {
         CircleShape shape = new CircleShape();
         FixtureDef fixtureDef = new FixtureDef();
 
-        bodyDef.position.set(getX(), getY());
+        bodyDef.position.set(getX() + 8, getY() + 8);
         bodyDef.fixedRotation = true;
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         b2body = world.createBody(bodyDef);
 
-        shape.setRadius(8);
+        shape.setRadius(7);
 
         fixtureDef.shape = shape;
         fixtureDef.filter.categoryBits = Constants.ACTOR_BIT;
@@ -74,11 +71,17 @@ public class Enemy extends Actor {
             return State.RUNNING;
     }
 
+    @Override
+    public void update(float dt) {
+        super.update(dt);
+        setPosition(b2body.getPosition().x - getWidth() / 2 , b2body.getPosition().y - getHeight() / 2 + 5);
+    }
+
 
     @Override
     public TextureRegion getFrame(float dt) {
         currentState = getState();
-        direction = getDirection();
+        direction = calculateDirection();
 
         TextureRegion region;
         switch (currentState) {
@@ -131,29 +134,34 @@ public class Enemy extends Actor {
         Array<TextureRegion> frames = new Array<TextureRegion>();
 
         float frameTime = 0.2f;
-        for (int i = 0; i < 2; i++) {
-            frames.add(new TextureRegion(getTexture(), 42 + i*(WIDTH + 3), 1, WIDTH, HEIGHT));
+        for (int i = 0; i < 4; i++) {
+            frames.add(new TextureRegion(getTexture(), 29 + i*(WIDTH+2), 1, WIDTH, HEIGHT));
         }
-        playerRunDown = new Animation(0.1f, frames);
+        playerRunDown = new Animation(frameTime, frames);
         frames.clear();
 
-        for (int i = 0; i < 2; i++) {
-            frames.add(new TextureRegion(getTexture(), 42 + i*(WIDTH+3), 1 + 33, WIDTH, HEIGHT));
+        for (int i = 0; i < 4; i++) {
+            frames.add(new TextureRegion(getTexture(), 29 + i*(WIDTH+2), 1 + 28, WIDTH, HEIGHT));
         }
         playerRunUp = new Animation(frameTime, frames);
         frames.clear();
 
-        for (int i = 0; i < 2; i++) {
-            frames.add(new TextureRegion(getTexture(), 42 + i*(WIDTH+3), 1 + 2*33, WIDTH, HEIGHT));
+        for (int i = 0; i < 4; i++) {
+            frames.add(new TextureRegion(getTexture(), 29 + i*(WIDTH+2), 1 + 2*28, WIDTH, HEIGHT));
         }
         playerRunRight = new Animation(frameTime, frames);
         frames.clear();
 
-        for (int i = 0; i < 2; i++) {
-            frames.add(new TextureRegion(getTexture(), 42 + i*(WIDTH+3), 1 + 3*33, WIDTH, HEIGHT));
+        for (int i = 0; i < 4; i++) {
+            frames.add(new TextureRegion(getTexture(), 29 + i*(WIDTH+2), 1 + 3*28, WIDTH, HEIGHT));
         }
         playerRunLeft = new Animation(frameTime, frames);
         frames.clear();
+
+        playerStandDown = new TextureRegion(getTexture(), 1, 1, WIDTH, HEIGHT);
+        playerStandUp = new TextureRegion(getTexture(), 1, 1 + 2*28, WIDTH, HEIGHT);
+        playerStandRight = new TextureRegion(getTexture(), 1, 1 + 3*28, WIDTH, HEIGHT);
+        playerStandLeft = new TextureRegion(getTexture(), 1, 1 + 3*28, WIDTH, HEIGHT);
 
         //set looping
         playerRunDown.setPlayMode(Animation.PlayMode.LOOP);
@@ -165,7 +173,7 @@ public class Enemy extends Actor {
 
     @Override
     public String toString() {
-        return "Enemy";
+        return "Monster";
     }
 
     @Override

@@ -71,7 +71,7 @@ public class GenerateInputHandler implements InputProcessor{
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         // TODO: 11.12.16 screenX instead of GDx.inout.getX()
-        Vector3 screenTouch = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+        Vector3 screenTouch = new Vector3(screenX, screenY, 0);
         Vector3 point = screen.getGamePort().unproject(screenTouch.cpy());
         screenTouch.y = screen.getGamePort().getScreenHeight() - screenTouch.y;
         if(screen.getUndo().getBoundingRectangle().contains(point.x, point.y)) {

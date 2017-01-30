@@ -1,6 +1,5 @@
 package com.jacktheogre.lightswitch.tools;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -15,7 +14,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.jacktheogre.lightswitch.Constants;
 import com.jacktheogre.lightswitch.objects.InteractiveObject;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
-import com.jacktheogre.lightswitch.sprites.Enemy;
+import com.jacktheogre.lightswitch.sprites.Monster;
 import com.jacktheogre.lightswitch.sprites.Human;
 
 /**
@@ -85,7 +84,7 @@ public class B2WorldCreator {
             if(!ClassReflection.isInstance(RectangleMapObject.class,object))
                 continue;
             Rectangle bounds = ((RectangleMapObject) object).getRectangle();
-            screen.getPlayer().setActor(new Human(world, bounds.getX(), bounds.getY()));
+            screen.getPlayer().setGameActor(new Human(world, bounds.getX(), bounds.getY()));
         }
 
         //enemies
@@ -93,7 +92,7 @@ public class B2WorldCreator {
             if(!ClassReflection.isInstance(RectangleMapObject.class,object))
                 continue;
             Rectangle bounds = ((RectangleMapObject) object).getRectangle();
-            screen.getEnemyPlayer().setEnemy(new Enemy(world, bounds.getX(), bounds.getY()));
+            screen.getEnemyPlayer().setMonster(new Monster(world, bounds.getX(), bounds.getY()));
         }
 
         //lights

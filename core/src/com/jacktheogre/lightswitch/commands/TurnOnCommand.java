@@ -43,4 +43,9 @@ public class TurnOnCommand extends GlobalCommand{
     public void redo() {
         lighting.turnOn();
     }
+
+    @Override
+    public String toString() {
+        return "TurnOnCommand";
+    }
 }

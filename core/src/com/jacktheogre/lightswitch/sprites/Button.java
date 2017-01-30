@@ -20,6 +20,7 @@ public class Button extends Sprite {
     private TextureRegion focusedTexture;
     private TextureRegion pressedTexture;
     private TextureRegion disabledTexture;
+    private boolean singleTexture;
 
     private boolean disabled = false;
     private boolean pressed = false;
@@ -40,6 +41,14 @@ public class Button extends Sprite {
         this.state = state;
     }
 
+    public Button(TextureRegion textureRegion, State state, boolean oneTexture) {
+        super(new TextureRegion(textureRegion, 0, 0, oneTexture? textureRegion.getRegionWidth() : textureRegion.getRegionWidth() / 4, textureRegion.getRegionHeight()));
+        this.textureReg = textureRegion;
+        this.singleTexture = oneTexture;
+        initGraphics(textureReg);
+        this.state = state;
+    }
+
     public void setScreen(GeneratingScreen screen) {
         this.screen = screen;
     }
@@ -48,13 +57,21 @@ public class Button extends Sprite {
         int width = textureRegion.getRegionWidth() / 4;
         Array<TextureRegion> frames = new Array<TextureRegion>();
 
-        for (int i = 0; i < 4; i++) {
-            frames.add(new TextureRegion(textureRegion, i*width, 0, width, textureRegion.getRegionHeight()));
+        if(!singleTexture) {
+
+            for (int i = 0; i < 4; i++) {
+                frames.add(new TextureRegion(textureRegion, i*width, 0, width, textureRegion.getRegionHeight()));
+            }
+            disabledTexture = frames.get(0);
+            activeTexture = frames.get(1);
+            pressedTexture = frames.get(2);
+            focusedTexture = frames.get(3);
+        } else {
+            disabledTexture = textureReg;
+            activeTexture = textureReg;
+            pressedTexture = textureReg;
+            focusedTexture = textureReg;
         }
-        disabledTexture = frames.get(0);
-        activeTexture = frames.get(1);
-        pressedTexture = frames.get(2);
-        focusedTexture = frames.get(3);
     }
 
     public TextureRegion getFrame() {
@@ -89,6 +106,8 @@ public class Button extends Sprite {
     }
 
     public boolean press(){
+        if(pressed)
+            return false;
         pressed = true;
         if(!disabled) {
             setState(State.PRESSED);
@@ -100,6 +119,7 @@ public class Button extends Sprite {
     }
 
     public boolean touchUp() {
+
         boolean wasPressed = pressed;
         pressed = false;
         if(!disabled) {
@@ -150,6 +170,10 @@ public class Button extends Sprite {
         else {
             setState(State.DISABLED);
         }
+    }
+
+    public boolean isPressed() {
+        return pressed;
     }
 
     @Override

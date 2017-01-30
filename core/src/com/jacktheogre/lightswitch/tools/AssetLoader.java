@@ -20,9 +20,10 @@ public class AssetLoader {
     public static final float LETTER_HEIGHT = 15 * FONT_SCALE;
     public static final int LEVEL_AMOUNT = 3;
     private AssetManager manager;
-    public Texture link, ghost, teleport, scale, scale_fill, timer;
+    public Texture characters, teleport, scale, scale_fill, timer;
     public Texture moon, buttons;
-    public TextureRegion next_level_button, home_button, replay_button;
+    public Texture touchBg, touchKnob;
+    public TextureRegion next_level_button, home_button, replay_button, light_button;
     public TextureRegion undo_button, redo_button, start_button, teleport_button, play_button;
     public TiledMap[] maps;
     private TmxMapLoader mapLoader;
@@ -35,11 +36,12 @@ public class AssetLoader {
         this.manager = new AssetManager();
         mapLoader = new TmxMapLoader();
         maps = new TiledMap[LEVEL_AMOUNT];
+
 //        manager.load();
     }
 
     public void load() {
-        manager.load("char.png", Texture.class);
+        manager.load("characters.png", Texture.class);
         manager.load("ghost.png", Texture.class);
         manager.load("portals.png", Texture.class);
         manager.load("scale.png", Texture.class);
@@ -50,22 +52,29 @@ public class AssetLoader {
         manager.load("running.mp3", Sound.class);
         manager.load("tpOpen.mp3", Sound.class);
         manager.load("tpClose.mp3", Sound.class);
+        manager.load("light_button.png", Texture.class);
+        manager.load("touchBackground.png", Texture.class);
+        manager.load("touchKnob.png", Texture.class);
         manager.finishLoading();
 
         for (int i = 0; i < LEVEL_AMOUNT; i++) {
             maps[i] = mapLoader.load("level"+i+".tmx");
         }
-        ghost = manager.get("ghost.png",Texture.class);
-        link = manager.get("char.png", Texture.class);
+        characters = manager.get("characters.png",Texture.class);
         teleport = manager.get("portals.png", Texture.class);
         buttons = manager.get("allbuttons.png",Texture.class);
         scale = manager.get("scale.png", Texture.class);
         scale_fill = manager.get("scale_fill.png", Texture.class);
         moon = manager.get("moon.png",Texture.class);
         timer = manager.get("timer.png", Texture.class);
+        touchBg = manager.get("touchBackground.png", Texture.class);
+        touchKnob = manager.get("touchKnob.png", Texture.class);
         runningSound = manager.get("running.mp3", Sound.class);
         teleportOpenSound = manager.get("tpOpen.mp3", Sound.class);
         teleportCloseSound = manager.get("tpClose.mp3", Sound.class);
+        
+//        light_button = new TextureRegion(manager.get("light_button.png", Texture.class));
+        light_button = new TextureRegion(buttons, 0, 251, 148, 44);
         start_button = new TextureRegion(buttons, 0, 0, 344, 22);
         redo_button = new TextureRegion(buttons, 0, 26, 148, 22);
         undo_button = new TextureRegion(buttons, 0, 52, 148, 22);
@@ -73,7 +82,7 @@ public class AssetLoader {
         play_button = new TextureRegion(buttons, 0, 104, 472, 65);
         next_level_button = new TextureRegion(buttons, 0, 173, 100, 22);
         replay_button = new TextureRegion(buttons, 0, 199, 100, 22);
-        home_button =new TextureRegion(buttons, 0, 225, 100, 22);
+        home_button = new TextureRegion(buttons, 0, 225, 100, 22);
 
         font = new BitmapFont(Gdx.files.internal("font.fnt"));
         font.getData().setScale(FONT_SCALE,FONT_SCALE);

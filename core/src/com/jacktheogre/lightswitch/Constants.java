@@ -17,8 +17,13 @@ public class Constants {
 
     public static final float LIGHT_DISTANCE = 90f;
     public static final int LIGHT_RAYS = 50;
-
     public static float TELEPORT_INTERVAL = 3f;
+
+    public static final float WASTE_ENERGY_PER_SWITCH = 15f; //in LD ver it's 20
+    public static final float WASTE_ENERGY_PER_SEC = 30f;
+    public static final float ADD_ENERGY_PER_SEC = 5f;
+
     public static float PLAYTIME = 20f;
+
 
 }

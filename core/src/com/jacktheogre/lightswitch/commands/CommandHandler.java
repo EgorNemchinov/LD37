@@ -5,7 +5,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
-import com.jacktheogre.lightswitch.sprites.Actor;
+import com.jacktheogre.lightswitch.sprites.GameActor;
 
 import java.util.Stack;
 
@@ -37,12 +37,13 @@ public class CommandHandler {
 
     public void addCommand(Command command) {
         int pops = commands.size() - pointer;
-//        Gdx.app.log("iterations", ""+(commands.size()-pointer));
+        if(ClassReflection.isInstance(TeleportCommand.class, command));
+//            Gdx.app.log("addCommand", "teleport command");
         for (int i = 0; i < pops; i++) {
             commands.pop();
         }
         commands.push(command);
-//        Gdx.app.log("CMNDHDLR", "COMMAND ADDED: "+commands.peek().toString());
+        Gdx.app.log("CMNDHDLR", "COMMAND ADDED: "+commands.peek().toString());
         newCommands = true;
     }
 
@@ -52,9 +53,9 @@ public class CommandHandler {
             if(commands.get(i) != null) {
                 if(ClassReflection.isInstance(ActorCommand.class, commands.get(i))){
                     ActorCommand cmd = (ActorCommand)commands.get(i);
-                    if(cmd.actor == null)
-                        cmd.execute(screen.getPlayer().getActor());
-                    else cmd.execute(cmd.actor);
+                    if(cmd.gameActor == null)
+                        cmd.execute(screen.getPlayer().getGameActor());
+                    else cmd.execute(cmd.gameActor);
                 } else if(ClassReflection.isInstance(GlobalCommand.class, commands.get(i))){
                     ((GlobalCommand)commands.get(i)).execute();
                 }
@@ -83,7 +84,7 @@ public class CommandHandler {
         return commands;
     }
 
-    public void stopMoving(Actor.Direction direction) {
+    public void stopMoving(GameActor.Direction direction) {
         for (int i = commands.size() - 1; i >= 0 ; i--) {
             Command cmd = commands.get(i);
             if(ClassReflection.isInstance(StartMovingCommand.class, cmd)) {

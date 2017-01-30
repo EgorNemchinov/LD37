@@ -29,7 +29,6 @@ import com.jacktheogre.lightswitch.tools.Assets;
 import com.jacktheogre.lightswitch.tools.B2WorldCreator;
 import com.jacktheogre.lightswitch.tools.GenerateInputHandler;
 import com.jacktheogre.lightswitch.tools.Lighting;
-import com.jacktheogre.lightswitch.screens.PlayScreen;
 
 /**
  * Created by luna on 10.12.16.
@@ -48,7 +47,6 @@ public class GeneratingScreen implements Screen{
     private final Player player;
     private Lighting lighting;
     private OrthographicCamera gameCam;
-    //    private OrthographicCamera staticCam;
     private Viewport gamePort;
     private LightSwitch game;
     public Array<InteractiveObject> objects;
@@ -63,10 +61,8 @@ public class GeneratingScreen implements Screen{
     private Node selectedNode;
 
     public GeneratingScreen(LightSwitch game) {
-        Gdx.app.log("GeneratingScreen", "Constructor called");
         this.game = game;
         gameCam = new OrthographicCamera();
-//        staticCam = new OrthographicCamera();
         gamePort = new FitViewport(LightSwitch.WIDTH, LightSwitch.HEIGHT, gameCam);
         gameCam.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
         gameCam.zoom -= 0.2f;
@@ -77,17 +73,7 @@ public class GeneratingScreen implements Screen{
 
         state = State.DEFAULT;
 
-        undo = new Button(Assets.getAssetLoader().undo_button, Button.State.ACTIVE);
-        redo = new Button(Assets.getAssetLoader().redo_button, Button.State.ACTIVE);
-        start = new Button(Assets.getAssetLoader().start_button, Button.State.ACTIVE);
-        teleportButton = new Button(Assets.getAssetLoader().teleport_button, Button.State.ACTIVE);
-        undo.setPosition(30, -25);
-        redo.setPosition(undo.getX() + undo.getWidth()+15, undo.getY());
-        start.setPosition(redo.getX() + redo.getWidth()+15, redo.getY());
-        teleportButton.setPosition(-teleportButton.getWidth() - 10, 100);
-        undo.disable();
-        redo.disable();
-        teleportButton.setAutoUnpress(false);
+        initializeButtons();
 
         world = new World(new Vector2(0, 0), true);
         objects = new Array<InteractiveObject>();
@@ -95,7 +81,6 @@ public class GeneratingScreen implements Screen{
         player = new Player(this);
         enemyPlayer = new EnemyPlayer(this);
 
-        LevelManager.loadLevel(loader.getMap());
         lighting = new Lighting(this);
         new B2WorldCreator(this);
         if(!addable()) {
@@ -108,8 +93,21 @@ public class GeneratingScreen implements Screen{
         commandHandler = new CommandHandler(this);
         Node.Indexer.nullify();
         Gdx.input.setInputProcessor(new GenerateInputHandler(this));
-        // TODO: 12.12.16 look next string 
-//        player.update(0);
+    }
+
+    private void initializeButtons() {
+        undo = new Button(Assets.getAssetLoader().undo_button, Button.State.ACTIVE);
+        redo = new Button(Assets.getAssetLoader().redo_button, Button.State.ACTIVE);
+        start = new Button(Assets.getAssetLoader().start_button, Button.State.ACTIVE);
+        teleportButton = new Button(Assets.getAssetLoader().teleport_button, Button.State.ACTIVE);
+        undo.setPosition(30, -25);
+        redo.setPosition(undo.getX() + undo.getWidth()+15, undo.getY());
+        start.setPosition(redo.getX() + redo.getWidth()+15, redo.getY());
+        teleportButton.setPosition(-teleportButton.getWidth() - 10, 100);
+        undo.disable();
+        redo.disable();
+        teleportButton.setAutoUnpress(false);
+
     }
 
     public void update(float dt){
@@ -143,6 +141,22 @@ public class GeneratingScreen implements Screen{
 
         mapRenderer.render();
 
+        renderUI();
+        renderSelected();
+
+        game.batch.begin();
+        for (InteractiveObject object :objects) {
+            object.render(game.batch, delta);
+        }
+        player.getGameActor().draw(game.batch);
+        if(lighting.lightsOn())
+            enemyPlayer.getMonster().draw(game.batch);
+        game.batch.end();
+//        LevelManager.graph.render(shapeRenderer);
+
+    }
+
+    public void renderUI() {
         game.batch.setProjectionMatrix(gameCam.combined);
         game.batch.begin();
         game.batch.draw(Assets.getAssetLoader().moon, Assets.getAssetLoader().moon.getWidth()-gamePort.getWorldWidth() / 4, -gameCam.position.y / 2);
@@ -152,19 +166,6 @@ public class GeneratingScreen implements Screen{
         start.draw(game.batch);
         teleportButton.draw(game.batch);
         game.batch.end();
-
-        renderSelected();
-
-        game.batch.begin();
-        for (InteractiveObject object :objects) {
-            object.render(game.batch, delta);
-        }
-        player.getActor().draw(game.batch);
-        if(lighting.lightsOn())
-            enemyPlayer.getEnemy().draw(game.batch);
-        game.batch.end();
-//        LevelManager.graph.render(shapeRenderer);
-
     }
 
     public void renderSelected() {

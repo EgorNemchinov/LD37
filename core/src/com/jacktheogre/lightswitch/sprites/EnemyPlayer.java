@@ -4,14 +4,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.jacktheogre.lightswitch.ai.Agent;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
-import com.jacktheogre.lightswitch.screens.PlayScreen;
 
 /**
  * Created by luna on 10.12.16.
  */
 public class EnemyPlayer {
 
-    private Enemy enemy;
+    private Monster monster;
     private GeneratingScreen screen;
     private Agent agent;
 
@@ -21,29 +20,29 @@ public class EnemyPlayer {
     }
 
     public void update(float dt) {
-        enemy.setTarget(screen.getPlayer().getActor().b2body.getPosition());
-        agent.makePath(enemy);
-        enemy.update(dt);
+        monster.setTarget(screen.getPlayer().getGameActor().b2body.getPosition());
+        agent.makePath(monster);
+        monster.update(dt);
     }
 
-    public Enemy getEnemy() {
-        return enemy;
+    public Monster getMonster() {
+        return monster;
     }
 
-    public void setEnemy(Enemy enemy) {
-        this.enemy = enemy;
-        this.enemy.agent = agent;
+    public void setMonster(Monster monster) {
+        this.monster = monster;
+        this.monster.agent = agent;
     }
 
     public void setTarget(Vector2 target) {
-        enemy.setTarget(target);
+        monster.setTarget(target);
     }
 
     public void dispose(){
-        enemy.dispose();
+        monster.dispose();
     }
 
     public void render(SpriteBatch batch, float dt) {
-        batch.draw(enemy.getFrame(dt), enemy.getX(), enemy.getY());
+        batch.draw(monster.getFrame(dt), monster.getX(), monster.getY());
     }
 }

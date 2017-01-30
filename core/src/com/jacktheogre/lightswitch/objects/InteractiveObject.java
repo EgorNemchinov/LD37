@@ -4,10 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Circle;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
@@ -18,8 +15,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.jacktheogre.lightswitch.Constants;
 import com.jacktheogre.lightswitch.ai.LevelManager;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
-import com.jacktheogre.lightswitch.screens.PlayScreen;
-import com.jacktheogre.lightswitch.sprites.Actor;
+import com.jacktheogre.lightswitch.sprites.GameActor;
 
 /**
  * Created by luna on 10.12.16.
@@ -38,7 +34,7 @@ public abstract class InteractiveObject {
     protected Animation openAnimation, closingAnimation;
 
     public abstract void render(SpriteBatch spriteBatch, float dt);
-    public abstract void activate(Actor actor);
+    public abstract boolean activate(GameActor gameActor);
 
     public InteractiveObject(GeneratingScreen screen, int x, int y) {
         this(screen, x, y, true);

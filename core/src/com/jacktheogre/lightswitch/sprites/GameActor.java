@@ -21,7 +21,7 @@ import com.jacktheogre.lightswitch.ai.Node;
 /**
  * Created by luna on 19.10.16.
  */
-public abstract class Actor extends Sprite {
+public abstract class GameActor extends Sprite {
     protected float teleportTime;
     protected boolean teleportReady;
 
@@ -59,7 +59,9 @@ public abstract class Actor extends Sprite {
 
     protected boolean keyboardControl;
 
-    public Actor(World world, float x, float y, Texture texture) {
+    protected boolean isMoving;
+
+    public GameActor(World world, float x, float y, Texture texture) {
         super(texture);
         setPosition(x, y);
         this.world = world;
@@ -80,6 +82,7 @@ public abstract class Actor extends Sprite {
         nextPosition = curPosition;
         agent = new Agent(world);
         keyboardControl = false;
+        isMoving = false;
     }
 
     public void update(float dt) {
@@ -91,20 +94,23 @@ public abstract class Actor extends Sprite {
             }
         }
         if(keyboardControl) {
-            switch(direction) {
-                case DOWN:
-                    b2body.setLinearVelocity(0, -getSpeed());
-                    break;
-                case UP:
-                    b2body.setLinearVelocity(0, getSpeed());
-                    break;
-                case RIGHT:
-                    b2body.setLinearVelocity(getSpeed(), 0);
-                    break;
-                case LEFT:
-                    b2body.setLinearVelocity(-getSpeed(), 0);
-                    break;
-            }
+            if(isMoving) {
+                switch(direction) {
+                    case DOWN:
+                        b2body.setLinearVelocity(0, -getSpeed());
+                        break;
+                    case UP:
+                        b2body.setLinearVelocity(0, getSpeed());
+                        break;
+                    case RIGHT:
+                        b2body.setLinearVelocity(getSpeed(), 0);
+                        break;
+                    case LEFT:
+                        b2body.setLinearVelocity(-getSpeed(), 0);
+                        break;
+                }
+            } else
+                b2body.setLinearVelocity(Vector2.Zero);
         } else {
             curPosition = b2body.getPosition();
             if(nextPosition.cpy().sub(curPosition).len() < 2) {
@@ -117,7 +123,7 @@ public abstract class Actor extends Sprite {
         setPosition(b2body.getPosition().x - getWidth() / 2 , b2body.getPosition().y - getHeight() / 2 );
     }
 
-    public Direction getDirection() {
+    public Direction calculateDirection() {
         xVel = b2body.getLinearVelocity().x;
         yVel = b2body.getLinearVelocity().y;
         if(xVel > 0) {
@@ -143,12 +149,20 @@ public abstract class Actor extends Sprite {
         }
         return lastDirection;
     }
-    public Direction getCurDirection() {
+    public Direction getDirection() {
         return direction;
     }
 
     public void setDirection(Direction direction) {
         this.direction = direction;
+    }
+
+    public boolean isMoving() {
+        return isMoving;
+    }
+
+    public void setMoving(boolean moving) {
+        isMoving = moving;
     }
 
     public void setVelocity(Vector2 velocity) {
@@ -194,7 +208,10 @@ public abstract class Actor extends Sprite {
 //        Gdx.app.log("Target", toString() + " is set to " + target);
         currentNodePointer = 0;
         agent.makePath(this);
+        setMoving(false);
     }
+
+//    protected abstract boolean isRunning();
 
     public void setKeyboardControl(boolean control) {
         this.keyboardControl = control;
@@ -243,6 +260,7 @@ public abstract class Actor extends Sprite {
         path.clear();
         curPosition = b2body.getPosition();
         nextPosition = curPosition;
+        setMoving(false);
     }
 
     public Vector2 getCurPos() {
@@ -265,9 +283,11 @@ public abstract class Actor extends Sprite {
         this.remakingPath = remakingPath;
     }
 
-
+    public Fixture getFixture() {
+        return fixture;
+    }
 
     public String toString() {
-        return "Actor";
+        return "GameActor";
     }
 }

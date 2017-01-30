@@ -1,18 +1,12 @@
 package com.jacktheogre.lightswitch.ai;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
-import com.badlogic.gdx.ai.fsm.StateMachine;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.ai.msg.Telegraph;
-import com.badlogic.gdx.ai.pfa.PathSmoother;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
-import com.badlogic.gdx.ai.steer.behaviors.Arrive;
 import com.badlogic.gdx.ai.utils.Ray;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.Array;
-import com.jacktheogre.lightswitch.sprites.Actor;
+import com.jacktheogre.lightswitch.sprites.GameActor;
 
 /**
  * Created by luna on 21.10.16.
@@ -24,7 +18,7 @@ public class Agent implements Telegraph {
     RayCastCollisionDetectorImp detectorImp;
     PathSmootherImp pathSmoother;
 
-    private Actor actor;
+    private GameActor gameActor;
     private HeuristicImp heuristicImp;
 
     public Agent(World world) {
@@ -36,15 +30,15 @@ public class Agent implements Telegraph {
 //        Gdx.app.log("New path:", resultPath.toString());
     }
 
-    public void makePath(Actor actor) {
+    public void makePath(GameActor gameActor) {
         resultPath.clear();
 
-        this.actor = actor;
-        int startX = (int) actor.b2body.getPosition().x;
-        int startY = (int) actor.b2body.getPosition().y;
+        this.gameActor = gameActor;
+        int startX = (int) gameActor.b2body.getPosition().x;
+        int startY = (int) gameActor.b2body.getPosition().y;
 
-        int endX = (int) actor.getTarget().x;
-        int endY = (int) actor.getTarget().y;
+        int endX = (int) gameActor.getTarget().x;
+        int endY = (int) gameActor.getTarget().y;
 
         Node startNode = LevelManager.graph.getNodeByXY(startX, startY);
         Node endNode = LevelManager.graph.getNodeByXY(endX, endY);
@@ -54,7 +48,7 @@ public class Agent implements Telegraph {
 
         pathFinder.searchNodePath(startNode, endNode, heuristicImp, resultPath);
         pathSmoother.smoothPath(resultPath);
-        actor.setPath(resultPath);
+        gameActor.setPath(resultPath);
 //        Gdx.app.log("Estimation", "From 12,6:" + (heuristicImp.estimate(LevelManager.graph.getNodeByIndex(LevelManager.lvlTileWidth * 6 + 12),
 //                LevelManager.graph.getNodeByIndex(LevelManager.lvlTileWidth * 7 + 18)) +
 //                        heuristicImp.estimate(LevelManager.graph.getNodeByIndex(LevelManager.lvlTileWidth * 6 + 11),
@@ -70,8 +64,8 @@ public class Agent implements Telegraph {
         return resultPath;
     }
 
-    public Actor getActor() {
-        return actor;
+    public GameActor getGameActor() {
+        return gameActor;
     }
 
     public void update(float dt) {
@@ -91,7 +85,7 @@ public class Agent implements Telegraph {
     }
 
     public void sleep() {
-        actor.setVelocity(new Vector2(0, 0));
+        gameActor.setVelocity(new Vector2(0, 0));
     }
 
 

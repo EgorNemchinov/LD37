@@ -1,6 +1,6 @@
 package com.jacktheogre.lightswitch.commands;
 
-import com.jacktheogre.lightswitch.sprites.Actor;
+import com.jacktheogre.lightswitch.sprites.GameActor;
 
 import java.util.Stack;
 
@@ -11,14 +11,14 @@ public class StopMovingCommand extends ActorCommand {
 
     private CommandHandler commandHandler;
     private Stack<Command> commands;
-    private Actor.Direction direction;
+    private GameActor.Direction direction;
 
-    public StopMovingCommand(CommandHandler commandHandler, Actor.Direction direction, Actor actor) {
+    public StopMovingCommand(CommandHandler commandHandler, GameActor.Direction direction, GameActor gameActor) {
         this(commandHandler, direction);
-        this.actor = actor;
+        this.gameActor = gameActor;
     }
 
-    public StopMovingCommand(CommandHandler commandHandler, Actor.Direction direction) {
+    public StopMovingCommand(CommandHandler commandHandler, GameActor.Direction direction) {
         this.commandHandler = commandHandler;
         commands = commandHandler.getCommands();
         this.direction = direction;
@@ -26,7 +26,7 @@ public class StopMovingCommand extends ActorCommand {
 
     // FIXME: 12.12.16 очень плохой пример но это временно
     @Override
-    public boolean execute(Actor actor) {
+    public boolean execute(GameActor gameActor) {
         if(executed)
             return false;
         commandHandler.stopMoving(direction);

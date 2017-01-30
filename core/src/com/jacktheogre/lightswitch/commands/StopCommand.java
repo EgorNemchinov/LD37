@@ -2,7 +2,7 @@ package com.jacktheogre.lightswitch.commands;
 
 import com.badlogic.gdx.math.Vector2;
 import com.jacktheogre.lightswitch.ai.GraphPathImp;
-import com.jacktheogre.lightswitch.sprites.Actor;
+import com.jacktheogre.lightswitch.sprites.GameActor;
 
 /**
  * Created by luna on 12.12.16.
@@ -13,45 +13,45 @@ public class StopCommand extends ActorCommand {
     GraphPathImp path;
     boolean keyboardControl;
 
-    public StopCommand(Actor actor) {
-        this.actor = actor;
+    public StopCommand(GameActor gameActor) {
+        this.gameActor = gameActor;
     }
 
     public StopCommand() {
     }
 
     @Override
-    public boolean execute(Actor actor) {
+    public boolean execute(GameActor gameActor) {
         if(executed)
             return false;
-        curPos = actor.getCurPos();
-        nextPos = actor.getNextPos();
-        velocity = actor.b2body.getLinearVelocity();
-        path = actor.getPath();
-        keyboardControl = actor.isKeyboardControl();
-        actor.setKeyboardControl(false);
-        actor.stop();
+        curPos = gameActor.getCurPos();
+        nextPos = gameActor.getNextPos();
+        velocity = gameActor.b2body.getLinearVelocity();
+        path = gameActor.getPath();
+        keyboardControl = gameActor.isKeyboardControl();
+        gameActor.setKeyboardControl(false);
+        gameActor.stop();
         return true;
     }
 
     @Override
     public void undo() {
-        actor.setCurPosition(curPos);
-        actor.setNextPosition(nextPos);
-        actor.b2body.setLinearVelocity(velocity);
-        actor.setPath(path);
-        actor.setKeyboardControl(keyboardControl);
+        gameActor.setCurPosition(curPos);
+        gameActor.setNextPosition(nextPos);
+        gameActor.b2body.setLinearVelocity(velocity);
+        gameActor.setPath(path);
+        gameActor.setKeyboardControl(keyboardControl);
     }
 
     @Override
     public void redo() {
-        curPos = actor.getCurPos();
-        nextPos = actor.getNextPos();
-        velocity = actor.b2body.getLinearVelocity();
-        path = actor.getPath();
-        keyboardControl = actor.isKeyboardControl();
-        actor.setKeyboardControl(false);
-        actor.stop();
+        curPos = gameActor.getCurPos();
+        nextPos = gameActor.getNextPos();
+        velocity = gameActor.b2body.getLinearVelocity();
+        path = gameActor.getPath();
+        keyboardControl = gameActor.isKeyboardControl();
+        gameActor.setKeyboardControl(false);
+        gameActor.stop();
     }
 
     @Override
