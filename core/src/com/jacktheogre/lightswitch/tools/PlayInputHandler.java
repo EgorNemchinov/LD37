@@ -13,6 +13,8 @@ import com.jacktheogre.lightswitch.commands.TurnOnCommand;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
 import com.jacktheogre.lightswitch.sprites.GameActor;
 
+import static sun.audio.AudioPlayer.player;
+
 /**
  * Created by luna on 10.12.16.
  */
@@ -20,7 +22,7 @@ public class PlayInputHandler extends Stage{
 
     private PlayScreen screen;
     private float lastMakingPathTime = 0;
-    private int lightPointer = -1, arrowsPointer = -1;
+    private int lightPointer = -1;
 
     public PlayInputHandler(PlayScreen playScreen) {
         this.screen = playScreen;
@@ -35,18 +37,22 @@ public class PlayInputHandler extends Stage{
             case Input.Keys.W:
             case Input.Keys.UP:
                 screen.getCommandHandler().addCommand(new StartMovingCommand(GameActor.Direction.UP));
+                screen.getPlayer().getGameActor().setMoving(true);
                 break;
             case Input.Keys.A:
             case Input.Keys.LEFT:
                 screen.getCommandHandler().addCommand(new StartMovingCommand(GameActor.Direction.LEFT));
+                screen.getPlayer().getGameActor().setMoving(true);
                 break;
             case Input.Keys.S:
             case Input.Keys.DOWN:
                 screen.getCommandHandler().addCommand(new StartMovingCommand(GameActor.Direction.DOWN));
+                screen.getPlayer().getGameActor().setMoving(true);
                 break;
             case Input.Keys.D:
             case Input.Keys.RIGHT:
                 screen.getCommandHandler().addCommand(new StartMovingCommand(GameActor.Direction.RIGHT));
+                screen.getPlayer().getGameActor().setMoving(true);
                 break;
         }
         return true;

@@ -53,8 +53,9 @@ public class CommandHandler {
             if(commands.get(i) != null) {
                 if(ClassReflection.isInstance(ActorCommand.class, commands.get(i))){
                     ActorCommand cmd = (ActorCommand)commands.get(i);
-                    if(cmd.gameActor == null)
+                    if(cmd.gameActor == null) {
                         cmd.execute(screen.getPlayer().getGameActor());
+                    }
                     else cmd.execute(cmd.gameActor);
                 } else if(ClassReflection.isInstance(GlobalCommand.class, commands.get(i))){
                     ((GlobalCommand)commands.get(i)).execute();

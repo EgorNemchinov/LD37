@@ -1,5 +1,6 @@
 package com.jacktheogre.lightswitch.commands;
 
+import com.badlogic.gdx.Gdx;
 import com.jacktheogre.lightswitch.sprites.GameActor;
 
 /**
@@ -15,6 +16,10 @@ public class StartMovingCommand extends ActorCommand{
         this.direction = direction;
     }
 
+    public StartMovingCommand(GameActor.Direction direction, GameActor actor) {
+        this(direction);
+        this.gameActor = actor;
+    }
 
     @Override
     public boolean execute(GameActor gameActor) {
@@ -24,6 +29,7 @@ public class StartMovingCommand extends ActorCommand{
         gameActor.setKeyboardControl(true);
         pastDirection = gameActor.getDirection();
         gameActor.setDirection(direction);
+        Gdx.app.log("SMC", "executed, dir:" + gameActor.getDirection());
         return true;
     }
 

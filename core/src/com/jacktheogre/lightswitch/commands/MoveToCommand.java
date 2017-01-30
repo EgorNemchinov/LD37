@@ -19,6 +19,11 @@ public class MoveToCommand extends ActorCommand {
         executed = false;
     }
 
+    public MoveToCommand(float x, float y, GameActor actor) {
+        this(x, y);
+        this.gameActor = actor;
+    }
+
     public MoveToCommand(float x, float y) {
         this((int) x, (int) y);
     }

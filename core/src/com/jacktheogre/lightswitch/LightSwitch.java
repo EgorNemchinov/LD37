@@ -13,6 +13,7 @@ public class LightSwitch extends Game {
     public SpriteBatch batch;
     public static final int WIDTH = 400;
     public static final int HEIGHT = 240;
+    private boolean playingHuman = false;
 
     @Override
 	public void create () {
@@ -24,4 +25,12 @@ public class LightSwitch extends Game {
 	public void render () {
 		super.render();
 	}
+
+    public boolean isPlayingHuman() {
+        return playingHuman;
+    }
+
+    public void setPlayingHuman(boolean playingHuman) {
+        this.playingHuman = playingHuman;
+    }
 }

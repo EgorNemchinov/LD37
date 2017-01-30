@@ -21,6 +21,10 @@ public class Lighting {
     private final Color[] COLORS = {
         new Color(0xed/255f, 0x8a/255f, 0x00/255f, 0.6f), new Color(0xed/255f, 0x8a/255f, 0x00/255f, 0.6f)
     };
+    private final Color AMBIENT_HUMAN = new Color(0.05f, 0.15f, 0.05f, 0.20f);
+    private final Color AMBIENT_MONSTER = new Color(0.4f, 0.15f, 0.1f, 0.35f);
+    private final Color LIGHT_HUMAN= new Color(0xb6/255f, 0xFF/255f, 0xDB/255f, 0.8f);
+    private final Color LIGHT_MONSTER = new Color(200/255f, 0/255f, 100/255f, 0.6f);
 
     //box2dlights
     private RayHandler rayHandler;
@@ -34,11 +38,12 @@ public class Lighting {
     public Lighting(GeneratingScreen screen) {
         this.screen = screen;
         rayHandler = new RayHandler(screen.getWorld());
-        rayHandler.setAmbientLight(0.05f, 0.15f, 0.05f, 0.20f);
+        rayHandler.setAmbientLight(screen.getGame().isPlayingHuman() ? AMBIENT_HUMAN : AMBIENT_MONSTER);
         rayHandler.setBlurNum(3);
         pointLights = new Array<PointLight>();
 
-        actorLight = new PointLight(rayHandler, Constants.LIGHT_RAYS, new Color(0xb6/255f, 0xFF/255f, 0xDB/255f, 0.8f), 0.6f*Constants.LIGHT_DISTANCE , 550, 100);
+        actorLight = new PointLight(rayHandler, Constants.LIGHT_RAYS, screen.getGame().isPlayingHuman()? LIGHT_HUMAN : LIGHT_MONSTER,
+                0.6f*Constants.LIGHT_DISTANCE , 550, 100);
         transformActorLight(actorLight);
 
         actorLightFilter = new Filter();
@@ -77,6 +82,8 @@ public class Lighting {
         }
         rayHandler.setCombinedMatrix(screen.getGameCam());
         actorLight.setPosition(screen.getPlayer().getGameActor().b2body.getPosition());
+//        if(!screen.getGame().isPlayingHuman())
+//            actorLight.setActive(false);
         rayHandler.updateAndRender();
     }
 

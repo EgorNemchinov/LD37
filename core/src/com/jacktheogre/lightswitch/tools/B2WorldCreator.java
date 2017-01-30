@@ -79,20 +79,27 @@ public class B2WorldCreator {
             body.createFixture(fixtureDef);
         }
 
-        //actors
+        //5th layer is
+        //player
         for (MapObject object : map.getLayers().get(5).getObjects()) {
             if(!ClassReflection.isInstance(RectangleMapObject.class,object))
                 continue;
             Rectangle bounds = ((RectangleMapObject) object).getRectangle();
-            screen.getPlayer().setGameActor(new Human(world, bounds.getX(), bounds.getY()));
+            if(screen.getGame().isPlayingHuman())
+                screen.getPlayer().setGameActor(new Human(world, bounds.getX(), bounds.getY()));
+            else
+                screen.getPlayer().setGameActor(new Monster(world, bounds.getX(), bounds.getY()));
         }
 
-        //enemies
+        //enemy
         for (MapObject object : map.getLayers().get(6).getObjects()) {
             if(!ClassReflection.isInstance(RectangleMapObject.class,object))
                 continue;
             Rectangle bounds = ((RectangleMapObject) object).getRectangle();
-            screen.getEnemyPlayer().setMonster(new Monster(world, bounds.getX(), bounds.getY()));
+            if(screen.getGame().isPlayingHuman())
+                screen.getEnemyPlayer().setGameActor(new Monster(world, bounds.getX(), bounds.getY()));
+            else
+                screen.getEnemyPlayer().setGameActor(new Human(world, bounds.getX(), bounds.getY()));
         }
 
         //lights

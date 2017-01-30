@@ -10,7 +10,7 @@ import com.jacktheogre.lightswitch.screens.GeneratingScreen;
  */
 public class EnemyPlayer {
 
-    private Monster monster;
+    private GameActor gameActor;
     private GeneratingScreen screen;
     private Agent agent;
 
@@ -20,29 +20,29 @@ public class EnemyPlayer {
     }
 
     public void update(float dt) {
-        monster.setTarget(screen.getPlayer().getGameActor().b2body.getPosition());
-        agent.makePath(monster);
-        monster.update(dt);
+        gameActor.setTarget(screen.getPlayer().getGameActor().b2body.getPosition());
+        agent.makePath(gameActor);
+        gameActor.update(dt);
     }
 
-    public Monster getMonster() {
-        return monster;
+    public GameActor getGameActor() {
+        return gameActor;
     }
 
-    public void setMonster(Monster monster) {
-        this.monster = monster;
-        this.monster.agent = agent;
+    public void setGameActor(GameActor gameActor) {
+        this.gameActor = gameActor;
+        this.gameActor.agent = agent;
     }
 
     public void setTarget(Vector2 target) {
-        monster.setTarget(target);
+        gameActor.setTarget(target);
     }
 
     public void dispose(){
-        monster.dispose();
+        gameActor.dispose();
     }
 
     public void render(SpriteBatch batch, float dt) {
-        batch.draw(monster.getFrame(dt), monster.getX(), monster.getY());
+        batch.draw(gameActor.getFrame(dt), gameActor.getX(), gameActor.getY());
     }
 }

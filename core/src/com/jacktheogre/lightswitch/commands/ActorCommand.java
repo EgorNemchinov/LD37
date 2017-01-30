@@ -13,5 +13,7 @@ public abstract class ActorCommand extends Command{
     public void setGameActor(GameActor gameActor) {
         this.gameActor = gameActor;
     }
-
+    public GameActor getGameActor() {
+        return gameActor;
+    }
 }

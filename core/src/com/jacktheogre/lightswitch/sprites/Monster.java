@@ -1,5 +1,6 @@
 package com.jacktheogre.lightswitch.sprites;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -75,6 +76,7 @@ public class Monster extends GameActor {
     public void update(float dt) {
         super.update(dt);
         setPosition(b2body.getPosition().x - getWidth() / 2 , b2body.getPosition().y - getHeight() / 2 + 5);
+//        Gdx.app.log("Monster", "Direction: "+getDirection() + ", speed: "+b2body.getLinearVelocity());
     }
 
 

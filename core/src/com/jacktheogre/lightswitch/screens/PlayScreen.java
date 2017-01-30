@@ -29,7 +29,6 @@ import com.jacktheogre.lightswitch.objects.Teleport;
 import com.jacktheogre.lightswitch.sprites.EnemyPlayer;
 import com.jacktheogre.lightswitch.sprites.GameActor;
 import com.jacktheogre.lightswitch.sprites.Player;
-import com.jacktheogre.lightswitch.tools.AssetLoader;
 import com.jacktheogre.lightswitch.tools.PlayInputHandler;
 import com.jacktheogre.lightswitch.tools.Lighting;
 import com.jacktheogre.lightswitch.tools.WorldContactListener;
@@ -41,7 +40,6 @@ import com.jacktheogre.lightswitch.tools.WorldContactListener;
 public class PlayScreen implements Screen{
     private final WorldContactListener contactListener;
     private PlayInputHandler inputHandler;
-    private AssetLoader loader;
     public Array<InteractiveObject> objects;
 
     private LightSwitch game;
@@ -75,7 +73,6 @@ public class PlayScreen implements Screen{
         this.game = screen.getGame();
         gameCam = screen.getGameCam();
         gamePort = screen.getGamePort();
-        loader = screen.getLoader();
         mapRenderer = screen.getMapRenderer();
         world = screen.getWorld();
         b2dRenderer = new Box2DDebugRenderer();
@@ -130,9 +127,8 @@ public class PlayScreen implements Screen{
         for (InteractiveObject object :objects) {
             object.update(dt);
         }
-
         player.update(dt);
-        enemyPlayer.update(dt);
+//        enemyPlayer.update(dt);
         checkFixtureContacts();
         world.step(1 / 60f, 6, 2);
         player.getGameActor().remakePath();
@@ -160,8 +156,8 @@ public class PlayScreen implements Screen{
             object.render(game.batch, dt);
         }
         player.getGameActor().draw(game.batch);
-        if(lighting.lightsOn())
-            enemyPlayer.getMonster().draw(game.batch);
+        if(lighting.lightsOn() || !getGame().isPlayingHuman())
+            enemyPlayer.getGameActor().draw(game.batch);
 
         game.batch.end();
 
@@ -180,7 +176,7 @@ public class PlayScreen implements Screen{
 //        LevelManager.graph.render(shapeRenderer);
 //        b2dRenderer.render(world, gameCam.combined);
 //        player.getGameActor().getPath().render(shapeRenderer);
-//        enemyPlayer.getMonster().getPath().render(shapeRenderer);
+//        enemyPlayer.getGameActor().getPath().render(shapeRenderer);
 //        fpsLogger.log();
     }
 
@@ -190,7 +186,6 @@ public class PlayScreen implements Screen{
         float y = touchpad.getKnobPercentY();
         GameActor.Direction direction;
         if(x == 0 && y == 0) {
-            Gdx.app.log("PlayScreen", "touchpad x&y are zero");
             if(player.getGameActor().isMoving())
                 commandHandler.addCommand(new StopCommand());
             return;
@@ -290,6 +285,13 @@ public class PlayScreen implements Screen{
 
     }
 
+    // TODO: 31.01.17 may be states or smth like that
+    public boolean isPlayingHuman() {
+        if(player.getGameActor().toString().equals("Human"))
+            return true;
+        else
+            return false;
+    }
 
     public void setTouchPoint(int x, int y) {
         touchPoint = new Vector2(x, y);

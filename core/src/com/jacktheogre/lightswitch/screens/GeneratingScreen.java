@@ -150,7 +150,7 @@ public class GeneratingScreen implements Screen{
         }
         player.getGameActor().draw(game.batch);
         if(lighting.lightsOn())
-            enemyPlayer.getMonster().draw(game.batch);
+            enemyPlayer.getGameActor().draw(game.batch);
         game.batch.end();
 //        LevelManager.graph.render(shapeRenderer);
 

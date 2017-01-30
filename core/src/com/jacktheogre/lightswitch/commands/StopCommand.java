@@ -13,11 +13,11 @@ public class StopCommand extends ActorCommand {
     GraphPathImp path;
     boolean keyboardControl;
 
-    public StopCommand(GameActor gameActor) {
-        this.gameActor = gameActor;
+    public StopCommand() {
     }
 
-    public StopCommand() {
+    public StopCommand(GameActor gameActor) {
+        this.gameActor = gameActor;
     }
 
     @Override
