@@ -9,11 +9,10 @@ import com.jacktheogre.lightswitch.screens.*;
 
 public class LightSwitch extends Game {
 
-    // TODO: 11.12.16 move camera
     public SpriteBatch batch;
     public static final int WIDTH = 400;
     public static final int HEIGHT = 240;
-    private boolean playingHuman = false;
+    private boolean playingHuman = true;
 
     @Override
 	public void create () {

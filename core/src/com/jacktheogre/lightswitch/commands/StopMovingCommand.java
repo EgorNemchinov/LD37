@@ -24,7 +24,6 @@ public class StopMovingCommand extends ActorCommand {
         this.direction = direction;
     }
 
-    // FIXME: 12.12.16 очень плохой пример но это временно
     @Override
     public boolean execute(GameActor gameActor) {
         if(executed)

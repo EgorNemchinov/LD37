@@ -21,16 +21,14 @@ import com.jacktheogre.lightswitch.tools.MainMenuInputHandler;
 /**
  * Created by luna on 10.12.16.
  */
-public class MainMenuScreen implements Screen{
+public class MainMenuScreen extends GameScreen{
     private final Color BACKGROUND_COLOR = new Color(31/255f, 24/255f, 44/255f, 1f);
 
-    private OrthographicCamera gameCam;
-    private Viewport gamePort;
-    private LightSwitch game;
     private Button play_button;
     private AssetLoader loader;
 
     public MainMenuScreen(LightSwitch game) {
+        super();
         this.game = game;
         gameCam = new OrthographicCamera();
         gamePort = new FitViewport(LightSwitch.WIDTH, LightSwitch.HEIGHT, gameCam);
@@ -45,27 +43,35 @@ public class MainMenuScreen implements Screen{
         if(ClassReflection.isInstance(RectangleMapObject.class, object))
 //            rectangleMapObject = (RectangleMapObject) object;
 
-        play_button = new Button(Assets.getAssetLoader().play_button, Button.State.ACTIVE);
-        play_button.setPosition(gamePort.getWorldWidth() / 2 - play_button.getWidth() / 2, gamePort.getWorldHeight() / 2 - play_button.getHeight() / 2);
-        play_button.setScale(1);
-
+        initializeButtons();
         Gdx.input.setInputProcessor(new MainMenuInputHandler(this));
     }
 
 
     @Override
-    public void show() {
-
-    }
-
-    @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(BACKGROUND_COLOR.r,BACKGROUND_COLOR.g, BACKGROUND_COLOR.b, BACKGROUND_COLOR.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        game.batch.setProjectionMatrix(gameCam.combined);
-        game.batch.begin();
-        play_button.draw(game.batch);
-        game.batch.end();
+        renderButtons(gameCam);
+    }
+
+    @Override
+    protected void initializeButtons() {
+        play_button = new Button(Assets.getAssetLoader().play_button, Button.State.ACTIVE, this) {
+            @Override
+            protected void actUnpress() {
+                screen.getGame().setScreen(new GeneratingScreen(screen.getGame()));
+            }
+        };
+        play_button.setPosition(gamePort.getWorldWidth() / 2 - play_button.getWidth() / 2, gamePort.getWorldHeight() / 2 - play_button.getHeight() / 2);
+//        play_button.setScale(1);
+
+        buttons.add(play_button);
+    }
+
+    @Override
+    public void show() {
+
     }
 
     @Override

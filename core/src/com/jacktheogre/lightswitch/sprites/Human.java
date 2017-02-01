@@ -159,7 +159,7 @@ public class Human extends GameActor {
         bodyDef.fixedRotation = true;
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         b2body = world.createBody(bodyDef);
-        // TODO: 20.10.16 make good
+        // TODO: 31.01.17 fix physical model
         shape.setRadius(7);
 
         fixtureDef.shape = shape;
@@ -187,7 +187,7 @@ public class Human extends GameActor {
 
     @Override
     public void dispose() {
-        // TODO: 13.12.16 all the disposes
+        super.dispose();
     }
 
 }

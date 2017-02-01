@@ -29,8 +29,7 @@ public class MainMenuInputHandler implements InputProcessor {
     @Override
     public boolean keyUp(int keycode) {
         if(keycode == Input.Keys.ENTER) {
-            screen.getPlayButton().touchUp();
-            screen.getGame().setScreen(new GeneratingScreen(screen.getGame()));
+            screen.getPlayButton().unpress();
         }
         return true;
     }
@@ -42,39 +41,34 @@ public class MainMenuInputHandler implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        Vector3 screenTouch = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+        Vector3 screenTouch = new Vector3(screenX, screenY, 0);
         Vector3 point = screen.getGamePort().unproject(screenTouch.cpy());
-        if(screen.getPlayButton().getBoundingRectangle().contains(point.x, point.y))
-            screen.getPlayButton().press();
+        screen.touchDownButtons(point.x, point.y, pointer);
         return true;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        Vector3 screenTouch = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+        Vector3 screenTouch = new Vector3(screenX, screenY, 0);
         Vector3 point = screen.getGamePort().unproject(screenTouch.cpy());
-        if(screen.getPlayButton().getBoundingRectangle().contains(point.x,point.y)) {
-            screen.getPlayButton().touchUp();
-            screen.getGame().setScreen(new GeneratingScreen(screen.getGame()));
-        }
-        return false;
+        screen.touchUpButtons(point.x, point.y, pointer);
+        return true;
     }
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        return false;
+        Vector3 screenTouch = new Vector3(screenX, screenY, 0);
+        Vector3 point = screen.getGamePort().unproject(screenTouch.cpy());
+        screen.touchDraggedButtons(point.x, point.y, pointer);
+        return true;
     }
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
-        Vector3 screenTouch = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+        Vector3 screenTouch = new Vector3(screenX, screenY, 0);
         Vector3 point = screen.getGamePort().unproject(screenTouch.cpy());
-        if(screen.getPlayButton().getBoundingRectangle().contains(point.x,point.y)) {
-            screen.getPlayButton().focused();
-        } else {
-            screen.getPlayButton().unfocused();
-        }
-        return false;
+        screen.mouseMovedButtons(point.x, point.y);
+        return true;
     }
 
     @Override

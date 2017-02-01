@@ -30,7 +30,7 @@ public class AssetLoader {
     public BitmapFont font;
     public Sound runningSound, teleportOpenSound;
     public Sound teleportCloseSound;
-    private static int levelNum = 0;
+    private static int levelNum = 1;
 
     public AssetLoader() {
         this.manager = new AssetManager();

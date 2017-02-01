@@ -33,7 +33,7 @@ import com.jacktheogre.lightswitch.tools.Lighting;
 /**
  * Created by luna on 10.12.16.
  */
-public class GeneratingScreen implements Screen{
+public class GeneratingScreen extends GameScreen {
     private final Color DEFAULT = new Color(0.2f, 0.1f, 0.2f, 0.3f);
     private final Color CORRECT = new Color(0, 1, 0, 0.3f);
     private final Color WRONG = new Color(1, 0, 0, 0.3f);
@@ -46,12 +46,8 @@ public class GeneratingScreen implements Screen{
     private final EnemyPlayer enemyPlayer;
     private final Player player;
     private Lighting lighting;
-    private OrthographicCamera gameCam;
-    private Viewport gamePort;
-    private LightSwitch game;
     public Array<InteractiveObject> objects;
     private AssetLoader loader;
-    private ShapeRenderer shapeRenderer;
     private OrthogonalTiledMapRenderer mapRenderer;
     private World world;
     private CommandHandler commandHandler;
@@ -61,6 +57,7 @@ public class GeneratingScreen implements Screen{
     private Node selectedNode;
 
     public GeneratingScreen(LightSwitch game) {
+        super();
         this.game = game;
         gameCam = new OrthographicCamera();
         gamePort = new FitViewport(LightSwitch.WIDTH, LightSwitch.HEIGHT, gameCam);
@@ -95,11 +92,32 @@ public class GeneratingScreen implements Screen{
         Gdx.input.setInputProcessor(new GenerateInputHandler(this));
     }
 
-    private void initializeButtons() {
-        undo = new Button(Assets.getAssetLoader().undo_button, Button.State.ACTIVE);
-        redo = new Button(Assets.getAssetLoader().redo_button, Button.State.ACTIVE);
-        start = new Button(Assets.getAssetLoader().start_button, Button.State.ACTIVE);
-        teleportButton = new Button(Assets.getAssetLoader().teleport_button, Button.State.ACTIVE);
+    @Override
+    protected void initializeButtons() {
+        undo = new Button(Assets.getAssetLoader().undo_button, Button.State.ACTIVE) {
+            @Override
+            protected void actUnpress() {
+                commandHandler.undo();
+            }
+        };
+        redo = new Button(Assets.getAssetLoader().redo_button, Button.State.ACTIVE) {
+            @Override
+            protected void actUnpress() {
+                commandHandler.redo();
+            }
+        };
+        start = new Button(Assets.getAssetLoader().start_button, Button.State.ACTIVE, this) {
+            @Override
+            protected void actUnpress() {
+                game.setScreen(new PlayScreen(generatingScreen));
+            }
+        };
+        teleportButton = new Button(Assets.getAssetLoader().teleport_button, Button.State.ACTIVE, this) {
+            @Override
+            protected void actPress() {
+                generatingScreen.setState(GeneratingScreen.State.SETTING_TELEPORT);
+            }
+        };
         undo.setPosition(30, -25);
         redo.setPosition(undo.getX() + undo.getWidth()+15, undo.getY());
         start.setPosition(redo.getX() + redo.getWidth()+15, redo.getY());
@@ -108,6 +126,10 @@ public class GeneratingScreen implements Screen{
         redo.disable();
         teleportButton.setAutoUnpress(false);
 
+        buttons.add(undo);
+        buttons.add(redo);
+        buttons.add(start);
+        buttons.add(teleportButton);
     }
 
     public void update(float dt){
@@ -161,11 +183,9 @@ public class GeneratingScreen implements Screen{
         game.batch.begin();
         game.batch.draw(Assets.getAssetLoader().moon, Assets.getAssetLoader().moon.getWidth()-gamePort.getWorldWidth() / 4, -gameCam.position.y / 2);
         //buttons
-        undo.draw(game.batch);
-        redo.draw(game.batch);
-        start.draw(game.batch);
-        teleportButton.draw(game.batch);
-        game.batch.end();
+        renderButtons(gameCam);
+        if(game.batch.isDrawing())
+            game.batch.end();
     }
 
     public void renderSelected() {
@@ -230,7 +250,7 @@ public class GeneratingScreen implements Screen{
             commandHandler.addCommand(new AddTeleportCommand(this, (int) selectedNode.getWorldX() - LevelManager.tilePixelWidth / 2, (int)selectedNode.getWorldY() - LevelManager.tilePixelHeight / 2, objects));
             undo.enable();
             state = State.DEFAULT;
-            teleportButton.touchUp();
+            teleportButton.unpress();
         }
     }
 

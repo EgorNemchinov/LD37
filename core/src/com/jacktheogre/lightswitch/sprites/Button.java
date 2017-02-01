@@ -1,11 +1,10 @@
 package com.jacktheogre.lightswitch.sprites;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import com.jacktheogre.lightswitch.screens.GameScreen;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
 
@@ -27,7 +26,12 @@ public class Button extends Sprite {
     private boolean focused = false;
     private boolean autoUnpress = true;
 
-    private GeneratingScreen screen;
+    private int pointer;
+
+    // TODO: 01.02.17 mb only gamescreen is needed? delete playscreen and generating
+    public GeneratingScreen generatingScreen;
+    public PlayScreen playScreen;
+    public GameScreen screen;
 
     public Button(TextureRegion texture) {
         super(new TextureRegion(texture, 0, 0, texture.getRegionWidth() / 4, texture.getRegionHeight()));
@@ -39,6 +43,8 @@ public class Button extends Sprite {
     public Button(TextureRegion textureRegion, State state) {
         this(textureRegion);
         this.state = state;
+        if(state == State.DISABLED)
+            disabled = true;
     }
 
     public Button(TextureRegion textureRegion, State state, boolean oneTexture) {
@@ -49,8 +55,29 @@ public class Button extends Sprite {
         this.state = state;
     }
 
-    public void setScreen(GeneratingScreen screen) {
+    public Button(TextureRegion textureReg, State state, GameScreen screen) {
+        this(textureReg, state);
         this.screen = screen;
+    }
+
+    public Button(TextureRegion textureReg, State state, GeneratingScreen generatingScreen) {
+        this(textureReg, state);
+        this.generatingScreen = generatingScreen;
+    }
+
+    public Button(TextureRegion textureReg, State state, PlayScreen playScreen) {
+        this(textureReg, state);
+        this.playScreen = playScreen;
+    }
+
+    public void setPlayScreen(PlayScreen playScreen) {
+        this.playScreen = playScreen;
+    }
+
+    public void setGeneratingScreen(GeneratingScreen screen) {
+        this.generatingScreen = screen;
+
+
     }
 
     public void initGraphics(TextureRegion textureRegion) {
@@ -111,6 +138,7 @@ public class Button extends Sprite {
         pressed = true;
         if(!disabled) {
             setState(State.PRESSED);
+            actPress();
             return true;
         } else {
             setState(State.DISABLED);
@@ -118,8 +146,29 @@ public class Button extends Sprite {
         }
     }
 
-    public boolean touchUp() {
+    //used when button is pressed and then touch dragged outside it's bounds
+    public boolean undoPressing() {
+        if(disabled)
+            return false;
+        else {
+            pressed = false;
+            setState(State.ACTIVE);
+            return true;
+        }
+    }
 
+    //when it's dragged back
+    public boolean redoPressing() {
+        if(disabled)
+            return false;
+        else {
+            pressed = true;
+            setState(State.PRESSED);
+            return true;
+        }
+    }
+
+    public boolean unpress() {
         boolean wasPressed = pressed;
         pressed = false;
         if(!disabled) {
@@ -132,6 +181,8 @@ public class Button extends Sprite {
         } else {
             setState(State.DISABLED);
         }
+        if(wasPressed)
+            actUnpress();
         return wasPressed;
     }
 
@@ -160,7 +211,7 @@ public class Button extends Sprite {
 
     public void unfocused() {
         if(pressed)
-            touchUp();
+            unpress();
         if(!focused)
             return;
         focused = false;
@@ -172,8 +223,19 @@ public class Button extends Sprite {
         }
     }
 
+    protected void actPress() {}
+    protected void actUnpress() {}
+
     public boolean isPressed() {
         return pressed;
+    }
+
+    public int getPointer() {
+        return pointer;
+    }
+
+    public void setPointer(int pointer) {
+        this.pointer = pointer;
     }
 
     @Override

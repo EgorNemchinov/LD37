@@ -2,7 +2,6 @@ package com.jacktheogre.lightswitch.screens;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL20;
@@ -26,6 +25,7 @@ import com.jacktheogre.lightswitch.commands.StartMovingCommand;
 import com.jacktheogre.lightswitch.commands.StopCommand;
 import com.jacktheogre.lightswitch.objects.InteractiveObject;
 import com.jacktheogre.lightswitch.objects.Teleport;
+import com.jacktheogre.lightswitch.sprites.Button;
 import com.jacktheogre.lightswitch.sprites.EnemyPlayer;
 import com.jacktheogre.lightswitch.sprites.GameActor;
 import com.jacktheogre.lightswitch.sprites.Player;
@@ -37,15 +37,10 @@ import com.jacktheogre.lightswitch.tools.WorldContactListener;
 /**
  * Created by luna on 10.12.16.
  */
-public class PlayScreen implements Screen{
+public class PlayScreen extends GameScreen {
     private final WorldContactListener contactListener;
     private PlayInputHandler inputHandler;
     public Array<InteractiveObject> objects;
-
-    private LightSwitch game;
-    private OrthographicCamera gameCam;
-    private Viewport gamePort;
-    private ShapeRenderer shapeRenderer;
 
     private OrthogonalTiledMapRenderer mapRenderer;
 
@@ -60,16 +55,17 @@ public class PlayScreen implements Screen{
     private Lighting lighting;
     private CommandHandler commandHandler;
 
+    private FPSLogger fpsLogger;
+
+    private EnemyPlayer enemyPlayer;
+    private Vector2 touchPoint;
+    private Array<Contact> fixturesContacts;
+
     private float runTime;
     private float energy;
 
-    private FPSLogger fpsLogger;
-    private EnemyPlayer enemyPlayer;
-    private Vector2 touchPoint;
-
-    private Array<Contact> fixturesContacts;
-
     public PlayScreen(GeneratingScreen screen) {
+        super();
         this.game = screen.getGame();
         gameCam = screen.getGameCam();
         gamePort = screen.getGamePort();
@@ -108,6 +104,7 @@ public class PlayScreen implements Screen{
         fixturesContacts = new Array<Contact>();
         runTime = 0;
 
+        initializeButtons();
     }
 
     public void update(float dt) {
@@ -178,6 +175,13 @@ public class PlayScreen implements Screen{
 //        player.getGameActor().getPath().render(shapeRenderer);
 //        enemyPlayer.getGameActor().getPath().render(shapeRenderer);
 //        fpsLogger.log();
+    }
+
+    @Override
+    protected void initializeButtons() {
+        if(Gdx.app.getType() == Application.ApplicationType.Android) {
+            buttons.add(hud.getLightButton());
+        }
     }
 
     private void handleTouchpadInput() {
@@ -285,12 +289,8 @@ public class PlayScreen implements Screen{
 
     }
 
-    // TODO: 31.01.17 may be states or smth like that
     public boolean isPlayingHuman() {
-        if(player.getGameActor().toString().equals("Human"))
-            return true;
-        else
-            return false;
+        return game.isPlayingHuman();
     }
 
     public void setTouchPoint(int x, int y) {
@@ -331,7 +331,9 @@ public class PlayScreen implements Screen{
 
     @Override
     public void dispose() {
-        // TODO: 10.12.16 dispose
+        hud.dispose();
+        world.dispose();
+        mapRenderer.dispose();
     }
 
     public World getWorld() {

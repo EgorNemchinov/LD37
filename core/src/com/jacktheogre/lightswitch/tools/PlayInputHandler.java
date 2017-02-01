@@ -60,7 +60,6 @@ public class PlayInputHandler extends Stage{
 
     @Override
     public boolean keyUp(int keycode) {
-        // TODO: 12.12.16 maybe undo last command with certain direction
         switch(keycode) {
             case Input.Keys.SPACE:
                 screen.getCommandHandler().addCommand(new TurnOffCommand(screen));
@@ -94,25 +93,12 @@ public class PlayInputHandler extends Stage{
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         super.touchDown(screenX, screenY, pointer, button);
         Vector3 screenTouch = new Vector3(screenX, screenY, 0);
-        Vector3 point = screen.getGamePort().getCamera().unproject(screenTouch.cpy());
         Vector3 hudPoint = screen.getHud().getCamera().unproject(screenTouch.cpy());
         screenTouch.y = screen.getGamePort().getScreenHeight() - screenTouch.y;
-        if(Gdx.app.getType() == Application.ApplicationType.Android) {
-            if(screen.getHud().getLight_button().getBoundingRectangle().contains(hudPoint.x, hudPoint.y)) {
-                if(!screen.getLighting().lightsOn())
-                    screen.getCommandHandler().addCommand(new TurnOnCommand(screen));
-                lightPointer = pointer;
-            }
-            /*else{
-                screen.getCommandHandler().addCommand(new MoveToCommand(point.x, point.y));
-                screen.setTouchPoint((int)point.x, (int)point.y);
-                lastMakingPathTime = screen.getRunTime();
-            }*/
-        } else {
-            screen.getCommandHandler().addCommand(new MoveToCommand(point.x, point.y));
-            screen.setTouchPoint((int)point.x, (int)point.y);
-            lastMakingPathTime = screen.getRunTime();
-        }
+        screen.touchDownButtons(hudPoint.x, hudPoint.y, pointer);
+        /*screen.getCommandHandler().addCommand(new MoveToCommand(point.x, point.y));
+        screen.setTouchPoint((int)point.x, (int)point.y);
+        lastMakingPathTime = screen.getRunTime();*/
         return true;
     }
 
@@ -120,13 +106,9 @@ public class PlayInputHandler extends Stage{
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         super.touchUp(screenX, screenY, pointer, button);
         Vector3 screenTouch = new Vector3(screenX, screenY, 0);
-        Vector3 point = screen.getHud().getCamera().unproject(screenTouch.cpy());
+        Vector3 hudPoint = screen.getHud().getCamera().unproject(screenTouch.cpy());
         screenTouch.y = screen.getGamePort().getScreenHeight() - screenTouch.y;
-        if(Gdx.app.getType() == Application.ApplicationType.Android) {
-            if(pointer == lightPointer) {
-                screen.getCommandHandler().addCommand(new TurnOffCommand(screen));
-            }
-        }
+        screen.touchUpButtons(hudPoint.x, hudPoint.y, pointer);
         return true;
     }
 
@@ -136,13 +118,7 @@ public class PlayInputHandler extends Stage{
         super.touchDragged(screenX, screenY, pointer);
         Vector3 screenTouch = new Vector3(screenX, screenY, 0);
         Vector3 point = screen.getHud().getCamera().unproject(screenTouch.cpy());
-        if(pointer == lightPointer) {
-            if(!screen.getHud().getLight_button().getBoundingRectangle().contains(point.x, point.y)) {
-                if(screen.getLighting().lightsOn())
-                    screen.getCommandHandler().addCommand(new TurnOffCommand(screen));
-            }
-            return true;
-        }
+        screen.touchDraggedButtons(point.x, point.y, pointer);
        /* if(screen.getRunTime() - lastMakingPathTime > 0.2f) {
             return touchDown(screenX, screenY, pointer, 0);
         } else

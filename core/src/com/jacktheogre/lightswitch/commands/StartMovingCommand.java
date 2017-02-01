@@ -29,7 +29,6 @@ public class StartMovingCommand extends ActorCommand{
         gameActor.setKeyboardControl(true);
         pastDirection = gameActor.getDirection();
         gameActor.setDirection(direction);
-        Gdx.app.log("SMC", "executed, dir:" + gameActor.getDirection());
         return true;
     }
 

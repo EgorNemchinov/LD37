@@ -4,11 +4,7 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -18,6 +14,8 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.jacktheogre.lightswitch.commands.TurnOffCommand;
+import com.jacktheogre.lightswitch.commands.TurnOnCommand;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
 import com.jacktheogre.lightswitch.sprites.Button;
 import com.jacktheogre.lightswitch.tools.Assets;
@@ -29,12 +27,11 @@ public class Hud implements Disposable{
 
     public Stage stage;
     private Viewport viewport;
-    private Rectangle arrowsRect;
 
     private Label timeLabel;
     private PlayScreen screen;
     private Sprite energyBar, fill, timer;
-    private Button light_button, arrowUp, arrowRight, arrowDown, arrowLeft;
+    private Button lightButton;
     private float energyBarScale = 1f;
 
     // FIXME: 29.01.17 TOUCHPAD
@@ -88,10 +85,24 @@ public class Hud implements Disposable{
         timer = new Sprite(Assets.getAssetLoader().timer);
         timer.setPosition((viewport.getWorldWidth() - timer.getWidth()) / 2, viewport.getWorldHeight() - timer.getHeight());
         if(Gdx.app.getType() == Application.ApplicationType.Android) {
-            light_button = new Button(Assets.getAssetLoader().light_button, com.jacktheogre.lightswitch.sprites.Button.State.ACTIVE);
-            energyBar.setPosition(energyBar.getX(), energyBar.getY() + light_button.getHeight() / 2 );
+            lightButton = new Button(Assets.getAssetLoader().light_button, com.jacktheogre.lightswitch.sprites.Button.State.ACTIVE, screen) {
+                @Override
+                protected void actPress() {
+                    Gdx.app.log("lightButton", "press");
+                    if(!playScreen.getLighting().lightsOn())
+                        playScreen.getCommandHandler().addCommand(new TurnOnCommand(screen));
+                }
+
+                @Override
+                protected void actUnpress() {
+                    Gdx.app.log("lightButton", "unpress");
+                    if(playScreen.getLighting().lightsOn())
+                        playScreen.getCommandHandler().addCommand(new TurnOffCommand(screen));
+                }
+            };
+            energyBar.setPosition(energyBar.getX(), energyBar.getY() + lightButton.getHeight() / 2 );
             fill.setPosition(energyBar.getX() + 2, energyBar.getY() + 2);
-            light_button.setPosition(energyBar.getX(), energyBar.getY() - light_button.getHeight());
+            lightButton.setPosition(energyBar.getX(), energyBar.getY() - lightButton.getHeight());
         }
     }
 
@@ -108,7 +119,6 @@ public class Hud implements Disposable{
         timer.draw(screen.getGame().batch);
         timeLabel.draw(screen.getGame().batch, 1f);
         if(Gdx.app.getType() == Application.ApplicationType.Android) {
-            light_button.draw(screen.getGame().batch);
             //draws touchPad
             screen.getInputHandler().act(dt);
             screen.getGame().batch.setProjectionMatrix(screen.getInputHandler().getCamera().combined);
@@ -117,7 +127,9 @@ public class Hud implements Disposable{
             Color color = screen.getGame().batch.getColor();
             screen.getGame().batch.setColor(color.r, color.g, color.b, 1);
         }
-        screen.getGame().batch.end();
+        screen.renderButtons(stage.getCamera());
+        if(screen.getGame().batch.isDrawing())
+            screen.getGame().batch.end();
 
         /*ShapeRenderer sr = new ShapeRenderer();
         sr.setAutoShapeType(true);
@@ -147,23 +159,7 @@ public class Hud implements Disposable{
         //nothing to dispose
     }
 
-    public Button getLight_button() {
-        return light_button;
-    }
-
-    public Button getArrowUp() {
-        return arrowUp;
-    }
-
-    public Button getArrowRight() {
-        return arrowRight;
-    }
-
-    public Button getArrowDown() {
-        return arrowDown;
-    }
-
-    public Button getArrowLeft() {
-        return arrowLeft;
+    public Button getLightButton() {
+        return lightButton;
     }
 }

@@ -21,14 +21,10 @@ import com.jacktheogre.lightswitch.tools.GameOverInputHandler;
 /**
  * Created by luna on 10.12.16.
  */
-public class GameOverScreen implements Screen{
+public class GameOverScreen extends GameScreen{
 
     private static final float INTERVAL = 10;
     private static final float SCALE = 1.5f;
-
-    private LightSwitch game;
-    private OrthographicCamera gameCam;
-    private Viewport gamePort;
 
     public State getState() {
         return state;
@@ -39,28 +35,13 @@ public class GameOverScreen implements Screen{
     private Button next_level, replay, home;
 
     public GameOverScreen(LightSwitch game, State state) {
+        super();
         this.game = game;
         this.state = state;
         gameCam = new OrthographicCamera();
         gamePort = new FitViewport(LightSwitch.WIDTH, LightSwitch.HEIGHT, gameCam);
         gameCam.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
-
-        replay = new Button(Assets.getAssetLoader().replay_button, Button.State.ACTIVE);
-        replay.setPosition(gamePort.getWorldWidth() / 2 - 2f*replay.getWidth()-INTERVAL, gamePort.getWorldHeight() / 2 - replay.getHeight() / 2 - 80);
-        replay.setScale(SCALE);
-
-        next_level = new Button(Assets.getAssetLoader().next_level_button);
-        next_level.setPosition(replay.getBoundingRectangle().getX()+replay.getBoundingRectangle().getWidth() + INTERVAL, replay.getY());
-        if(!Assets.getAssetLoader().isMaxLevel() && state == State.WIN)
-            next_level.enable();
-        else
-            next_level.disable();
-        next_level.setScale(SCALE);
-
-
-        home = new Button(Assets.getAssetLoader().home_button, Button.State.ACTIVE);
-        home.setPosition(next_level.getBoundingRectangle().getX()+next_level.getBoundingRectangle().getWidth() + INTERVAL, next_level.getY());
-        home.setScale(SCALE);
+        initializeButtons();
 
         Gdx.input.setInputProcessor(new GameOverInputHandler(this));
     }
@@ -84,9 +65,6 @@ public class GameOverScreen implements Screen{
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         game.batch.setProjectionMatrix(gameCam.combined);
         game.batch.begin();
-        replay.draw(game.batch);
-        next_level.draw(game.batch);
-        home.draw(game.batch);
         switch (state) {
             case WIN:
                 if(Assets.getAssetLoader().isMaxLevel()) {
@@ -114,7 +92,9 @@ public class GameOverScreen implements Screen{
                         gamePort.getWorldHeight() / 2);
                 break;
         }
-        game.batch.end();
+        renderButtons(gameCam);
+        if(game.batch.isDrawing())
+            game.batch.end();
         /*ShapeRenderer shapeRenderer = new ShapeRenderer();
         shapeRenderer.setProjectionMatrix(gameCam.combined);
         shapeRenderer.setAutoShapeType(true);
@@ -122,6 +102,43 @@ public class GameOverScreen implements Screen{
         shapeRenderer.rect(replay.getBoundingRectangle().getX(), replay.getBoundingRectangle().getY(),
                 replay.getBoundingRectangle().getWidth(), replay.getBoundingRectangle().getHeight());
         shapeRenderer.end();*/
+    }
+
+    @Override
+    protected void initializeButtons() {
+        replay = new Button(Assets.getAssetLoader().replay_button, Button.State.ACTIVE, this) {
+          @Override
+          protected void actUnpress() {
+              screen.getGame().setScreen(new GeneratingScreen(screen.getGame()));
+          }
+        };
+        replay.setPosition(gamePort.getWorldWidth() / 2 - 2f*replay.getWidth()-INTERVAL, gamePort.getWorldHeight() / 2 - replay.getHeight() / 2 - 80);
+        replay.setScale(SCALE);
+
+        boolean nextLevelActive = !Assets.getAssetLoader().isMaxLevel() && state == State.WIN;
+        next_level = new Button(Assets.getAssetLoader().next_level_button, nextLevelActive ? Button.State.ACTIVE : Button.State.DISABLED, this) {
+            @Override
+            protected void actUnpress() {
+                Assets.getAssetLoader().nextLevel();
+                screen.getGame().setScreen(new GeneratingScreen(screen.getGame()));
+            }
+        };
+        next_level.setPosition(replay.getBoundingRectangle().getX()+replay.getBoundingRectangle().getWidth() + INTERVAL, replay.getY());
+        next_level.setScale(SCALE);
+
+
+        home = new Button(Assets.getAssetLoader().home_button, Button.State.ACTIVE, this) {
+            @Override
+            protected void actUnpress() {
+                screen.getGame().setScreen(new MainMenuScreen(screen.getGame()));
+            }
+        };
+        home.setPosition(next_level.getBoundingRectangle().getX()+next_level.getBoundingRectangle().getWidth() + INTERVAL, next_level.getY());
+        home.setScale(SCALE);
+
+        buttons.add(replay);
+        buttons.add(next_level);
+        buttons.add(home);
     }
 
     public Button getNext_level() {

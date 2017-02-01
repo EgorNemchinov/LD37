@@ -242,8 +242,6 @@ public abstract class GameActor extends Sprite {
         return agent;
     }
 
-    public abstract void dispose();
-
     public abstract int getSpeed();
     protected abstract void initialize();
     private void setTransparent() {
@@ -262,6 +260,10 @@ public abstract class GameActor extends Sprite {
         curPosition = b2body.getPosition();
         nextPosition = curPosition;
         setMoving(false);
+    }
+
+    public void dispose() {
+
     }
 
     public Vector2 getCurPos() {

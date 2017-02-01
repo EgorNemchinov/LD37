@@ -45,24 +45,24 @@ public class GameOverInputHandler implements InputProcessor {
     @Override
     public boolean keyUp(int keycode) {
         if(keycode == Input.Keys.ENTER) {
-            enterButton.touchUp();
+            enterButton.unpress();
             if(enterButton == screen.getNext_level())
                 Assets.getAssetLoader().nextLevel();
             screen.getGame().setScreen(new GeneratingScreen(screen.getGame()));
         }
         if(keycode == Input.Keys.R) {
-            screen.getReplay().touchUp();
+            screen.getReplay().unpress();
             screen.getGame().setScreen(new GeneratingScreen(screen.getGame()));
         }
         if(keycode == Input.Keys.N) {
-            screen.getNext_level().touchUp();
+            screen.getNext_level().unpress();
             if(screen.getNext_level().getState() == Button.State.DISABLED) {
                 Assets.getAssetLoader().nextLevel();
                 screen.getGame().setScreen(new GeneratingScreen(screen.getGame()));
             }
         }
         if(keycode == Input.Keys.BACKSPACE) {
-            screen.getHome().touchUp();
+            screen.getHome().unpress();
             screen.getGame().setScreen(new MainMenuScreen(screen.getGame()));
         }
         return true;
@@ -75,61 +75,34 @@ public class GameOverInputHandler implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        Vector3 screenTouch = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+        Vector3 screenTouch = new Vector3(screenX, screenY, 0);
         Vector3 point = screen.getGamePort().unproject(screenTouch.cpy());
-        if(screen.getReplay().getBoundingRectangle().contains(point.x, point.y))
-            screen.getReplay().press();
-        if(screen.getNext_level().getBoundingRectangle().contains(point.x, point.y))
-            screen.getNext_level().press();
-        if(screen.getHome().getBoundingRectangle().contains(point.x, point.y))
-            screen.getHome().press();
+        screen.touchDownButtons(point.x, point.y, pointer);
         return true;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        Vector3 screenTouch = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+        Vector3 screenTouch = new Vector3(screenX, screenY, 0);
         Vector3 point = screen.getGamePort().unproject(screenTouch.cpy());
-        if(screen.getReplay().getBoundingRectangle().contains(point.x, point.y)) {
-            screen.getReplay().touchUp();
-            screen.getGame().setScreen(new GeneratingScreen(screen.getGame()));
-        }
-        if(screen.getNext_level().getBoundingRectangle().contains(point.x, point.y)) {
-            screen.getNext_level().touchUp();
-            if(screen.getNext_level().getState() != Button.State.DISABLED) {
-                Assets.getAssetLoader().nextLevel();
-                screen.getGame().setScreen(new GeneratingScreen(screen.getGame()));
-            }
-        }
-        if(screen.getHome().getBoundingRectangle().contains(point.x, point.y)) {
-            screen.getHome().touchUp();
-            screen.getGame().setScreen(new MainMenuScreen(screen.getGame()));
-        }
+        screen.touchUpButtons(point.x, point.y, pointer);
         return true;
     }
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        return false;
+        Vector3 screenTouch = new Vector3(screenX, screenY, 0);
+        Vector3 point = screen.getGamePort().unproject(screenTouch.cpy());
+        screen.touchDraggedButtons(point.x, point.y, pointer);
+        return true;
     }
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
-        Vector3 screenTouch = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+        Vector3 screenTouch = new Vector3(screenX, screenY, 0);
         Vector3 point = screen.getGamePort().unproject(screenTouch.cpy());
         screenTouch.y = screen.getGamePort().getScreenHeight() - screenTouch.y;
-        if(screen.getReplay().getBoundingRectangle().contains(point.x, point.y))
-            screen.getReplay().focused();
-        else
-            screen.getReplay().unfocused();
-        if(screen.getNext_level().getBoundingRectangle().contains(point.x, point.y))
-            screen.getNext_level().focused();
-        else
-            screen.getNext_level().unfocused();
-        if(screen.getHome().getBoundingRectangle().contains(point.x, point.y))
-            screen.getHome().focused();
-        else
-            screen.getHome().unfocused();
+        screen.mouseMovedButtons(point.x, point.y);
         return true;
     }
 
