@@ -13,20 +13,20 @@ import com.jacktheogre.lightswitch.screens.PlayScreen;
  */
 public class Button extends Sprite {
     public enum State {ACTIVE, FOCUSED, PRESSED, DISABLED}
-    private State state;
-    private TextureRegion textureReg;
-    private TextureRegion activeTexture;
-    private TextureRegion focusedTexture;
-    private TextureRegion pressedTexture;
-    private TextureRegion disabledTexture;
-    private boolean singleTexture;
+    protected State state;
+    protected TextureRegion textureReg;
+    protected TextureRegion activeTexture;
+    protected TextureRegion focusedTexture;
+    protected TextureRegion pressedTexture;
+    protected TextureRegion disabledTexture;
+    protected boolean singleTexture;
 
-    private boolean disabled = false;
-    private boolean pressed = false;
-    private boolean focused = false;
-    private boolean autoUnpress = true;
+    protected boolean disabled = false;
+    protected boolean pressed = false;
+    protected boolean focused = false;
+    protected boolean autoUnpress = true;
 
-    private int pointer;
+    protected int pointer;
 
     // TODO: 01.02.17 mb only gamescreen is needed? delete playscreen and generating
     public GeneratingScreen generatingScreen;
@@ -70,22 +70,11 @@ public class Button extends Sprite {
         this.playScreen = playScreen;
     }
 
-    public void setPlayScreen(PlayScreen playScreen) {
-        this.playScreen = playScreen;
-    }
-
-    public void setGeneratingScreen(GeneratingScreen screen) {
-        this.generatingScreen = screen;
-
-
-    }
-
     public void initGraphics(TextureRegion textureRegion) {
         int width = textureRegion.getRegionWidth() / 4;
         Array<TextureRegion> frames = new Array<TextureRegion>();
 
         if(!singleTexture) {
-
             for (int i = 0; i < 4; i++) {
                 frames.add(new TextureRegion(textureRegion, i*width, 0, width, textureRegion.getRegionHeight()));
             }

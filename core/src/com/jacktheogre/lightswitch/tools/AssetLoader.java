@@ -20,9 +20,9 @@ public class AssetLoader {
     public static final float LETTER_HEIGHT = 15 * FONT_SCALE;
     public static final int LEVEL_AMOUNT = 3;
     private AssetManager manager;
-    public Texture characters, teleport, scale, scale_fill, timer;
-    public Texture moon, buttons;
-    public Texture touchBg, touchKnob;
+    public Texture characters, teleport, scale_fill, timer;
+    public Texture moon, buttons, joystick;
+    public TextureRegion touchBg, touchKnob, scale;
     public TextureRegion next_level_button, home_button, replay_button, light_button;
     public TextureRegion undo_button, redo_button, start_button, teleport_button, play_button;
     public TiledMap[] maps;
@@ -30,7 +30,7 @@ public class AssetLoader {
     public BitmapFont font;
     public Sound runningSound, teleportOpenSound;
     public Sound teleportCloseSound;
-    private static int levelNum = 1;
+    private static int levelNum = 0;
 
     public AssetLoader() {
         this.manager = new AssetManager();
@@ -47,14 +47,13 @@ public class AssetLoader {
         manager.load("scale.png", Texture.class);
         manager.load("scale_fill.png", Texture.class);
         manager.load("moon.png", Texture.class);
-        manager.load("allbuttons.png", Texture.class);
+        manager.load("buttons.png", Texture.class);
         manager.load("timer.png", Texture.class);
         manager.load("running.mp3", Sound.class);
         manager.load("tpOpen.mp3", Sound.class);
         manager.load("tpClose.mp3", Sound.class);
         manager.load("light_button.png", Texture.class);
-        manager.load("touchBackground.png", Texture.class);
-        manager.load("touchKnob.png", Texture.class);
+        manager.load("joystick.png", Texture.class);
         manager.finishLoading();
 
         for (int i = 0; i < LEVEL_AMOUNT; i++) {
@@ -62,19 +61,16 @@ public class AssetLoader {
         }
         characters = manager.get("characters.png",Texture.class);
         teleport = manager.get("portals.png", Texture.class);
-        buttons = manager.get("allbuttons.png",Texture.class);
-        scale = manager.get("scale.png", Texture.class);
+        buttons = manager.get("buttons.png",Texture.class);
         scale_fill = manager.get("scale_fill.png", Texture.class);
         moon = manager.get("moon.png",Texture.class);
         timer = manager.get("timer.png", Texture.class);
-        touchBg = manager.get("touchBackground.png", Texture.class);
-        touchKnob = manager.get("touchKnob.png", Texture.class);
+        joystick = manager.get("joystick.png", Texture.class);
         runningSound = manager.get("running.mp3", Sound.class);
         teleportOpenSound = manager.get("tpOpen.mp3", Sound.class);
         teleportCloseSound = manager.get("tpClose.mp3", Sound.class);
         
 //        light_button = new TextureRegion(manager.get("light_button.png", Texture.class));
-        light_button = new TextureRegion(buttons, 0, 251, 148, 44);
         start_button = new TextureRegion(buttons, 0, 0, 344, 22);
         redo_button = new TextureRegion(buttons, 0, 26, 148, 22);
         undo_button = new TextureRegion(buttons, 0, 52, 148, 22);
@@ -83,6 +79,10 @@ public class AssetLoader {
         next_level_button = new TextureRegion(buttons, 0, 173, 100, 22);
         replay_button = new TextureRegion(buttons, 0, 199, 100, 22);
         home_button = new TextureRegion(buttons, 0, 225, 100, 22);
+        light_button = new TextureRegion(buttons, 0, 251, 98, 42);
+        scale = new TextureRegion(buttons, 476, 0, 49, 165);
+        touchBg = new TextureRegion(joystick, 0, 0, 132, 132);
+        touchKnob = new TextureRegion(joystick, 130, 0, 126, 126);
 
         font = new BitmapFont(Gdx.files.internal("font.fnt"));
         font.getData().setScale(FONT_SCALE,FONT_SCALE);

@@ -5,12 +5,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad.*;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -69,14 +71,14 @@ public class Hud implements Disposable{
         touchpadStyle.background = touchpadSkin.getDrawable("touchBackground");
         touchpadStyle.knob = touchpadSkin.getDrawable("touchKnob");
         touchpad = new Touchpad(15, touchpadStyle);
-        touchpad.setBounds(viewport.getScreenWidth() - 400, 20 , 400, 400);
+        touchpad.setBounds(viewport.getScreenWidth() - 420, 20 , 400, 400);
 
         screen.getInputHandler().addActor(touchpad);
     }
 
     private void initializeGraphicElements() {
         energyBar = new Sprite(Assets.getAssetLoader().scale);
-        energyBar.setPosition(energyBar.getWidth() / 2, 20);
+        energyBar.setPosition(energyBar.getWidth() / 2, 40);
         energyBar.setScale(1f);
         fill = new Sprite(Assets.getAssetLoader().scale_fill);
         fill.setPosition(energyBar.getX() + 2, energyBar.getY() + 2);
@@ -85,7 +87,7 @@ public class Hud implements Disposable{
         timer = new Sprite(Assets.getAssetLoader().timer);
         timer.setPosition((viewport.getWorldWidth() - timer.getWidth()) / 2, viewport.getWorldHeight() - timer.getHeight());
         if(Gdx.app.getType() == Application.ApplicationType.Android) {
-            lightButton = new Button(Assets.getAssetLoader().light_button, com.jacktheogre.lightswitch.sprites.Button.State.ACTIVE, screen) {
+            lightButton = new Button(Assets.getAssetLoader().light_button, Button.State.ACTIVE, screen) {
                 @Override
                 protected void actPress() {
                     if(!playScreen.getLighting().lightsOn())
@@ -97,10 +99,26 @@ public class Hud implements Disposable{
                     if(playScreen.getLighting().lightsOn())
                         playScreen.getCommandHandler().addCommand(new TurnOffCommand(playScreen));
                 }
+
+                @Override
+                public void initGraphics(TextureRegion textureRegion) {
+                    int width = textureRegion.getRegionWidth() / 2;
+                    Array<TextureRegion> frames = new Array<TextureRegion>();
+
+                    for (int i = 0; i < 2; i++) {
+                        frames.add(new TextureRegion(textureRegion, i*width, 0, width, textureRegion.getRegionHeight()));
+                    }
+                    disabledTexture = frames.get(0);
+                    activeTexture = frames.get(0);
+                    focusedTexture = frames.get(0);
+                    pressedTexture = frames.get(1);
+
+                    this.setSize(width, this.getHeight());
+                }
             };
             energyBar.setPosition(energyBar.getX(), energyBar.getY() + lightButton.getHeight() / 2 );
             fill.setPosition(energyBar.getX() + 2, energyBar.getY() + 2);
-            lightButton.setPosition(energyBar.getX(), energyBar.getY() - lightButton.getHeight());
+            lightButton.setPosition(energyBar.getX(), energyBar.getY() - lightButton.getHeight() - 5);
         }
     }
 
