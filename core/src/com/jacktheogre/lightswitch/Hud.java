@@ -88,16 +88,14 @@ public class Hud implements Disposable{
             lightButton = new Button(Assets.getAssetLoader().light_button, com.jacktheogre.lightswitch.sprites.Button.State.ACTIVE, screen) {
                 @Override
                 protected void actPress() {
-                    Gdx.app.log("lightButton", "press");
                     if(!playScreen.getLighting().lightsOn())
-                        playScreen.getCommandHandler().addCommand(new TurnOnCommand(screen));
+                        playScreen.getCommandHandler().addCommand(new TurnOnCommand(playScreen));
                 }
 
                 @Override
                 protected void actUnpress() {
-                    Gdx.app.log("lightButton", "unpress");
                     if(playScreen.getLighting().lightsOn())
-                        playScreen.getCommandHandler().addCommand(new TurnOffCommand(screen));
+                        playScreen.getCommandHandler().addCommand(new TurnOffCommand(playScreen));
                 }
             };
             energyBar.setPosition(energyBar.getX(), energyBar.getY() + lightButton.getHeight() / 2 );
