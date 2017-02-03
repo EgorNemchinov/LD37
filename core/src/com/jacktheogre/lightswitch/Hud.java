@@ -36,7 +36,6 @@ public class Hud implements Disposable{
     private Button lightButton;
     private float energyBarScale = 1f;
 
-    // FIXME: 29.01.17 TOUCHPAD
     private Touchpad touchpad;
     private Touchpad.TouchpadStyle touchpadStyle;
     private Skin touchpadSkin;
@@ -98,6 +97,23 @@ public class Hud implements Disposable{
                 protected void actUnpress() {
                     if(playScreen.getLighting().lightsOn())
                         playScreen.getCommandHandler().addCommand(new TurnOffCommand(playScreen));
+                }
+
+                @Override
+                public boolean press() {
+                    if(pressed)
+                        return false;
+                    pressed = true;
+                    if(!disabled) {
+                        if(playScreen.getEnergy() < Constants.WASTE_ENERGY_PER_SWITCH)
+                            return false;
+                        setState(State.PRESSED);
+                        actPress();
+                        return true;
+                    } else {
+                        setState(State.DISABLED);
+                        return false;
+                    }
                 }
 
                 @Override
