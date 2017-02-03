@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -24,6 +25,24 @@ import com.jacktheogre.lightswitch.tools.MainMenuInputHandler;
 public class MainMenuScreen extends GameScreen{
     private final Color BACKGROUND_COLOR = new Color(31/255f, 24/255f, 44/255f, 1f);
 
+    //basically every state has it's own array of buttons
+    //inputhandler checks array of buttons received from getButtons(), which returns state's array
+    private enum State {
+        MAIN();
+
+        private Array<Button> buttons;
+
+        State() {
+            this.buttons = new Array<Button>();
+        }
+
+        public Array<Button> getButtons() {
+            return buttons;
+        }
+    }
+
+    private State state;
+
     private Button play_button;
     private AssetLoader loader;
 
@@ -36,13 +55,8 @@ public class MainMenuScreen extends GameScreen{
 
         loader = Assets.getAssetLoader();
         loader.load();
-//        loader.nullifyLevel();
 
-//        RectangleMapObject rectangleMapObject = new RectangleMapObject();
-        MapObject object = loader.getMap().getLayers().get(3).getObjects().get(0);
-        if(ClassReflection.isInstance(RectangleMapObject.class, object))
-//            rectangleMapObject = (RectangleMapObject) object;
-
+        state = State.MAIN;
         initializeButtons();
         Gdx.input.setInputProcessor(new MainMenuInputHandler(this));
     }
@@ -55,6 +69,7 @@ public class MainMenuScreen extends GameScreen{
         renderButtons(gameCam);
     }
 
+    //here initialize all the buttons and add them into different arrays for different states
     @Override
     protected void initializeButtons() {
         play_button = new Button(Assets.getAssetLoader().play_button, Button.State.ACTIVE, this) {
@@ -64,9 +79,18 @@ public class MainMenuScreen extends GameScreen{
             }
         };
         play_button.setPosition(gamePort.getWorldWidth() / 2 - play_button.getWidth() / 2, gamePort.getWorldHeight() / 2 - play_button.getHeight() / 2);
-//        play_button.setScale(1);
 
-        buttons.add(play_button);
+        State.MAIN.getButtons().add(play_button);
+    }
+
+    //return needed buttons array depending on a state
+    @Override
+    public Array<Button> getButtons() {
+        return state.getButtons();
+    }
+
+    public void setState(State state) {
+        this.state = state;
     }
 
     @Override

@@ -28,8 +28,8 @@ public abstract class GameScreen implements Screen {
     protected abstract void initializeButtons();
 
     public void touchDownButtons(float x, float y, int pointer) {
-        for (int i = 0; i < buttons.size; i++) {
-            Button button = buttons.get(i);
+        for (int i = 0; i < getButtons().size; i++) {
+            Button button = getButtons().get(i);
             if(button.getBoundingRectangle().contains(x, y)) {
                 if(button.press())
                     button.setPointer(pointer);
@@ -38,8 +38,8 @@ public abstract class GameScreen implements Screen {
     }
 
     public void touchUpButtons(float x, float y, int pointer) {
-        for (int i = 0; i < buttons.size; i++) {
-            Button button = buttons.get(i);
+        for (int i = 0; i < getButtons().size; i++) {
+            Button button = getButtons().get(i);
             if(button.getBoundingRectangle().contains(x, y) && button.getPointer() == pointer && button.isAutoUnpress()) {
                 button.unpress();
             }
@@ -47,8 +47,8 @@ public abstract class GameScreen implements Screen {
     }
 
     public void touchDraggedButtons(float x, float y, int pointer) {
-        for (int i = 0; i < buttons.size; i++) {
-            Button button = buttons.get(i);
+        for (int i = 0; i < getButtons().size; i++) {
+            Button button = getButtons().get(i);
             if(button.getPointer() == pointer) {
                 if(!button.getBoundingRectangle().contains(x, y) && button.isAutoUnpress() && button.isPressed())
                     button.undoPressing();
@@ -59,8 +59,8 @@ public abstract class GameScreen implements Screen {
     }
 
     public void mouseMovedButtons(float x, float y) {
-        for (int i = 0; i < buttons.size; i++) {
-            Button button = buttons.get(i);
+        for (int i = 0; i < getButtons().size; i++) {
+            Button button = getButtons().get(i);
             if(button.getBoundingRectangle().contains(x, y)) {
                 button.focused();
             } else {
@@ -73,8 +73,8 @@ public abstract class GameScreen implements Screen {
         game.batch.setProjectionMatrix(camera.combined);
         if(!game.batch.isDrawing())
             game.batch.begin();
-        for (int i = 0; i < buttons.size; i++) {
-            buttons.get(i).draw(game.batch);
+        for (int i = 0; i < getButtons().size; i++) {
+            getButtons().get(i).draw(game.batch);
         }
         game.batch.end();
     }
@@ -83,5 +83,7 @@ public abstract class GameScreen implements Screen {
         return game;
     }
 
-
+    public Array<Button> getButtons() {
+        return buttons;
+    }
 }
