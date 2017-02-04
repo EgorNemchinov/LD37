@@ -85,7 +85,7 @@ public class Hud implements Disposable{
         fill.setOrigin(fill.getWidth() / 2, 0);
         timer = new Sprite(Assets.getAssetLoader().timer);
         timer.setPosition((viewport.getWorldWidth() - timer.getWidth()) / 2, viewport.getWorldHeight() - timer.getHeight());
-        if(Gdx.app.getType() == Application.ApplicationType.Android) {
+        if(Gdx.app.getType() == Application.ApplicationType.Android && screen.getGame().isPlayingHuman()) {
             lightButton = new Button(Assets.getAssetLoader().light_button, Button.State.ACTIVE, screen) {
                 @Override
                 protected void actPress() {
@@ -146,8 +146,10 @@ public class Hud implements Disposable{
         update(dt);
         screen.getGame().batch.begin();
         screen.getGame().batch.setProjectionMatrix(stage.getCamera().combined);
-        fill.draw(screen.getGame().batch);
-        energyBar.draw(screen.getGame().batch);
+        if(screen.getGame().isPlayingHuman()) {
+            fill.draw(screen.getGame().batch);
+            energyBar.draw(screen.getGame().batch);
+        }
         timer.draw(screen.getGame().batch);
         timeLabel.draw(screen.getGame().batch, 1f);
         if(Gdx.app.getType() == Application.ApplicationType.Android) {
@@ -158,8 +160,8 @@ public class Hud implements Disposable{
             touchpad.draw(screen.getGame().batch, 0.7f);
             Color color = screen.getGame().batch.getColor();
             screen.getGame().batch.setColor(color.r, color.g, color.b, 1);
+            screen.renderButtons(stage.getCamera());
         }
-        screen.renderButtons(stage.getCamera());
         if(screen.getGame().batch.isDrawing())
             screen.getGame().batch.end();
 

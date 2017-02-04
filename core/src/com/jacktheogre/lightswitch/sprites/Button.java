@@ -45,14 +45,7 @@ public class Button extends Sprite {
         this.state = state;
         if(state == State.DISABLED)
             disabled = true;
-    }
-
-    public Button(TextureRegion textureRegion, State state, boolean oneTexture) {
-        super(new TextureRegion(textureRegion, 0, 0, oneTexture? textureRegion.getRegionWidth() : textureRegion.getRegionWidth() / 4, textureRegion.getRegionHeight()));
-        this.textureReg = textureRegion;
-        this.singleTexture = oneTexture;
-        initGraphics(textureReg);
-        this.state = state;
+        this.setOrigin(0, 0);
     }
 
     public Button(TextureRegion textureReg, State state, GameScreen screen) {

@@ -179,7 +179,7 @@ public class PlayScreen extends GameScreen {
 
     @Override
     protected void initializeButtons() {
-        if(Gdx.app.getType() == Application.ApplicationType.Android) {
+        if(Gdx.app.getType() == Application.ApplicationType.Android && game.isPlayingHuman()) {
             buttons.add(hud.getLightButton());
         }
     }
