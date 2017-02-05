@@ -20,8 +20,14 @@ public class EnemyPlayer {
     }
 
     public void update(float dt) {
-        gameActor.setTarget(screen.getPlayer().getGameActor().b2body.getPosition());
-        agent.makePath(gameActor);
+        //mb delegate to commands?
+        //&& not multiplayer
+        if(screen.getGame().isPlayingHuman()) {
+            gameActor.setTarget(screen.getPlayer().getGameActor().b2body.getPosition());
+            agent.makePath(gameActor);
+        } else {
+            gameActor.setKeyboardControl(true);
+        }
         gameActor.update(dt);
     }
 
@@ -34,8 +40,12 @@ public class EnemyPlayer {
         this.gameActor.agent = agent;
     }
 
-    public void setTarget(Vector2 target) {
-        gameActor.setTarget(target);
+    public void setPosition(Vector2 position) {
+        gameActor.setPosition(position.x, position.y);
+    }
+
+    public void setPosition(float x, float y) {
+        gameActor.setPosition(x, y);
     }
 
     public void dispose(){

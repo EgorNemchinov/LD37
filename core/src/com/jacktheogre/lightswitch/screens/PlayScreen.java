@@ -29,6 +29,7 @@ import com.jacktheogre.lightswitch.sprites.Button;
 import com.jacktheogre.lightswitch.sprites.EnemyPlayer;
 import com.jacktheogre.lightswitch.sprites.GameActor;
 import com.jacktheogre.lightswitch.sprites.Player;
+import com.jacktheogre.lightswitch.tools.CameraSettings;
 import com.jacktheogre.lightswitch.tools.PlayInputHandler;
 import com.jacktheogre.lightswitch.tools.Lighting;
 import com.jacktheogre.lightswitch.tools.WorldContactListener;
@@ -64,10 +65,18 @@ public class PlayScreen extends GameScreen {
     private float runTime;
     private float energy;
 
+    private CameraSettings currentSetings, targetSettings;
+
     public PlayScreen(GeneratingScreen screen) {
         super();
         this.game = screen.getGame();
         gameCam = screen.getGameCam();
+        currentSetings = new CameraSettings(screen.getGameCam());
+        if(!game.isPlayingHuman())
+            targetSettings = new CameraSettings(currentSetings.getX() + 25, currentSetings.getY() + 30, currentSetings.getZoom() - 0.2f);
+        else
+            targetSettings = new CameraSettings(currentSetings.getX(), currentSetings.getY() + 30, currentSetings.getZoom() - 0.1f);
+
         gamePort = screen.getGamePort();
         mapRenderer = screen.getMapRenderer();
         world = screen.getWorld();
@@ -110,7 +119,7 @@ public class PlayScreen extends GameScreen {
     public void update(float dt) {
         runTime += dt;
         if (runTime > Constants.PLAYTIME) {
-            endGame(true);
+            endGame(game.isPlayingHuman()?true:false);
         }
         addEnergy(Constants.ADD_ENERGY_PER_SEC * dt);
         if(Gdx.app.getType() == Application.ApplicationType.Android) {
@@ -125,13 +134,13 @@ public class PlayScreen extends GameScreen {
             object.update(dt);
         }
         player.update(dt);
-//        enemyPlayer.update(dt);
+        enemyPlayer.update(dt);
         checkFixtureContacts();
         world.step(1 / 60f, 6, 2);
         player.getGameActor().remakePath();
 
 //        lerpCamera(player.getGameActor().b2body.getPosition().x, player.getGameActor().b2body.getPosition().y , dt);
-        lerpCamera(gamePort.getWorldWidth() / 4, gamePort.getWorldHeight() / 4, dt);
+        lerpCamera(targetSettings, dt);
         gameCam.update();
 
         mapRenderer.setView(gameCam);
@@ -176,6 +185,8 @@ public class PlayScreen extends GameScreen {
 //        enemyPlayer.getGameActor().getPath().render(shapeRenderer);
 //        fpsLogger.log();
     }
+
+
 
     @Override
     protected void initializeButtons() {
@@ -259,11 +270,14 @@ public class PlayScreen extends GameScreen {
             game.setScreen(new GameOverScreen(game, GameOverScreen.State.LOSE));
     }
 
-    private void lerpCamera(float targetX, float targetY, float dt) {
+    private void lerpCamera(CameraSettings targetSettings, float dt) {
+        if(currentSetings.getPosition().epsilonEquals(targetSettings.getPosition(), 5))
+            return;
         float lerp = 10f;
-        Vector3 position = gameCam.position;
-        position.x += (targetX - position.x) * lerp * dt;
-        position.y += (targetY - position.y) * lerp * dt;
+        currentSetings.setX(currentSetings.getX() + (targetSettings.getX() - currentSetings.getX())*lerp*dt);
+        currentSetings.setY(currentSetings.getY() + (targetSettings.getY() - currentSetings.getY())*lerp*dt);
+        currentSetings.setZoom(currentSetings.getZoom() + (targetSettings.getZoom() - currentSetings.getZoom())*lerp*dt);
+        currentSetings.applyTo(gameCam);
     }
 
     public void addEnergy(float addition) {

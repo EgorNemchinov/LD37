@@ -86,7 +86,6 @@ public abstract class GameActor extends Sprite {
     }
 
     public void update(float dt) {
-//        Gdx.app.log("ss", "direction: " + direction);
         if(!teleportReady) {
             teleportTime += dt;
             if(teleportTime > Constants.TELEPORT_INTERVAL) {

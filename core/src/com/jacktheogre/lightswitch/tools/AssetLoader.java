@@ -25,6 +25,7 @@ public class AssetLoader {
     public TextureRegion touchBg, touchKnob, scale;
     public TextureRegion next_level_button, home_button, replay_button, light_button;
     public TextureRegion undo_button, redo_button, start_button, teleport_button, play_button;
+    public TextureRegion boy_button, monster_button;
     public TiledMap[] maps;
     private TmxMapLoader mapLoader;
     public BitmapFont font;
@@ -36,11 +37,12 @@ public class AssetLoader {
         this.manager = new AssetManager();
         mapLoader = new TmxMapLoader();
         maps = new TiledMap[LEVEL_AMOUNT];
-
-//        manager.load();
     }
 
     public void load() {
+        if(manager == null)
+            manager = new AssetManager();
+
         manager.load("characters.png", Texture.class);
         manager.load("ghost.png", Texture.class);
         manager.load("portals.png", Texture.class);
@@ -83,6 +85,8 @@ public class AssetLoader {
         scale = new TextureRegion(buttons, 476, 0, 49, 165);
         touchBg = new TextureRegion(joystick, 0, 0, 132, 132);
         touchKnob = new TextureRegion(joystick, 130, 0, 126, 126);
+        boy_button = new TextureRegion(buttons, 0, 297, 112, 73);
+        monster_button = new TextureRegion(buttons, 0, 370, 112, 73 );
 
         font = new BitmapFont(Gdx.files.internal("font.fnt"));
         font.getData().setScale(FONT_SCALE,FONT_SCALE);

@@ -155,7 +155,7 @@ public class Human extends GameActor {
         CircleShape shape = new CircleShape();
         FixtureDef fixtureDef = new FixtureDef();
 
-        bodyDef.position.set(getX()+8, getY() +8);
+        bodyDef.position.set(getX()+8, getY()+8);
         bodyDef.fixedRotation = true;
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         b2body = world.createBody(bodyDef);

@@ -10,6 +10,7 @@ import com.jacktheogre.lightswitch.commands.StartMovingCommand;
 import com.jacktheogre.lightswitch.commands.StopCommand;
 import com.jacktheogre.lightswitch.commands.TurnOffCommand;
 import com.jacktheogre.lightswitch.commands.TurnOnCommand;
+import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
 import com.jacktheogre.lightswitch.sprites.GameActor;
 
@@ -53,6 +54,9 @@ public class PlayInputHandler extends Stage{
             case Input.Keys.RIGHT:
                 screen.getCommandHandler().addCommand(new StartMovingCommand(GameActor.Direction.RIGHT));
                 screen.getPlayer().getGameActor().setMoving(true);
+                break;
+            case Input.Keys.BACK:
+                screen.getGame().setScreen(new GeneratingScreen(screen.getGame()));
                 break;
         }
         return true;

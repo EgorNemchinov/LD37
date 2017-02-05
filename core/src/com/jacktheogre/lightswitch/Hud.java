@@ -77,7 +77,7 @@ public class Hud implements Disposable{
 
     private void initializeGraphicElements() {
         energyBar = new Sprite(Assets.getAssetLoader().scale);
-        energyBar.setPosition(energyBar.getWidth() / 2, 40);
+        energyBar.setPosition(energyBar.getWidth() / 2 - 10, 40);
         energyBar.setScale(1f);
         fill = new Sprite(Assets.getAssetLoader().scale_fill);
         fill.setPosition(energyBar.getX() + 2, energyBar.getY() + 2);

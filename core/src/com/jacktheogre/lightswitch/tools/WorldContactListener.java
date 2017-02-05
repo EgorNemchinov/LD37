@@ -39,7 +39,7 @@ public class WorldContactListener implements ContactListener {
                 }
                 break;
             case  Constants.ACTOR_BIT | Constants.ACTOR_BIT:
-                screen.endGame(false);
+                screen.endGame(screen.getGame().isPlayingHuman()?false:true);
 
         }
     }

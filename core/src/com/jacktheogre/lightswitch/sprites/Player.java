@@ -36,4 +36,12 @@ public class Player {
     public void render(SpriteBatch batch, float dt) {
         batch.draw(gameActor.getFrame(dt), gameActor.getX(), gameActor.getY());
     }
+    /*
+    public void setPosition(Vector2 position) {
+        gameActor.setPosition(position.x, position.y);
+    }
+
+    public void setPosition(float x, float y) {
+        gameActor.setPosition(x, y);
+    }*/
 }

@@ -118,10 +118,14 @@ public class GeneratingScreen extends GameScreen {
                 generatingScreen.setState(GeneratingScreen.State.SETTING_TELEPORT);
             }
         };
-        undo.setPosition(30, -25);
-        redo.setPosition(undo.getX() + undo.getWidth()+15, undo.getY());
-        start.setPosition(redo.getX() + redo.getWidth()+15, redo.getY());
-        teleportButton.setPosition(-teleportButton.getWidth() - 10, 100);
+        undo.setScale(1.2f);
+        redo.setScale(1.2f);
+        start.setScale(1.2f);
+        teleportButton.setScale(1.5f);
+        undo.setPosition(20, -25);
+        redo.setPosition(undo.getX() + undo.getBoundingRectangle().getWidth()+5, undo.getY());
+        start.setPosition(redo.getX() + redo.getBoundingRectangle().getWidth()+5, redo.getY());
+        teleportButton.setPosition(-teleportButton.getBoundingRectangle().getWidth() - 5, 100);
         undo.disable();
         redo.disable();
         teleportButton.setAutoUnpress(false);
