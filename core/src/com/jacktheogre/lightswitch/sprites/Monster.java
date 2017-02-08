@@ -24,6 +24,9 @@ public class Monster extends GameActor {
     private State currentState;
     private State previousState;
 
+    private float timeSinceTrapped = 0;
+    private boolean trapped = false;
+
 
     public Monster(World world, float x, float y) {
         super(world, x, y, Assets.getAssetLoader().characters);
@@ -56,10 +59,13 @@ public class Monster extends GameActor {
         shape.setRadius(7);
 
         fixtureDef.shape = shape;
-        fixtureDef.filter.categoryBits = Constants.ACTOR_BIT;
+        fixtureDef.filter.categoryBits = Constants.MONSTER_BIT;
         fixtureDef.filter.maskBits = Constants.WALLS_BIT |
                 Constants.OBJECT_BIT |
-                Constants.ACTOR_BIT | Constants.INTERACTIVE_BIT;
+                Constants.BOY_BIT |
+                Constants.TELEPORT_BIT |
+                Constants.TRAP_BIT;
+        fixtureDef.filter.groupIndex = Constants.MONSTER_GROUP;
         filter = fixtureDef.filter;
         fixture = b2body.createFixture(fixtureDef);
         fixture.setUserData(this);
@@ -74,8 +80,16 @@ public class Monster extends GameActor {
 
     @Override
     public void update(float dt) {
+        // TODO: 06.02.17 if AI is playing then stop() and then change nextPosition or overwrite update
         super.update(dt);
         setPosition(b2body.getPosition().x - getWidth() / 2 , b2body.getPosition().y - getHeight() / 2 + 5);
+        if(trapped)
+            timeSinceTrapped += dt;
+        if(timeSinceTrapped > Constants.MONSTER_IN_TRAP) {
+            timeSinceTrapped = 0;
+            trapped = false;
+            isMoving = true;
+        }
 //        Gdx.app.log("Monster", "Direction: "+getDirection() + ", speed: "+b2body.getLinearVelocity());
     }
 
@@ -83,7 +97,7 @@ public class Monster extends GameActor {
     @Override
     public TextureRegion getFrame(float dt) {
         currentState = getState();
-        direction = calculateDirection();
+        direction = keyboardControl?getDirection():calculateDirection();
 
         TextureRegion region;
         switch (currentState) {
@@ -173,6 +187,18 @@ public class Monster extends GameActor {
 
     }
 
+    public void getCaught() {
+        trapped = true;
+    }
+
+    @Override
+    public void setMoving(boolean moving) {
+        if(trapped)
+            this.isMoving = false;
+        else
+            this.isMoving = moving;
+    }
+
     @Override
     public String toString() {
         return "Monster";
@@ -185,6 +211,9 @@ public class Monster extends GameActor {
 
     @Override
     public int getSpeed() {
-        return SPEED_BASE+8*Assets.getAssetLoader().getLevelNum();
+        if(!trapped)
+            return SPEED_BASE+8*Assets.getAssetLoader().getLevelNum();
+        else
+            return 0;
     }
 }

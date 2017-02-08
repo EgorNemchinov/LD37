@@ -18,9 +18,11 @@ import com.jacktheogre.lightswitch.LightSwitch;
 import com.jacktheogre.lightswitch.ai.LevelManager;
 import com.jacktheogre.lightswitch.ai.Node;
 import com.jacktheogre.lightswitch.commands.AddTeleportCommand;
+import com.jacktheogre.lightswitch.commands.AddTrapCommand;
 import com.jacktheogre.lightswitch.commands.CommandHandler;
 import com.jacktheogre.lightswitch.objects.InteractiveObject;
 import com.jacktheogre.lightswitch.objects.Teleport;
+import com.jacktheogre.lightswitch.objects.Trap;
 import com.jacktheogre.lightswitch.sprites.Button;
 import com.jacktheogre.lightswitch.sprites.EnemyPlayer;
 import com.jacktheogre.lightswitch.sprites.Player;
@@ -40,20 +42,21 @@ public class GeneratingScreen extends GameScreen {
     private final Color BACKGROUND_COLOR = new Color(56/255f, 56/255f, 113/255f, 1f);
 //    private final Color BACKGROUND_COLOR = Color.BLACK;
 
-    public enum State {DEFAULT, SETTING_TELEPORT}
+    public enum State {DEFAULT, SETTING_TELEPORT, SETTING_TRAP}
 
     private State state;
     private final EnemyPlayer enemyPlayer;
     private final Player player;
     private Lighting lighting;
-    public Array<InteractiveObject> objects;
     private AssetLoader loader;
     private OrthogonalTiledMapRenderer mapRenderer;
     private World world;
     private CommandHandler commandHandler;
 
-    private Button undo, redo, start, teleportButton;
+    private Button undo, redo, start, teleportButton, trapButton;
 
+    public Array<Teleport> teleports;
+    public Array<Trap> traps;
     private Node selectedNode;
 
     public GeneratingScreen(LightSwitch game) {
@@ -73,15 +76,19 @@ public class GeneratingScreen extends GameScreen {
         initializeButtons();
 
         world = new World(new Vector2(0, 0), true);
-        objects = new Array<InteractiveObject>();
+        teleports = new Array<Teleport>();
+        traps = new Array<Trap>();
 
         player = new Player(this);
         enemyPlayer = new EnemyPlayer(this);
 
         lighting = new Lighting(this);
         new B2WorldCreator(this);
-        if(!addable()) {
+        if(maxTeleports()) {
             teleportButton.disable();
+        }
+        if(maxTraps()) {
+            trapButton.disable();
         }
 
         shapeRenderer = new ShapeRenderer();
@@ -118,14 +125,22 @@ public class GeneratingScreen extends GameScreen {
                 generatingScreen.setState(GeneratingScreen.State.SETTING_TELEPORT);
             }
         };
+        trapButton = new Button(Assets.getAssetLoader().trap_button, Button.State.ACTIVE, this) {
+            @Override
+            protected void actPress() {
+                generatingScreen.setState(GeneratingScreen.State.SETTING_TRAP);
+            }
+        };
         undo.setScale(1.2f);
         redo.setScale(1.2f);
         start.setScale(1.2f);
-        teleportButton.setScale(1.5f);
+        teleportButton.setScale(1.2f);
+        trapButton.setScale(1.2f);
         undo.setPosition(20, -25);
         redo.setPosition(undo.getX() + undo.getBoundingRectangle().getWidth()+5, undo.getY());
         start.setPosition(redo.getX() + redo.getBoundingRectangle().getWidth()+5, redo.getY());
         teleportButton.setPosition(-teleportButton.getBoundingRectangle().getWidth() - 5, 100);
+        trapButton.setPosition(teleportButton.getX(), teleportButton.getY() - trapButton.getHeight() - 10);
         undo.disable();
         redo.disable();
         teleportButton.setAutoUnpress(false);
@@ -134,6 +149,7 @@ public class GeneratingScreen extends GameScreen {
         buttons.add(redo);
         buttons.add(start);
         buttons.add(teleportButton);
+        buttons.add(trapButton);
     }
 
     public void update(float dt){
@@ -171,9 +187,13 @@ public class GeneratingScreen extends GameScreen {
         renderSelected();
 
         game.batch.begin();
-        for (InteractiveObject object :objects) {
-            object.render(game.batch, delta);
+        for (Teleport teleport: teleports) {
+            teleport.render(game.batch, delta);
         }
+        for (Trap trap: traps) {
+            trap.render(game.batch, delta);
+        }
+
         player.getGameActor().draw(game.batch);
         if(lighting.lightsOn())
             enemyPlayer.getGameActor().draw(game.batch);
@@ -200,7 +220,7 @@ public class GeneratingScreen extends GameScreen {
         if(state == State.DEFAULT) {
             shapeRenderer.setColor(DEFAULT);
         } else {
-            if(selectedNode.getConnections().size > 0 && !existsTeleport()) {
+            if(selectedNode.getConnections().size > 0 && !existsObject()) {
                 shapeRenderer.setColor(CORRECT);
             } else {
                 shapeRenderer.setColor(WRONG);
@@ -218,11 +238,18 @@ public class GeneratingScreen extends GameScreen {
         return state;
     }
 
-    public boolean addable() {
-        if(objects.size >= Assets.getAssetLoader().getAmountOfTeleports())
-            return false;
-        else
+    public boolean maxTeleports() {
+        if(teleports.size >= Assets.getAssetLoader().getAmountOfTeleports())
             return true;
+        else
+            return false;
+    }
+
+    public boolean maxTraps() {
+        if(traps.size >= Assets.getAssetLoader().getAmountOfTraps())
+            return true;
+        else
+            return false;
     }
 
     public void setState(State state) {
@@ -245,29 +272,50 @@ public class GeneratingScreen extends GameScreen {
         return teleportButton;
     }
 
+    public Button getTrapButton() {
+        return trapButton;
+    }
+
     public void setSelectedNode(Node selectedNode) {
         this.selectedNode = selectedNode;
     }
 
     public void addTeleport() {
-        if(selectedNode.getConnections().size > 0 && state == State.SETTING_TELEPORT && !existsTeleport()) {
-            commandHandler.addCommand(new AddTeleportCommand(this, (int) selectedNode.getWorldX() - LevelManager.tilePixelWidth / 2, (int)selectedNode.getWorldY() - LevelManager.tilePixelHeight / 2, objects));
+        if(selectedNode.getConnections().size > 0 && state == State.SETTING_TELEPORT && !existsObject()) {
+            commandHandler.addCommand(new AddTeleportCommand(this, (int) selectedNode.getWorldX() - LevelManager.tilePixelWidth / 2, (int)selectedNode.getWorldY() - LevelManager.tilePixelHeight / 2, teleports));
             undo.enable();
             state = State.DEFAULT;
             teleportButton.unpress();
         }
     }
 
-    public boolean existsTeleport() {
-        return existsTeleport((int) selectedNode.getWorldX() - LevelManager.tilePixelWidth / 2, (int)selectedNode.getWorldY() - LevelManager.tilePixelHeight / 2);
+    public void addTrap() {
+        if(selectedNode.getConnections().size > 0 && state == State.SETTING_TRAP && !existsObject()) {
+            commandHandler.addCommand(new AddTrapCommand(this, (int) selectedNode.getWorldX() - LevelManager.tilePixelWidth / 2, (int)selectedNode.getWorldY() - LevelManager.tilePixelHeight / 2));
+            undo.enable();
+            state = State.DEFAULT;
+            trapButton.unpress();
+        }
+    }
+
+    public boolean existsObject() {
+            return existsTeleport((int) selectedNode.getWorldX() - LevelManager.tilePixelWidth / 2, (int)selectedNode.getWorldY() - LevelManager.tilePixelHeight / 2)
+            || existsTrap((int) selectedNode.getWorldX() - LevelManager.tilePixelWidth / 2, (int)selectedNode.getWorldY() - LevelManager.tilePixelHeight / 2);
     }
 
     public boolean existsTeleport(int x, int y) {
-        for (InteractiveObject obj : objects) {
-            if(ClassReflection.isInstance(Teleport.class, obj)) {
-                if(((Teleport)obj).getX() == x && ((Teleport)obj).getY() == y) {
+        for (Teleport obj : teleports) {
+            if((obj.getX() == x && obj.getY() == y)) {
                     return true;
-                }
+               }
+        }
+        return false;
+    }
+
+    public boolean existsTrap(int x, int y) {
+        for (Trap obj : traps) {
+            if(obj.getX() == x && obj.getY() == y) {
+                    return true;
             }
         }
         return false;
@@ -293,8 +341,12 @@ public class GeneratingScreen extends GameScreen {
         return game;
     }
 
-    public Array<InteractiveObject> getObjects() {
-        return objects;
+    public Array<Teleport> getTeleports() {
+        return teleports;
+    }
+
+    public Array<Trap> getTraps() {
+        return traps;
     }
 
     public AssetLoader getLoader() {
@@ -351,7 +403,4 @@ public class GeneratingScreen extends GameScreen {
         return lighting;
     }
 
-    public void setObjects(Array<InteractiveObject> objects) {
-        this.objects = objects;
-    }
 }

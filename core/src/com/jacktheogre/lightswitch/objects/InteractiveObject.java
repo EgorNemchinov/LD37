@@ -1,10 +1,12 @@
 package com.jacktheogre.lightswitch.objects;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
@@ -33,12 +35,10 @@ public abstract class InteractiveObject {
     protected float timeSinceClosure, stateTimer;
     protected Animation openAnimation, closingAnimation;
 
+    private boolean initialOpen = false;
+
     public abstract void render(SpriteBatch spriteBatch, float dt);
     public abstract boolean activate(GameActor gameActor);
-
-    public InteractiveObject(GeneratingScreen screen, int x, int y) {
-        this(screen, x, y, true);
-    }
 
     public InteractiveObject(GeneratingScreen screen, int x, int y, boolean initPhysics) {
         this.screen = screen;
@@ -51,6 +51,7 @@ public abstract class InteractiveObject {
             initPhysics();
     }
 
+    // TODO: 06.02.17 mb initPhysics(short bit)
     public void initPhysics(){
 
         BodyDef bdef = new BodyDef();
@@ -63,9 +64,18 @@ public abstract class InteractiveObject {
 
         shape.setRadius(bounds.radius);
         fdef.shape = shape;
+        fdef.filter.categoryBits = getFilter().categoryBits;
+        fdef.filter.maskBits = getFilter().maskBits;
+        fdef.filter.groupIndex = getFilter().groupIndex;
         fixture = body.createFixture(fdef);
         fixture.setUserData(this);
-        setCategoryFilter(Constants.INTERACTIVE_BIT);
+    }
+
+    protected Filter getFilter() {
+        Filter filter = new Filter();
+        filter.categoryBits = Constants.TRANSPARENT_BIT;
+        filter.maskBits = 0;
+        return filter;
     }
 
     protected abstract void initGraphics();
@@ -79,33 +89,42 @@ public abstract class InteractiveObject {
         this.open = open;
     }
 
-
-
     public void open() {
         setOpen(true);
-        Filter filter = fixture.getFilterData();
-        filter.categoryBits = Constants.INTERACTIVE_BIT;
-        filter.maskBits = Constants.ACTOR_BIT;
-        fixture.setFilterData(filter);
+        setTransparency(false);
         stateTimer = 0;
     }
 
     public void close() {
         setOpen(false);
-        Filter filter = fixture.getFilterData();
-        filter.categoryBits = Constants.TRANSPARENT_BIT;
-        filter.maskBits = 0;
-        fixture.setFilterData(filter);
+        setTransparency(true);
         stateTimer = 0;
     }
 
-    public abstract void update(float dt);
+    protected abstract void setTransparency(boolean transparency);
 
-    public void setCategoryFilter(short filterBit) {
+    public  void update(float dt) {
+        //better be done in another way
+        if(!initialOpen) {
+            quickOpen();
+            initialOpen = true;
+        }
+    }
+
+    public void setFilter(short categoryBits, short maskBits, short groupIndex) {
         Filter filter = new Filter();
-        filter.categoryBits = filterBit;
-        filter.maskBits = Constants.ACTOR_BIT;
+        filter.categoryBits = categoryBits;
+        filter.maskBits = maskBits;
+        filter.groupIndex = groupIndex;
         fixture.setFilterData(filter);
+    }
+
+    public void quickClose() {
+        setTransparency(true);
+    }
+
+    public void quickOpen() {
+        setTransparency(false);
     }
 
     public int getX() {
@@ -115,4 +134,10 @@ public abstract class InteractiveObject {
     public int getY() {
         return y;
     }
+
+    public Vector2 getCenter() {
+        return new Vector2(x + 8, y + 8);
+    }
+
+
 }

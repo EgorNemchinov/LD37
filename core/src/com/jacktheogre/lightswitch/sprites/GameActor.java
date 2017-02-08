@@ -35,7 +35,7 @@ public abstract class GameActor extends Sprite {
     protected Direction lastDirection;
 
     public Body b2body;
-    protected Filter filter, transparent;
+    protected Filter filter;
 
     protected World world;
 
@@ -68,9 +68,6 @@ public abstract class GameActor extends Sprite {
         stateTimer = 0;
         teleportTime = 0;
         teleportReady = true;
-        transparent = new Filter();
-        transparent.maskBits = 0;
-        transparent.categoryBits = Constants.TRANSPARENT_BIT;
 
         direction = Direction.RIGHT;
         lastDirection = Direction.RIGHT;
@@ -126,6 +123,8 @@ public abstract class GameActor extends Sprite {
     public Direction calculateDirection() {
         xVel = b2body.getLinearVelocity().x;
         yVel = b2body.getLinearVelocity().y;
+        if(xVel == 0 && yVel == 0)
+            return getDirection();
         if(xVel > 0) {
             if(yVel > 0 && Math.abs(yVel) > Math.abs(xVel))
                 return Direction.UP;
@@ -243,14 +242,6 @@ public abstract class GameActor extends Sprite {
 
     public abstract int getSpeed();
     protected abstract void initialize();
-    private void setTransparent() {
-        fixture.setFilterData(transparent);
-    }
-
-
-    private void setSolid() {
-        fixture.setFilterData(filter);
-    }
 
     public void stop() {
         target = b2body.getPosition();

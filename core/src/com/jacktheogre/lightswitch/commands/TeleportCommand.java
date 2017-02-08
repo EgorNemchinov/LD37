@@ -30,7 +30,7 @@ public class TeleportCommand extends ActorCommand {
             destination.close();
         }
         executed = true;
-        Gdx.app.log("TeleportCommand", "executed");
+//        Gdx.app.log("TeleportCommand", "executed");
         return true;
     }
 

@@ -90,7 +90,7 @@ public class Human extends GameActor {
     @Override
     public TextureRegion getFrame(float dt) {
         currentState = getState();
-        direction = calculateDirection();
+        direction = getDirection();
 
         TextureRegion region;
         switch (currentState) {
@@ -163,11 +163,13 @@ public class Human extends GameActor {
         shape.setRadius(7);
 
         fixtureDef.shape = shape;
-        fixtureDef.filter.categoryBits = Constants.ACTOR_BIT;
+        fixtureDef.filter.categoryBits = Constants.BOY_BIT;
+        //obivously if add more boys then boy also
         fixtureDef.filter.maskBits = Constants.WALLS_BIT |
                 Constants.OBJECT_BIT |
-                Constants.ACTOR_BIT |
-                Constants.INTERACTIVE_BIT;
+                Constants.MONSTER_BIT |
+                Constants.TELEPORT_BIT;
+        fixtureDef.filter.groupIndex = Constants.BOY_GROUP;
         filter = fixtureDef.filter;
         fixtureDef.friction = 0;
         fixture = b2body.createFixture(fixtureDef);

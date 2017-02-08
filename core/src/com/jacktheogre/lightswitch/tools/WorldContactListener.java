@@ -8,8 +8,10 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.jacktheogre.lightswitch.Constants;
 import com.jacktheogre.lightswitch.objects.InteractiveObject;
+import com.jacktheogre.lightswitch.objects.Trap;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
 import com.jacktheogre.lightswitch.sprites.GameActor;
+import com.jacktheogre.lightswitch.sprites.Monster;
 
 /**
  * Created by luna on 11.12.16.
@@ -29,8 +31,9 @@ public class WorldContactListener implements ContactListener {
 
         int cDef = fixA.getFilterData().categoryBits | fixB.getFilterData().categoryBits;
         switch(cDef) {
-            case Constants.INTERACTIVE_BIT | Constants.ACTOR_BIT:
-                if(fixA.getFilterData().categoryBits == Constants.ACTOR_BIT) {
+            case Constants.TELEPORT_BIT | Constants.BOY_BIT:
+            case Constants.TELEPORT_BIT | Constants.MONSTER_BIT:
+                if(fixA.getFilterData().categoryBits == Constants.BOY_BIT || fixA.getFilterData().categoryBits == Constants.MONSTER_BIT) {
                     if(!((InteractiveObject) fixB.getUserData()).activate((GameActor)fixA.getUserData()))
                         screen.addFixtureContact(contact);
                 } else {
@@ -38,12 +41,25 @@ public class WorldContactListener implements ContactListener {
                         screen.addFixtureContact(contact);
                 }
                 break;
-            case  Constants.ACTOR_BIT | Constants.ACTOR_BIT:
-                screen.endGame(screen.getGame().isPlayingHuman()?false:true);
-
+            case  Constants.BOY_BIT | Constants.MONSTER_BIT:
+                screen.endGame(!screen.getGame().isPlayingHuman());
+                break;
+            case Constants.MONSTER_BIT | Constants.TRAP_BIT:
+                if(fixA.getFilterData().categoryBits == Constants.TRAP_BIT) {
+                    if (!((Trap) fixA.getUserData()).activate((Monster) fixB.getUserData())) {
+                        screen.addFixtureContact(contact);
+                    }
+                }
+                else {
+                    if (!((Trap) fixB.getUserData()).activate((Monster) fixA.getUserData())) {
+                            screen.addFixtureContact(contact);
+                       }
+                }
+                break;
         }
     }
 
+    // FIXME: 06.02.17 doens't check all the time, mb contact ends too soon for some reason
     public boolean checkContact(Contact contact) {
         Gdx.app.log("ContactListener", "Checking contact");
         Fixture fixA = contact.getFixtureA();
@@ -52,15 +68,28 @@ public class WorldContactListener implements ContactListener {
         int cDef = fixA.getFilterData().categoryBits | fixB.getFilterData().categoryBits;
 
         switch(cDef) {
-            case Constants.INTERACTIVE_BIT | Constants.ACTOR_BIT:
-                if (fixA.getFilterData().categoryBits == Constants.ACTOR_BIT) {
+            case Constants.TELEPORT_BIT | Constants.BOY_BIT:
+                if (fixA.getFilterData().categoryBits == Constants.BOY_BIT) {
                     if (!((InteractiveObject) fixB.getUserData()).activate((GameActor) fixA.getUserData()))
                         return false;
                     else return true;
                 } else {
                     if (!((InteractiveObject) fixA.getUserData()).activate((GameActor) fixB.getUserData()))
                         return false;
-                    else return true;
+                    else
+                        return true;
+                }
+            case Constants.MONSTER_BIT | Constants.TRAP_BIT:
+                if(fixA.getFilterData().categoryBits == Constants.TRAP_BIT) {
+                    if (!((Trap) fixA.getUserData()).trigger((Monster) fixB.getUserData()))
+                        return false;
+                    else
+                        return true;
+                } else {
+                    if(!((Trap) fixB.getUserData()).trigger((Monster)fixA.getUserData()))
+                        return false;
+                    else
+                        return true;
                 }
         }
         return true;
@@ -72,7 +101,8 @@ public class WorldContactListener implements ContactListener {
 
     @Override
     public void endContact(Contact contact) {
-
+        if(screen.getFixturesContacts().contains(contact, true))
+            screen.getFixturesContacts().removeValue(contact, true);
     }
 
     @Override

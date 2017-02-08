@@ -25,9 +25,11 @@ import com.jacktheogre.lightswitch.commands.StartMovingCommand;
 import com.jacktheogre.lightswitch.commands.StopCommand;
 import com.jacktheogre.lightswitch.objects.InteractiveObject;
 import com.jacktheogre.lightswitch.objects.Teleport;
+import com.jacktheogre.lightswitch.objects.Trap;
 import com.jacktheogre.lightswitch.sprites.Button;
 import com.jacktheogre.lightswitch.sprites.EnemyPlayer;
 import com.jacktheogre.lightswitch.sprites.GameActor;
+import com.jacktheogre.lightswitch.sprites.Monster;
 import com.jacktheogre.lightswitch.sprites.Player;
 import com.jacktheogre.lightswitch.tools.CameraSettings;
 import com.jacktheogre.lightswitch.tools.PlayInputHandler;
@@ -94,9 +96,12 @@ public class PlayScreen extends GameScreen {
         shapeRenderer.setProjectionMatrix(gameCam.combined);
         shapeRenderer.setAutoShapeType(true);
 
-        objects = screen.getObjects();
+        objects = new Array<InteractiveObject>();
+        objects.addAll(screen.getTeleports());
+        objects.addAll(screen.getTraps());
         for (InteractiveObject obj : objects) {
             obj.initPhysics();
+            obj.quickClose();
         }
 
         commandHandler = screen.getCommandHandler();
@@ -119,7 +124,7 @@ public class PlayScreen extends GameScreen {
     public void update(float dt) {
         runTime += dt;
         if (runTime > Constants.PLAYTIME) {
-            endGame(game.isPlayingHuman()?true:false);
+            endGame(game.isPlayingHuman());
         }
         addEnergy(Constants.ADD_ENERGY_PER_SEC * dt);
         if(Gdx.app.getType() == Application.ApplicationType.Android) {
@@ -139,7 +144,6 @@ public class PlayScreen extends GameScreen {
         world.step(1 / 60f, 6, 2);
         player.getGameActor().remakePath();
 
-//        lerpCamera(player.getGameActor().b2body.getPosition().x, player.getGameActor().b2body.getPosition().y , dt);
         lerpCamera(targetSettings, dt);
         gameCam.update();
 
@@ -247,6 +251,10 @@ public class PlayScreen extends GameScreen {
 
     public void addFixtureContact(Contact contact) {
         fixturesContacts.add(contact);
+    }
+
+    public Array<Contact> getFixturesContacts() {
+        return fixturesContacts;
     }
 
     private void makeTeleportConnections() {

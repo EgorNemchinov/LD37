@@ -74,8 +74,8 @@ public class GenerateInputHandler implements InputProcessor{
         screenTouch.y = screen.getGamePort().getScreenHeight() - screenTouch.y;
         screen.touchDownButtons(point.x, point.y, pointer);
         screen.setSelectedNode(LevelManager.graph.getNodeByXY((int) point.x, (int)point.y));
-        // TODO: 01.02.17 change method's name
         screen.addTeleport();
+        screen.addTrap();
         return true;
     }
 

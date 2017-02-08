@@ -2,8 +2,6 @@ package com.jacktheogre.lightswitch.commands;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.jacktheogre.lightswitch.objects.InteractiveObject;
 import com.jacktheogre.lightswitch.objects.Teleport;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 
@@ -12,54 +10,51 @@ import com.jacktheogre.lightswitch.screens.GeneratingScreen;
  */
 public class AddTeleportCommand extends GlobalCommand {
 
+    private Array<Teleport> teleports;
     private int x, y;
-    private Array<InteractiveObject> objects;
     private Teleport teleport;
+    private GeneratingScreen screen;
 
-    public AddTeleportCommand(GeneratingScreen generatingScreen, int x, int y, Array<InteractiveObject> objects) {
+    public AddTeleportCommand(GeneratingScreen generatingScreen, int x, int y, Array<Teleport> teleports) {
         super(generatingScreen);
+        this.screen = generatingScreen;
         this.x = x;
         this.y = y;
-        this.objects = objects;
-        teleport = new Teleport((GeneratingScreen) screen, x, y, false);
+        this.teleports = teleports;
+        teleport = new Teleport(screen, x, y, false);
     }
 
     @Override
     public boolean execute() {
         if(executed)
             return false;
-        if(((GeneratingScreen)screen).addable()) {
-            for (InteractiveObject obj :objects) {
-                if(ClassReflection.isInstance(Teleport.class, obj)) {
-                    if(((Teleport)obj).getX() == x && ((Teleport)obj).getY() == y) {
-                        return false;
-                    }
-                }
-            }
+        if(!screen.maxTeleports()) {
+            if(screen.existsTeleport(x, y))
+                return false;
 
-            objects.add(teleport);
-            if(!((GeneratingScreen)screen).addable())
-                ((GeneratingScreen)screen).getTeleportButton().disable();
+            screen.getTeleports().add(teleport);
+            if(screen.maxTeleports())
+                screen.getTeleportButton().disable();
         }
         return true;
     }
 
     @Override
     public void undo() {
-        if(!((GeneratingScreen)screen).addable()) {
-            ((GeneratingScreen)screen).getTeleportButton().enable();
+        if(!screen.maxTeleports()) {
+            screen.getTeleportButton().enable();
         }
-        objects.removeValue(teleport, true);
-        if(((GeneratingScreen)screen).getObjects().size == 0)
-            ((GeneratingScreen)screen).getUndo().disable();
+        teleports.removeValue(teleport, true);
+        if(screen.getTeleports().size == 0 && screen.getTraps().size == 0)
+            screen.getUndo().disable();
     }
 
     @Override
     public void redo() {
-        if(((GeneratingScreen)screen).addable()) {
-            objects.add(teleport);
-            if(!((GeneratingScreen)screen).addable())
-                ((GeneratingScreen)screen).getTeleportButton().disable();
+        if(screen.maxTeleports()) {
+            teleports.add(teleport);
+            if(screen.maxTeleports())
+                screen.getTeleportButton().disable();
         }
     }
 

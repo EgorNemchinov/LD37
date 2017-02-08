@@ -9,10 +9,8 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.jacktheogre.lightswitch.Constants;
-import com.jacktheogre.lightswitch.objects.InteractiveObject;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 import com.jacktheogre.lightswitch.sprites.Monster;
 import com.jacktheogre.lightswitch.sprites.Human;
@@ -22,16 +20,13 @@ import com.jacktheogre.lightswitch.sprites.Human;
  */
 public class B2WorldCreator {
 
-    public Array<InteractiveObject> objects;
     private World world;
     private TiledMap map;
 
     public B2WorldCreator(GeneratingScreen screen) {
         world = screen.getWorld();
         map = Assets.getAssetLoader().getMap();
-        objects = new Array<InteractiveObject>();
 
-        int actorCount = 0;
         BodyDef bodyDef = new BodyDef();
         PolygonShape shape = new PolygonShape();
         FixtureDef fixtureDef = new FixtureDef();
@@ -39,7 +34,7 @@ public class B2WorldCreator {
 
         //walls
         for (MapObject object : map.getLayers().get(3).getObjects()) {
-            if(!ClassReflection.isInstance(RectangleMapObject.class,object))
+            if (!ClassReflection.isInstance(RectangleMapObject.class, object))
                 continue;
             Rectangle bounds = ((RectangleMapObject) object).getRectangle();
 
@@ -53,14 +48,15 @@ public class B2WorldCreator {
             fixtureDef.filter.categoryBits = Constants.WALLS_BIT;
             fixtureDef.filter.maskBits = Constants.WALLS_BIT |
                     Constants.OBJECT_BIT |
-                    Constants.ACTOR_BIT ;
+                    Constants.BOY_BIT |
+                    Constants.MONSTER_BIT;
 //            fixtureDef.filter.maskBits |= Constants.LIGHT_BIT;
             body.createFixture(fixtureDef);
         }
 
         //static objects
         for (MapObject object : map.getLayers().get(4).getObjects()) {
-            if(!ClassReflection.isInstance(RectangleMapObject.class,object))
+            if (!ClassReflection.isInstance(RectangleMapObject.class, object))
                 continue;
             Rectangle bounds = ((RectangleMapObject) object).getRectangle();
 
@@ -74,7 +70,8 @@ public class B2WorldCreator {
             fixtureDef.filter.categoryBits = Constants.OBJECT_BIT;
             fixtureDef.filter.maskBits = Constants.WALLS_BIT |
                     Constants.OBJECT_BIT |
-                    Constants.ACTOR_BIT;
+                    Constants.BOY_BIT |
+                    Constants.MONSTER_BIT;
 //            fixtureDef.filter.maskBits |= Constants.LIGHT_BIT;
             body.createFixture(fixtureDef);
         }
@@ -82,10 +79,10 @@ public class B2WorldCreator {
         //5th layer is
         //player
         for (MapObject object : map.getLayers().get(5).getObjects()) {
-            if(!ClassReflection.isInstance(RectangleMapObject.class,object))
+            if (!ClassReflection.isInstance(RectangleMapObject.class, object))
                 continue;
             Rectangle bounds = ((RectangleMapObject) object).getRectangle();
-            if(screen.getGame().isPlayingHuman())
+            if (screen.getGame().isPlayingHuman())
                 screen.getPlayer().setGameActor(new Human(world, bounds.getX(), bounds.getY()));
             else
                 screen.getPlayer().setGameActor(new Monster(world, bounds.getX(), bounds.getY()));
@@ -93,10 +90,10 @@ public class B2WorldCreator {
 
         //enemy
         for (MapObject object : map.getLayers().get(6).getObjects()) {
-            if(!ClassReflection.isInstance(RectangleMapObject.class,object))
+            if (!ClassReflection.isInstance(RectangleMapObject.class, object))
                 continue;
             Rectangle bounds = ((RectangleMapObject) object).getRectangle();
-            if(screen.getGame().isPlayingHuman())
+            if (screen.getGame().isPlayingHuman())
                 screen.getEnemyPlayer().setGameActor(new Monster(world, bounds.getX(), bounds.getY()));
             else
                 screen.getEnemyPlayer().setGameActor(new Human(world, bounds.getX(), bounds.getY()));
@@ -104,14 +101,13 @@ public class B2WorldCreator {
 
         //lights
         for (MapObject object : map.getLayers().get(7).getObjects()) {
-            if(!ClassReflection.isInstance(RectangleMapObject.class,object))
+            if (!ClassReflection.isInstance(RectangleMapObject.class, object))
                 continue;
             Rectangle bounds = ((RectangleMapObject) object).getRectangle();
 
             screen.getLighting().addLight(bounds.getX() + bounds.getWidth() / 2, bounds.getY() + bounds.getHeight() / 2);
         }
 
-        screen.setObjects(objects);
     }
 
 }
