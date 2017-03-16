@@ -1,4 +1,4 @@
-package com.jacktheogre.lightswitch.tools;
+package com.jacktheogre.lightswitch.tools.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;

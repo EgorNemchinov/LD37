@@ -1,26 +1,24 @@
 package com.jacktheogre.lightswitch.commands;
 
+import com.badlogic.gdx.Gdx;
 import com.jacktheogre.lightswitch.sprites.GameActor;
-
-import java.util.Stack;
+import com.jacktheogre.lightswitch.sprites.Player;
 
 /**
  * Created by luna on 12.12.16.
  */
-public class StopMovingCommand extends ActorCommand {
+public class StopDirectionCommand extends ActorCommand {
 
     private CommandHandler commandHandler;
-    private Stack<Command> commands;
     private GameActor.Direction direction;
 
-    public StopMovingCommand(CommandHandler commandHandler, GameActor.Direction direction, GameActor gameActor) {
+    public StopDirectionCommand(CommandHandler commandHandler, GameActor.Direction direction, Player player) {
         this(commandHandler, direction);
-        this.gameActor = gameActor;
+        this.player = player;
     }
 
-    public StopMovingCommand(CommandHandler commandHandler, GameActor.Direction direction) {
+    public StopDirectionCommand(CommandHandler commandHandler, GameActor.Direction direction) {
         this.commandHandler = commandHandler;
-        commands = commandHandler.getCommands();
         this.direction = direction;
     }
 
@@ -29,6 +27,7 @@ public class StopMovingCommand extends ActorCommand {
         if(executed)
             return false;
         commandHandler.stopMoving(direction);
+        Gdx.app.log("StopMC", "executed, dir: " + direction);
         return true;
     }
 
@@ -42,9 +41,13 @@ public class StopMovingCommand extends ActorCommand {
 
     }
 
+    @Override
+    public String toLog() {
+        return String.format("sd %s %d", direction, isEnemyCommandToInt());
+    }
 
     @Override
     public String toString() {
-        return "StopMovingCommand. Direction:"+direction;
+        return "StopDirectionCommand. Direction:"+direction;
     }
 }

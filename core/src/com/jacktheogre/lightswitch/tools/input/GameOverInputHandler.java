@@ -1,4 +1,4 @@
-package com.jacktheogre.lightswitch.tools;
+package com.jacktheogre.lightswitch.tools.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -8,6 +8,7 @@ import com.jacktheogre.lightswitch.screens.GameOverScreen;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 import com.jacktheogre.lightswitch.screens.MainMenuScreen;
 import com.jacktheogre.lightswitch.sprites.Button;
+import com.jacktheogre.lightswitch.tools.Assets;
 
 /**
  * Created by luna on 14.12.16.

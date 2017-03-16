@@ -1,20 +1,17 @@
-package com.jacktheogre.lightswitch.tools;
+package com.jacktheogre.lightswitch.tools.input;
 
-import com.badlogic.gdx.Application;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.jacktheogre.lightswitch.commands.MoveToCommand;
+import com.jacktheogre.lightswitch.LightSwitch;
 import com.jacktheogre.lightswitch.commands.StartMovingCommand;
-import com.jacktheogre.lightswitch.commands.StopCommand;
 import com.jacktheogre.lightswitch.commands.TurnOffCommand;
 import com.jacktheogre.lightswitch.commands.TurnOnCommand;
+import com.jacktheogre.lightswitch.commands.WallthroughCommand;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
 import com.jacktheogre.lightswitch.sprites.GameActor;
-
-import static sun.audio.AudioPlayer.player;
+import com.jacktheogre.lightswitch.sprites.Monster;
 
 /**
  * Created by luna on 10.12.16.
@@ -23,7 +20,6 @@ public class PlayInputHandler extends Stage{
 
     private PlayScreen screen;
     private float lastMakingPathTime = 0;
-    private int lightPointer = -1;
 
     public PlayInputHandler(PlayScreen playScreen) {
         this.screen = playScreen;
@@ -33,29 +29,34 @@ public class PlayInputHandler extends Stage{
     public boolean keyDown(int keycode) {
         switch(keycode) {
             case Input.Keys.SPACE:
-                screen.getCommandHandler().addCommand(new TurnOnCommand(screen));
+                if(LightSwitch.isPlayingHuman())
+                    screen.getCommandHandler().addCommand(new TurnOnCommand(screen));
+                else {
+                    screen.getCommandHandler().addCommand(new WallthroughCommand(screen.getPlayer()));
+                }
                 break;
             case Input.Keys.W:
             case Input.Keys.UP:
-                screen.getCommandHandler().addCommand(new StartMovingCommand(GameActor.Direction.UP));
+                screen.getCommandHandler().addCommand(new StartMovingCommand(GameActor.Direction.UP, screen.getPlayer()));
                 screen.getPlayer().getGameActor().setMoving(true);
                 break;
             case Input.Keys.A:
             case Input.Keys.LEFT:
-                screen.getCommandHandler().addCommand(new StartMovingCommand(GameActor.Direction.LEFT));
+                screen.getCommandHandler().addCommand(new StartMovingCommand(GameActor.Direction.LEFT, screen.getPlayer()));
                 screen.getPlayer().getGameActor().setMoving(true);
                 break;
             case Input.Keys.S:
             case Input.Keys.DOWN:
-                screen.getCommandHandler().addCommand(new StartMovingCommand(GameActor.Direction.DOWN));
+                screen.getCommandHandler().addCommand(new StartMovingCommand(GameActor.Direction.DOWN, screen.getPlayer()));
                 screen.getPlayer().getGameActor().setMoving(true);
                 break;
             case Input.Keys.D:
             case Input.Keys.RIGHT:
-                screen.getCommandHandler().addCommand(new StartMovingCommand(GameActor.Direction.RIGHT));
+                screen.getCommandHandler().addCommand(new StartMovingCommand(GameActor.Direction.RIGHT, screen.getPlayer()));
                 screen.getPlayer().getGameActor().setMoving(true);
                 break;
             case Input.Keys.BACK:
+            case Input.Keys.BACKSPACE:
                 screen.getGame().setScreen(new GeneratingScreen(screen.getGame()));
                 break;
         }
@@ -66,23 +67,29 @@ public class PlayInputHandler extends Stage{
     public boolean keyUp(int keycode) {
         switch(keycode) {
             case Input.Keys.SPACE:
-                screen.getCommandHandler().addCommand(new TurnOffCommand(screen));
+                if(LightSwitch.isPlayingHuman())
+                    screen.getCommandHandler().addCommand(new TurnOffCommand(screen));
                 break;
             case Input.Keys.W:
             case Input.Keys.UP:
+                // TODO: 10.02.17 get command working
                 screen.getCommandHandler().stopMoving(GameActor.Direction.UP);
+//                screen.getCommandHandler().addCommand(new StopDirectionCommand(screen.getCommandHandler(), GameActor.Direction.UP));
                 break;
             case Input.Keys.A:
             case Input.Keys.LEFT:
                 screen.getCommandHandler().stopMoving(GameActor.Direction.LEFT);
+//                screen.getCommandHandler().addCommand(new StopDirectionCommand(screen.getCommandHandler(), GameActor.Direction.LEFT));
                 break;
             case Input.Keys.S:
             case Input.Keys.DOWN:
                 screen.getCommandHandler().stopMoving(GameActor.Direction.DOWN);
+//                screen.getCommandHandler().addCommand(new StopDirectionCommand(screen.getCommandHandler(), GameActor.Direction.DOWN));
                 break;
             case Input.Keys.D:
             case Input.Keys.RIGHT:
                 screen.getCommandHandler().stopMoving(GameActor.Direction.RIGHT);
+//                screen.getCommandHandler().addCommand(new StopDirectionCommand(screen.getCommandHandler(), GameActor.Direction.RIGHT));
                 break;
         }
         return true;

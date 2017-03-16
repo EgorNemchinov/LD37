@@ -6,6 +6,7 @@ import com.badlogic.gdx.ai.pfa.indexed.IndexedGraph;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 /**
@@ -57,8 +58,16 @@ public class GraphImp implements IndexedGraph<Node>{
         return nodes.get(ind);
     }
 
-    public Array<Node> getNodes() {
-        return nodes;
+    //returns null if node is closed, else returns this node
+    public Node getOpenNode(int x, int y) {
+        int index = x + y*LevelManager.lvlTileWidth;
+        if(index >= nodes.size)
+            return null;
+        Node node = nodes.get(index);
+        if(node.getConnections().size > 0)
+            return node;
+        else
+            return null;
     }
 
     public void render(ShapeRenderer shapeRenderer) {
@@ -84,7 +93,7 @@ public class GraphImp implements IndexedGraph<Node>{
         return nodes.get(fromNode.getIndex()).getConnections();
     }
 
-    public void removeConnections(Node node) {
+    void removeConnections(Node node) {
         for (Connection fromConnection : node.getConnections()) {
             for (Connection toConnection :((Node)fromConnection.getToNode()).getConnections()) {
                 if(toConnection.getToNode() == node)
@@ -94,7 +103,7 @@ public class GraphImp implements IndexedGraph<Node>{
         node.getConnections().clear();
     }
 
-    public void removeConnections(Node node1, Node node2) {
+    void removeConnections(Node node1, Node node2) {
         for (Connection fromConnection : node1.getConnections()) {
             if(fromConnection.getToNode() == node2)
                 node1.getConnections().removeValue(fromConnection, true);
