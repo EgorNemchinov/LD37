@@ -1,6 +1,5 @@
 package com.jacktheogre.lightswitch.objects;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -17,7 +16,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.jacktheogre.lightswitch.Constants;
 import com.jacktheogre.lightswitch.ai.LevelManager;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
-import com.jacktheogre.lightswitch.sprites.GameActor;
+import com.jacktheogre.lightswitch.sprites.Player;
 
 /**
  * Created by luna on 10.12.16.
@@ -35,10 +34,26 @@ public abstract class InteractiveObject {
     protected float timeSinceClosure, stateTimer;
     protected Animation openAnimation, closingAnimation;
 
+    protected int index;
+
+    public static class Indexer {
+        static int i = 0;
+
+        public static int getIndex() {
+            i++;
+            return i;
+        }
+
+        public static void nullify() {
+            i = 0;
+        }
+    }
+
+
     private boolean initialOpen = false;
 
     public abstract void render(SpriteBatch spriteBatch, float dt);
-    public abstract boolean activate(GameActor gameActor);
+    public abstract boolean activate(Player player);
 
     public InteractiveObject(GeneratingScreen screen, int x, int y, boolean initPhysics) {
         this.screen = screen;
@@ -106,12 +121,12 @@ public abstract class InteractiveObject {
     public  void update(float dt) {
         //better be done in another way
         if(!initialOpen) {
-            quickOpen();
+            initOpen();
             initialOpen = true;
         }
     }
 
-    public void setFilter(short categoryBits, short maskBits, short groupIndex) {
+    void setFilter(short categoryBits, short maskBits, short groupIndex) {
         Filter filter = new Filter();
         filter.categoryBits = categoryBits;
         filter.maskBits = maskBits;
@@ -119,11 +134,12 @@ public abstract class InteractiveObject {
         fixture.setFilterData(filter);
     }
 
-    public void quickClose() {
+    public void initClose() {
         setTransparency(true);
+        index = Indexer.getIndex();
     }
 
-    public void quickOpen() {
+     protected void initOpen() {
         setTransparency(false);
     }
 
@@ -139,5 +155,7 @@ public abstract class InteractiveObject {
         return new Vector2(x + 8, y + 8);
     }
 
-
+    public int getIndex() {
+        return index;
+    }
 }

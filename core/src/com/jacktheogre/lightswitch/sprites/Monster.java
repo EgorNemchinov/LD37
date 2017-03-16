@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.jacktheogre.lightswitch.Constants;
+import com.jacktheogre.lightswitch.tools.AssetLoader;
 import com.jacktheogre.lightswitch.tools.Assets;
 
 /**
@@ -21,12 +22,10 @@ public class Monster extends GameActor {
     private final int WIDTH = 22, HEIGHT = 26;
 
     public enum State {RUNNING, STANDING;}
+
     private State currentState;
     private State previousState;
-
     private float timeSinceTrapped = 0;
-    private boolean trapped = false;
-
 
     public Monster(World world, float x, float y) {
         super(world, x, y, Assets.getAssetLoader().characters);
@@ -45,6 +44,7 @@ public class Monster extends GameActor {
         target = new Vector2(b2body.getPosition());
 
     }
+
 
     protected void initialize() {
         BodyDef bodyDef = new BodyDef();
@@ -175,8 +175,8 @@ public class Monster extends GameActor {
         frames.clear();
 
         playerStandDown = new TextureRegion(getTexture(), 1, 1, WIDTH, HEIGHT);
-        playerStandUp = new TextureRegion(getTexture(), 1, 1 + 2*28, WIDTH, HEIGHT);
-        playerStandRight = new TextureRegion(getTexture(), 1, 1 + 3*28, WIDTH, HEIGHT);
+        playerStandUp = new TextureRegion(getTexture(), 1, 1 + 1*28, WIDTH, HEIGHT);
+        playerStandRight = new TextureRegion(getTexture(), 1, 1 + 2*28, WIDTH, HEIGHT);
         playerStandLeft = new TextureRegion(getTexture(), 1, 1 + 3*28, WIDTH, HEIGHT);
 
         //set looping
@@ -193,10 +193,7 @@ public class Monster extends GameActor {
 
     @Override
     public void setMoving(boolean moving) {
-        if(trapped)
-            this.isMoving = false;
-        else
-            this.isMoving = moving;
+        this.isMoving = !trapped && moving;
     }
 
     @Override
@@ -211,9 +208,9 @@ public class Monster extends GameActor {
 
     @Override
     public int getSpeed() {
-        if(!trapped)
-            return SPEED_BASE+8*Assets.getAssetLoader().getLevelNum();
-        else
+        if(trapped)
             return 0;
+        else
+            return SPEED_BASE+6* AssetLoader.getLevelNum();
     }
 }

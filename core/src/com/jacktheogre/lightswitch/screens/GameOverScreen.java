@@ -1,22 +1,15 @@
 package com.jacktheogre.lightswitch.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.jacktheogre.lightswitch.LightSwitch;
 import com.jacktheogre.lightswitch.sprites.Button;
 import com.jacktheogre.lightswitch.tools.AssetLoader;
 import com.jacktheogre.lightswitch.tools.Assets;
-import com.jacktheogre.lightswitch.tools.GameOverInputHandler;
+import com.jacktheogre.lightswitch.tools.input.GameOverInputHandler;
 
 /**
  * Created by luna on 10.12.16.
@@ -115,6 +108,15 @@ public class GameOverScreen extends GameScreen{
         replay.setPosition(gamePort.getWorldWidth() / 2 - 2f*replay.getWidth()-INTERVAL, gamePort.getWorldHeight() / 2 - replay.getHeight() / 2 - 80);
         replay.setScale(SCALE);
 
+        home = new Button(Assets.getAssetLoader().home_button, Button.State.ACTIVE, this) {
+            @Override
+            protected void actUnpress() {
+                screen.getGame().setScreen(new MainMenuScreen(screen.getGame()));
+            }
+        };
+        home.setPosition(replay.getBoundingRectangle().getX()+replay.getBoundingRectangle().getWidth() + INTERVAL, replay.getY());
+        home.setScale(SCALE);
+
         boolean nextLevelActive = !Assets.getAssetLoader().isMaxLevel() && state == State.WIN;
         next_level = new Button(Assets.getAssetLoader().next_level_button, nextLevelActive ? Button.State.ACTIVE : Button.State.DISABLED, this) {
             @Override
@@ -123,18 +125,8 @@ public class GameOverScreen extends GameScreen{
                 screen.getGame().setScreen(new GeneratingScreen(screen.getGame()));
             }
         };
-        next_level.setPosition(replay.getBoundingRectangle().getX()+replay.getBoundingRectangle().getWidth() + INTERVAL, replay.getY());
+        next_level.setPosition(home.getBoundingRectangle().getX()+home.getBoundingRectangle().getWidth() + INTERVAL, home.getY());
         next_level.setScale(SCALE);
-
-
-        home = new Button(Assets.getAssetLoader().home_button, Button.State.ACTIVE, this) {
-            @Override
-            protected void actUnpress() {
-                screen.getGame().setScreen(new MainMenuScreen(screen.getGame()));
-            }
-        };
-        home.setPosition(next_level.getBoundingRectangle().getX()+next_level.getBoundingRectangle().getWidth() + INTERVAL, next_level.getY());
-        home.setScale(SCALE);
 
         buttons.add(replay);
         buttons.add(next_level);

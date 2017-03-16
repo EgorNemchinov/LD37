@@ -1,9 +1,8 @@
 package com.jacktheogre.lightswitch.commands;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.jacktheogre.lightswitch.objects.Teleport;
-import com.jacktheogre.lightswitch.sprites.GameActor;
+import com.jacktheogre.lightswitch.sprites.Player;
 
 /**
  * Created by luna on 11.12.16.
@@ -12,20 +11,20 @@ public class TeleportCommand extends ActorCommand {
 
     private Teleport start, destination;
 
-    public TeleportCommand(GameActor gameActor, Teleport start, Teleport destination) {
-        this.gameActor = gameActor;
+    public TeleportCommand(Teleport start, Teleport destination, Player player) {
         this.start = start;
         this.destination = destination;
+        this.player = player;
     }
 
     @Override
-    public boolean execute(GameActor gameActor) {
+    public boolean execute() {
         if(executed)
             return false;
-//        gameActor.moveTo(destination.getX(), destination.getY());
+//        player.getGameActor().moveTo(destination.getX(), destination.getY());
         if(start.isOpen() && destination.isOpen()) {
-            gameActor.b2body.setTransform(new Vector2(destination.getX(), destination.getY()), 0);
-            gameActor.setRemakingPath(true);
+            player.getGameActor().b2body.setTransform(new Vector2(destination.getX(), destination.getY()), 0);
+            player.getGameActor().setRemakingPath(true);
             start.close();
             destination.close();
         }
@@ -37,12 +36,17 @@ public class TeleportCommand extends ActorCommand {
 
     @Override
     public void undo() {
-        gameActor.b2body.setTransform(new Vector2(start.getX(), start.getY()), 0);
+        getGameActor().b2body.setTransform(new Vector2(start.getX(), start.getY()), 0);
     }
 
     @Override
     public void redo() {
-        gameActor.b2body.setTransform(new Vector2(destination.getX(), destination.getY()), 0);
+        getGameActor().b2body.setTransform(new Vector2(destination.getX(), destination.getY()), 0);
+    }
+
+    @Override
+    public String toLog() {
+        return String.format("teleport %d %d %d", start.getIndex(), destination.getIndex(), isEnemyCommandToInt());
     }
 
     @Override

@@ -73,8 +73,8 @@ public class Button extends Sprite {
             }
             disabledTexture = frames.get(0);
             activeTexture = frames.get(1);
-            pressedTexture = frames.get(2);
-            focusedTexture = frames.get(3);
+            focusedTexture = frames.get(2);
+            pressedTexture = frames.get(3);
         } else {
             disabledTexture = textureReg;
             activeTexture = textureReg;
@@ -104,6 +104,10 @@ public class Button extends Sprite {
                 break;
         }
         return region;
+    }
+
+    public void update(float dt) {
+
     }
 
     public void setAutoUnpress(boolean autoUnpress) {

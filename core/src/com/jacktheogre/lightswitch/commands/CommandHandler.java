@@ -1,11 +1,14 @@
 package com.jacktheogre.lightswitch.commands;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.jacktheogre.lightswitch.Constants;
+import com.jacktheogre.lightswitch.multiplayer.MessageHandler;
+import com.jacktheogre.lightswitch.replay.Logger;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
 import com.jacktheogre.lightswitch.sprites.GameActor;
+import com.jacktheogre.lightswitch.sprites.Player;
 
 import java.util.Stack;
 
@@ -14,51 +17,71 @@ import java.util.Stack;
  */
 public class CommandHandler {
 
-    // TODO: 10.12.16 if add another screen then change everything. check for type of screen and command
+    public enum ScreenState {
+        GENERATINGSCREEN, PLAYSCREEN
+    }
+    private ScreenState screenState;
     private Screen screen;
     private Stack<Command> commands;
     private int pointer = 0;
     private boolean newCommands;
+    private Logger logger;
+    private float timeSinceSynchronizing = 0;
 
     public CommandHandler(Screen screen) {
         this.screen = screen;
         commands = new Stack<Command>();
+        logger = new Logger();
+        screenState = ScreenState.GENERATINGSCREEN;
     }
 
     public void update(float dt) {
+        timeSinceSynchronizing += dt;
+        if(timeSinceSynchronizing > Constants.SYNCRONIZING_FREQUENCY_TIME) {
+            if(screenState == ScreenState.PLAYSCREEN)
+                synchronizePosition();
+            timeSinceSynchronizing %= Constants.SYNCRONIZING_FREQUENCY_TIME;
+        }
         if(newCommands) {
-            if (ClassReflection.isInstance(PlayScreen.class, screen)) {
+            if (screenState == ScreenState.PLAYSCREEN) {
                 executeCommandsPlay();
-            } else if (ClassReflection.isInstance(GeneratingScreen.class, screen)) {
+            } else if (screenState == ScreenState.GENERATINGSCREEN) {
                 executeCommandsGenerate();
             }
         }
     }
 
+    private void synchronizePosition() {
+        Player player = ((PlayScreen) screen).getPlayer();
+        SetPositionCommand cmd = new SetPositionCommand((int) player.getGameActor().b2body.getPosition().x,
+                (int) player.getGameActor().b2body.getPosition().y, player);
+        logger.logStringToFile(cmd.toLog());
+//        MessageHandler.sendMessage(cmd.toLog());
+        // TODO: 13.02.17  log and\or send message with setposition command
+    }
+
     public void addCommand(Command command) {
         int pops = commands.size() - pointer;
-        if(ClassReflection.isInstance(TeleportCommand.class, command));
-//            Gdx.app.log("addCommand", "teleport command");
         for (int i = 0; i < pops; i++) {
             commands.pop();
         }
         commands.push(command);
-        Gdx.app.log("CMNDHDLR", "COMMAND ADDED: "+commands.peek().toString());
         newCommands = true;
     }
 
     public void executeCommandsPlay() {
-        PlayScreen screen = (PlayScreen) this.screen;
         for (int i = pointer; i < commands.size(); i++) {
             if(commands.get(i) != null) {
                 if(ClassReflection.isInstance(ActorCommand.class, commands.get(i))){
                     ActorCommand cmd = (ActorCommand)commands.get(i);
-                    if(cmd.gameActor == null) {
-                        cmd.execute(screen.getPlayer().getGameActor());
+                    if(cmd.player!= null) {
+                        if(cmd.execute())
+                            logger.logStringToFile(cmd.toLog());
                     }
-                    else cmd.execute(cmd.gameActor);
                 } else if(ClassReflection.isInstance(GlobalCommand.class, commands.get(i))){
-                    ((GlobalCommand)commands.get(i)).execute();
+                    GlobalCommand cmd = (GlobalCommand)commands.get(i);
+                    if(cmd.execute())
+                        logger.logStringToFile(cmd.toLog());
                 }
             }
         }
@@ -68,7 +91,6 @@ public class CommandHandler {
     }
 
     public void executeCommandsGenerate() {
-        GeneratingScreen screen = (GeneratingScreen) this.screen;
         for (int i = pointer; i < commands.size(); i++) {
             if(commands.get(i) != null) {
                  if(ClassReflection.isInstance(GlobalCommand.class, commands.get(i))){
@@ -86,6 +108,7 @@ public class CommandHandler {
     }
 
     public void stopMoving(GameActor.Direction direction) {
+        logger.logStringToFile("sd " + direction.toString());
         for (int i = commands.size() - 1; i >= 0 ; i--) {
             Command cmd = commands.get(i);
             if(ClassReflection.isInstance(StartMovingCommand.class, cmd)) {
@@ -98,7 +121,7 @@ public class CommandHandler {
         for (int i = commands.size() - 1; i >= 0 ; i--) {
             Command cmd = commands.get(i);
             if(ClassReflection.isInstance(StopCommand.class, cmd) || ClassReflection.isInstance(MoveToCommand.class, cmd)) {
-                addCommand(new StopCommand());
+                addCommand(new StopCommand(((PlayScreen) screen).getPlayer()));
                 return;
             } else if(ClassReflection.isInstance(StartMovingCommand.class, cmd)) {
                 if(((StartMovingCommand) cmd).getDirection() != direction) {
@@ -111,7 +134,7 @@ public class CommandHandler {
                 }
             }
         }
-        addCommand(new StopCommand());
+        addCommand(new StopCommand(((PlayScreen) screen).getPlayer()));
     }
 
     public boolean undo() {
@@ -147,6 +170,14 @@ public class CommandHandler {
             return true;
         } else
             return false;
+    }
+
+    public ScreenState getScreenState() {
+        return screenState;
+    }
+
+    public void setScreenState(ScreenState screenState) {
+        this.screenState = screenState;
     }
 
     public void setScreen(Screen screen) {

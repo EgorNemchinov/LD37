@@ -9,6 +9,7 @@ import com.jacktheogre.lightswitch.Constants;
 import com.jacktheogre.lightswitch.commands.TeleportCommand;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 import com.jacktheogre.lightswitch.sprites.GameActor;
+import com.jacktheogre.lightswitch.sprites.Player;
 import com.jacktheogre.lightswitch.tools.Assets;
 
 import java.util.Random;
@@ -32,13 +33,11 @@ public class Teleport extends InteractiveObject {
         stateTimer = 0f;
     }
 
-
-
-    public boolean activate(GameActor gameActor) {
+    public boolean activate(Player player) {
         if(others.size > 0){
             Teleport dest = randomTeleport();
             if(dest != null) {
-                screen.getCommandHandler().addCommand(new TeleportCommand(gameActor, this, dest));
+                screen.getCommandHandler().addCommand(new TeleportCommand(this, dest, player));
                 return true;
             } else
                 return false;

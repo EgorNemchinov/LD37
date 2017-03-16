@@ -115,4 +115,9 @@ public class WallthroughCommand extends ActorCommand {
     public void redo() {
 
     }
+
+    @Override
+    public String toLog() {
+        return String.format("wtc ", isEnemyCommandToInt());
+    }
 }

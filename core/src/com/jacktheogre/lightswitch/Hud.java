@@ -18,8 +18,10 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.jacktheogre.lightswitch.commands.TurnOffCommand;
 import com.jacktheogre.lightswitch.commands.TurnOnCommand;
+import com.jacktheogre.lightswitch.commands.WallthroughCommand;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
 import com.jacktheogre.lightswitch.sprites.Button;
+import com.jacktheogre.lightswitch.sprites.Monster;
 import com.jacktheogre.lightswitch.tools.Assets;
 
 /**
@@ -33,7 +35,7 @@ public class Hud implements Disposable{
     private Label timeLabel;
     private PlayScreen screen;
     private Sprite energyBar, fill, timer;
-    private Button lightButton;
+    private Button lightButton, wallthroughButton;
     private float energyBarScale = 1f;
 
     private Touchpad touchpad;
@@ -85,56 +87,120 @@ public class Hud implements Disposable{
         fill.setOrigin(fill.getWidth() / 2, 0);
         timer = new Sprite(Assets.getAssetLoader().timer);
         timer.setPosition((viewport.getWorldWidth() - timer.getWidth()) / 2, viewport.getWorldHeight() - timer.getHeight());
-        if(Gdx.app.getType() == Application.ApplicationType.Android && screen.getGame().isPlayingHuman()) {
-            lightButton = new Button(Assets.getAssetLoader().light_button, Button.State.ACTIVE, screen) {
-                @Override
-                protected void actPress() {
-                    if(!playScreen.getLighting().lightsOn())
-                        playScreen.getCommandHandler().addCommand(new TurnOnCommand(playScreen));
-                }
+        if(Gdx.app.getType() == Application.ApplicationType.Android ) {
+            if(LightSwitch.isPlayingHuman()) {
+                lightButton = new Button(Assets.getAssetLoader().light_button, Button.State.ACTIVE, screen) {
+                    @Override
+                    protected void actPress() {
+                        if(!playScreen.getLighting().lightsOn())
+                            playScreen.getCommandHandler().addCommand(new TurnOnCommand(playScreen));
+                    }
 
-                @Override
-                protected void actUnpress() {
-                    if(playScreen.getLighting().lightsOn())
-                        playScreen.getCommandHandler().addCommand(new TurnOffCommand(playScreen));
-                }
+                    @Override
+                    protected void actUnpress() {
+                        if(playScreen.getLighting().lightsOn())
+                            playScreen.getCommandHandler().addCommand(new TurnOffCommand(playScreen));
+                    }
 
-                @Override
-                public boolean press() {
-                    if(pressed)
-                        return false;
-                    pressed = true;
-                    if(!disabled) {
-                        if(playScreen.getEnergy() < Constants.WASTE_ENERGY_PER_SWITCH)
+                    @Override
+                    public void update(float dt) {
+                        if(playScreen.getLighting().lightsOn() && !isPressed())
+                            playScreen.getCommandHandler().addCommand(new TurnOffCommand(playScreen));
+                    }
+
+                    @Override
+                    public boolean press() {
+                        if(pressed)
                             return false;
-                        setState(State.PRESSED);
-                        actPress();
-                        return true;
-                    } else {
-                        setState(State.DISABLED);
-                        return false;
+                        pressed = true;
+                        if(!disabled) {
+                            if(playScreen.getEnergy() < Constants.WASTE_ENERGY_PER_SWITCH)
+                                return false;
+                            setState(State.PRESSED);
+                            actPress();
+                            return true;
+                        } else {
+                            setState(State.DISABLED);
+                            return false;
+                        }
                     }
-                }
 
-                @Override
-                public void initGraphics(TextureRegion textureRegion) {
-                    int width = textureRegion.getRegionWidth() / 2;
-                    Array<TextureRegion> frames = new Array<TextureRegion>();
+                    @Override
+                    public void initGraphics(TextureRegion textureRegion) {
+                        int width = textureRegion.getRegionWidth() / 2;
+                        Array<TextureRegion> frames = new Array<TextureRegion>();
 
-                    for (int i = 0; i < 2; i++) {
-                        frames.add(new TextureRegion(textureRegion, i*width, 0, width, textureRegion.getRegionHeight()));
+                        for (int i = 0; i < 2; i++) {
+                            frames.add(new TextureRegion(textureRegion, i*width, 0, width, textureRegion.getRegionHeight()));
+                        }
+                        disabledTexture = frames.get(0);
+                        activeTexture = frames.get(0);
+                        focusedTexture = frames.get(0);
+                        pressedTexture = frames.get(1);
+
+                        this.setSize(width, this.getHeight());
                     }
-                    disabledTexture = frames.get(0);
-                    activeTexture = frames.get(0);
-                    focusedTexture = frames.get(0);
-                    pressedTexture = frames.get(1);
+                };
+                energyBar.setPosition(energyBar.getX(), energyBar.getY() + lightButton.getHeight() / 2 );
+                fill.setPosition(energyBar.getX() + 2, energyBar.getY() + 2);
+                lightButton.setPosition(energyBar.getX(), energyBar.getY() - lightButton.getHeight() - 5);
+            } else {
+                wallthroughButton = new Button(Assets.getAssetLoader().light_button, Button.State.ACTIVE, screen) {
+                    @Override
+                    protected void actPress() {
+                        if(!((Monster)playScreen.getPlayer().getGameActor()).isTransparency())
+                            playScreen.getCommandHandler().addCommand(new WallthroughCommand(playScreen.getPlayer()));
+                    }
 
-                    this.setSize(width, this.getHeight());
-                }
-            };
-            energyBar.setPosition(energyBar.getX(), energyBar.getY() + lightButton.getHeight() / 2 );
-            fill.setPosition(energyBar.getX() + 2, energyBar.getY() + 2);
-            lightButton.setPosition(energyBar.getX(), energyBar.getY() - lightButton.getHeight() - 5);
+                    @Override
+                    protected void actUnpress() {
+                        if(((Monster)playScreen.getPlayer().getGameActor()).isTransparency())
+                            playScreen.getCommandHandler().addCommand(new WallthroughCommand(playScreen.getPlayer()));
+                    }
+
+                    @Override
+                    public void update(float dt) {
+//                        if(playScreen.getLighting().lightsOn() && !isPressed())
+//                            playScreen.getCommandHandler().addCommand(new TurnOffCommand(playScreen));
+                    }
+
+                    @Override
+                    public boolean press() {
+                        if(pressed)
+                            return false;
+                        pressed = true;
+                        if(!disabled) {
+//                            if(playScreen.getEnergy() < Constants.WASTE_ENERGY_PER_SWITCH)
+//                                return false;
+                            setState(State.PRESSED);
+                            actPress();
+                            return true;
+                        } else {
+                            setState(State.DISABLED);
+                            return false;
+                        }
+                    }
+
+                    @Override
+                    public void initGraphics(TextureRegion textureRegion) {
+                        int width = textureRegion.getRegionWidth() / 2;
+                        Array<TextureRegion> frames = new Array<TextureRegion>();
+
+                        for (int i = 0; i < 2; i++) {
+                            frames.add(new TextureRegion(textureRegion, i*width, 0, width, textureRegion.getRegionHeight()));
+                        }
+                        disabledTexture = frames.get(0);
+                        activeTexture = frames.get(0);
+                        focusedTexture = frames.get(0);
+                        pressedTexture = frames.get(1);
+
+                        this.setSize(width, this.getHeight());
+                    }
+                };
+                energyBar.setPosition(energyBar.getX(), energyBar.getY() + wallthroughButton.getHeight() / 2 );
+                fill.setPosition(energyBar.getX() + 2, energyBar.getY() + 2);
+                wallthroughButton.setPosition(energyBar.getX(), energyBar.getY() - wallthroughButton.getHeight() - 5);
+            }
         }
     }
 
@@ -146,10 +212,10 @@ public class Hud implements Disposable{
         update(dt);
         screen.getGame().batch.begin();
         screen.getGame().batch.setProjectionMatrix(stage.getCamera().combined);
-        if(screen.getGame().isPlayingHuman()) {
+//        if(LightSwitch.isPlayingHuman()) {
             fill.draw(screen.getGame().batch);
             energyBar.draw(screen.getGame().batch);
-        }
+//        }
         timer.draw(screen.getGame().batch);
         timeLabel.draw(screen.getGame().batch, 1f);
         if(Gdx.app.getType() == Application.ApplicationType.Android) {
@@ -191,6 +257,10 @@ public class Hud implements Disposable{
 
     public void dispose() {
         //nothing to dispose
+    }
+
+    public Button getWallthroughButton() {
+        return wallthroughButton;
     }
 
     public Button getLightButton() {

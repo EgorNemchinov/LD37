@@ -9,8 +9,8 @@ import com.jacktheogre.lightswitch.screens.GeneratingScreen;
  * Created by luna on 18.10.16.
  */
 public class Player {
-    private GameActor gameActor;
-    private Agent agent;
+    protected GameActor gameActor;
+    protected Agent agent;
 
     public Player(GeneratingScreen screen) {
         agent = new Agent(screen.getWorld());
@@ -35,6 +35,10 @@ public class Player {
 
     public void render(SpriteBatch batch, float dt) {
         batch.draw(gameActor.getFrame(dt), gameActor.getX(), gameActor.getY());
+    }
+
+    public void setPosition(int x, int y) {
+        gameActor.b2body.setTransform(x, y, 0);
     }
     /*
     public void setPosition(Vector2 position) {

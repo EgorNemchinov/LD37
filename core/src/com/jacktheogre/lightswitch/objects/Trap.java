@@ -1,6 +1,5 @@
 package com.jacktheogre.lightswitch.objects;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -12,8 +11,8 @@ import com.badlogic.gdx.utils.Array;
 import com.jacktheogre.lightswitch.Constants;
 import com.jacktheogre.lightswitch.commands.TrapTriggerCommand;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
-import com.jacktheogre.lightswitch.sprites.GameActor;
 import com.jacktheogre.lightswitch.sprites.Monster;
+import com.jacktheogre.lightswitch.sprites.Player;
 import com.jacktheogre.lightswitch.tools.Assets;
 
 /**
@@ -96,9 +95,9 @@ public class Trap extends InteractiveObject {
     }
 
     @Override
-    public boolean activate(GameActor gameActor) {
+    public boolean activate(Player player) {
         if(!triggered)
-            screen.getCommandHandler().addCommand(new TrapTriggerCommand(this, (Monster) gameActor));
+            screen.getCommandHandler().addCommand(new TrapTriggerCommand(this, player));
         // TODO: 06.02.17 when false?
         return true;
     }
@@ -116,7 +115,7 @@ public class Trap extends InteractiveObject {
             return false;
         this.target = monster;
         triggered = true;
-        quickClose();
+        initClose();
         return true;
     }
 

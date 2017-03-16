@@ -18,7 +18,6 @@ public class Logger {
     public Logger() {
         fileHandle = Assets.getAssetLoader().fileHandle;
         clearLog();
-
     }
 
     public void clearLog() {
@@ -30,7 +29,7 @@ public class Logger {
     }
 
     public void logStringToFile(String s) {
-        fileHandle.writeString(s, true);
+        fileHandle.writeString(s+"\n", true);
     }
 
     public void printLog() {

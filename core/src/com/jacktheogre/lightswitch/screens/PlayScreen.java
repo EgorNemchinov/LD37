@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.World;
@@ -23,16 +22,15 @@ import com.jacktheogre.lightswitch.LightSwitch;
 import com.jacktheogre.lightswitch.commands.CommandHandler;
 import com.jacktheogre.lightswitch.commands.StartMovingCommand;
 import com.jacktheogre.lightswitch.commands.StopCommand;
+import com.jacktheogre.lightswitch.multiplayer.MessageHandler;
 import com.jacktheogre.lightswitch.objects.InteractiveObject;
+import com.jacktheogre.lightswitch.objects.NullInteractiveObject;
 import com.jacktheogre.lightswitch.objects.Teleport;
-import com.jacktheogre.lightswitch.objects.Trap;
-import com.jacktheogre.lightswitch.sprites.Button;
 import com.jacktheogre.lightswitch.sprites.EnemyPlayer;
 import com.jacktheogre.lightswitch.sprites.GameActor;
-import com.jacktheogre.lightswitch.sprites.Monster;
 import com.jacktheogre.lightswitch.sprites.Player;
 import com.jacktheogre.lightswitch.tools.CameraSettings;
-import com.jacktheogre.lightswitch.tools.PlayInputHandler;
+import com.jacktheogre.lightswitch.tools.input.PlayInputHandler;
 import com.jacktheogre.lightswitch.tools.Lighting;
 import com.jacktheogre.lightswitch.tools.WorldContactListener;
 
@@ -74,9 +72,9 @@ public class PlayScreen extends GameScreen {
         this.game = screen.getGame();
         gameCam = screen.getGameCam();
         currentSetings = new CameraSettings(screen.getGameCam());
-        if(!game.isPlayingHuman())
-            targetSettings = new CameraSettings(currentSetings.getX() + 25, currentSetings.getY() + 30, currentSetings.getZoom() - 0.2f);
-        else
+//        if(!game.isPlayingHuman())
+//            targetSettings = new CameraSettings(currentSetings.getX() + 25, currentSetings.getY() + 30, currentSetings.getZoom() - 0.2f);
+//        else
             targetSettings = new CameraSettings(currentSetings.getX(), currentSetings.getY() + 30, currentSetings.getZoom() - 0.1f);
 
         gamePort = screen.getGamePort();
@@ -101,11 +99,12 @@ public class PlayScreen extends GameScreen {
         objects.addAll(screen.getTraps());
         for (InteractiveObject obj : objects) {
             obj.initPhysics();
-            obj.quickClose();
+            obj.initClose();
         }
 
         commandHandler = screen.getCommandHandler();
         commandHandler.setScreen(this);
+        commandHandler.setScreenState(CommandHandler.ScreenState.PLAYSCREEN);
 
         lighting = screen.getLighting();
         lighting.setPlayScreen(this);
@@ -113,7 +112,7 @@ public class PlayScreen extends GameScreen {
         world.setContactListener(contactListener);
         lighting.turnOff();
         makeTeleportConnections();
-        commandHandler.addCommand(new StopCommand());
+        commandHandler.addCommand(new StopCommand(player));
         energy = 100f;
         fixturesContacts = new Array<Contact>();
         runTime = 0;
@@ -122,6 +121,7 @@ public class PlayScreen extends GameScreen {
     }
 
     public void update(float dt) {
+        super.update(dt);
         runTime += dt;
         if (runTime > Constants.PLAYTIME) {
             endGame(game.isPlayingHuman());
@@ -131,6 +131,8 @@ public class PlayScreen extends GameScreen {
             handleTouchpadInput();
         }
 
+        MessageHandler.getMessage(commandHandler);
+        //messages are sent from commandhandler
         commandHandler.update(dt);
         if (commandHandler.newCommands()) {
             commandHandler.executeCommandsPlay();
@@ -190,12 +192,13 @@ public class PlayScreen extends GameScreen {
 //        fpsLogger.log();
     }
 
-
-
     @Override
     protected void initializeButtons() {
-        if(Gdx.app.getType() == Application.ApplicationType.Android && game.isPlayingHuman()) {
-            buttons.add(hud.getLightButton());
+        if(Gdx.app.getType() == Application.ApplicationType.Android) {
+            if(LightSwitch.isPlayingHuman())
+                buttons.add(hud.getLightButton());
+            else
+                buttons.add(hud.getWallthroughButton());
         }
     }
 
@@ -206,7 +209,7 @@ public class PlayScreen extends GameScreen {
         GameActor.Direction direction;
         if(x == 0 && y == 0) {
             if(player.getGameActor().isMoving())
-                commandHandler.addCommand(new StopCommand());
+                commandHandler.addCommand(new StopCommand(player));
             return;
         }
         if(x >= 0) {
@@ -238,9 +241,11 @@ public class PlayScreen extends GameScreen {
         }
 
         if(player.getGameActor().getDirection() != direction || !player.getGameActor().isMoving())
-            commandHandler.addCommand(new StartMovingCommand(direction));
+            commandHandler.addCommand(new StartMovingCommand(direction, getPlayer()));
         player.getGameActor().setMoving(true);
     }
+
+
 
     private void checkFixtureContacts() {
         for (int i = 0; i < fixturesContacts.size; i++) {
@@ -309,6 +314,15 @@ public class PlayScreen extends GameScreen {
     @Override
     public void show() {
 
+    }
+
+    public InteractiveObject getInteractiveObjectByIndex(int index) {
+        for (int i = 0; i < objects.size; i++) {
+            if(objects.get(i).getIndex() == index)
+                return objects.get(i);
+        }
+        Gdx.app.log("PlayScreen", "Not found object by index");
+        return new NullInteractiveObject(game);
     }
 
     public boolean isPlayingHuman() {

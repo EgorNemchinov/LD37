@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.jacktheogre.lightswitch.Constants;
+import com.jacktheogre.lightswitch.LightSwitch;
 import com.jacktheogre.lightswitch.objects.InteractiveObject;
 import com.jacktheogre.lightswitch.objects.Trap;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
@@ -32,26 +33,34 @@ public class WorldContactListener implements ContactListener {
         int cDef = fixA.getFilterData().categoryBits | fixB.getFilterData().categoryBits;
         switch(cDef) {
             case Constants.TELEPORT_BIT | Constants.BOY_BIT:
-            case Constants.TELEPORT_BIT | Constants.MONSTER_BIT:
                 if(fixA.getFilterData().categoryBits == Constants.BOY_BIT || fixA.getFilterData().categoryBits == Constants.MONSTER_BIT) {
-                    if(!((InteractiveObject) fixB.getUserData()).activate((GameActor)fixA.getUserData()))
+                    if(!((InteractiveObject) fixB.getUserData()).activate(LightSwitch.isPlayingHuman()?screen.getPlayer():screen.getEnemyPlayer()))
                         screen.addFixtureContact(contact);
                 } else {
-                    if(!((InteractiveObject) fixA.getUserData()).activate((GameActor)fixB.getUserData()))
+                    if(!((InteractiveObject) fixA.getUserData()).activate(LightSwitch.isPlayingHuman()?screen.getPlayer():screen.getEnemyPlayer()))
+                        screen.addFixtureContact(contact);
+                }
+                break;
+            case Constants.TELEPORT_BIT | Constants.MONSTER_BIT:
+                if(fixA.getFilterData().categoryBits == Constants.BOY_BIT || fixA.getFilterData().categoryBits == Constants.MONSTER_BIT) {
+                    if(!((InteractiveObject) fixB.getUserData()).activate(LightSwitch.isPlayingHuman()?screen.getEnemyPlayer():screen.getPlayer()))
+                        screen.addFixtureContact(contact);
+                } else {
+                    if(!((InteractiveObject) fixA.getUserData()).activate(LightSwitch.isPlayingHuman()?screen.getEnemyPlayer():screen.getPlayer()))
                         screen.addFixtureContact(contact);
                 }
                 break;
             case  Constants.BOY_BIT | Constants.MONSTER_BIT:
-                screen.endGame(!screen.getGame().isPlayingHuman());
+                screen.endGame(!LightSwitch.isPlayingHuman());
                 break;
             case Constants.MONSTER_BIT | Constants.TRAP_BIT:
                 if(fixA.getFilterData().categoryBits == Constants.TRAP_BIT) {
-                    if (!((Trap) fixA.getUserData()).activate((Monster) fixB.getUserData())) {
+                    if (!((Trap) fixA.getUserData()).activate(LightSwitch.isPlayingHuman()?screen.getEnemyPlayer():screen.getPlayer())) {
                         screen.addFixtureContact(contact);
                     }
                 }
                 else {
-                    if (!((Trap) fixB.getUserData()).activate((Monster) fixA.getUserData())) {
+                    if (!((Trap) fixB.getUserData()).activate(LightSwitch.isPlayingHuman()?screen.getEnemyPlayer():screen.getPlayer())) {
                             screen.addFixtureContact(contact);
                        }
                 }
@@ -70,11 +79,11 @@ public class WorldContactListener implements ContactListener {
         switch(cDef) {
             case Constants.TELEPORT_BIT | Constants.BOY_BIT:
                 if (fixA.getFilterData().categoryBits == Constants.BOY_BIT) {
-                    if (!((InteractiveObject) fixB.getUserData()).activate((GameActor) fixA.getUserData()))
+                    if (!((InteractiveObject) fixB.getUserData()).activate(LightSwitch.isPlayingHuman()?screen.getPlayer():screen.getEnemyPlayer()))
                         return false;
                     else return true;
                 } else {
-                    if (!((InteractiveObject) fixA.getUserData()).activate((GameActor) fixB.getUserData()))
+                    if (!((InteractiveObject) fixA.getUserData()).activate(LightSwitch.isPlayingHuman()?screen.getPlayer():screen.getEnemyPlayer()))
                         return false;
                     else
                         return true;

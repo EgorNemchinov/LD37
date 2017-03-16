@@ -23,7 +23,7 @@ public class StopDirectionCommand extends ActorCommand {
     }
 
     @Override
-    public boolean execute(GameActor gameActor) {
+    public boolean execute(){
         if(executed)
             return false;
         commandHandler.stopMoving(direction);

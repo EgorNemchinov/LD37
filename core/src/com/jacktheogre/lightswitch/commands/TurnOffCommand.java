@@ -23,6 +23,12 @@ public class TurnOffCommand extends GlobalCommand{
         this.lighting = this.screen.getLighting();
     }
 
+    public TurnOffCommand(PlayScreen screen, boolean activeBefore) {
+        super(screen);
+        this.screen = screen;
+        this.activeBefore = activeBefore;
+    }
+
     @Override
     public boolean execute() {
         if(executed)
@@ -42,6 +48,11 @@ public class TurnOffCommand extends GlobalCommand{
     @Override
     public void redo() {
         lighting.turnOff();
+    }
+
+    @Override
+    public String toLog() {
+        return "toff";
     }
 
     @Override

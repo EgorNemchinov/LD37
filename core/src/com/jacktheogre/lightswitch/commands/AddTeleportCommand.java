@@ -59,6 +59,11 @@ public class AddTeleportCommand extends GlobalCommand {
     }
 
     @Override
+    public String toLog() {
+        return "";
+    }
+
+    @Override
     public String toString() {
         return "AddTeleportCommand";
     }

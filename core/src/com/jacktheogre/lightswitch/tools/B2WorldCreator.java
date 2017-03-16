@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.jacktheogre.lightswitch.Constants;
+import com.jacktheogre.lightswitch.LightSwitch;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 import com.jacktheogre.lightswitch.sprites.Monster;
 import com.jacktheogre.lightswitch.sprites.Human;
@@ -77,26 +78,26 @@ public class B2WorldCreator {
         }
 
         //5th layer is
-        //player
+        //human
         for (MapObject object : map.getLayers().get(5).getObjects()) {
             if (!ClassReflection.isInstance(RectangleMapObject.class, object))
                 continue;
             Rectangle bounds = ((RectangleMapObject) object).getRectangle();
-            if (screen.getGame().isPlayingHuman())
+            if (LightSwitch.isPlayingHuman())
                 screen.getPlayer().setGameActor(new Human(world, bounds.getX(), bounds.getY()));
             else
-                screen.getPlayer().setGameActor(new Monster(world, bounds.getX(), bounds.getY()));
+                screen.getEnemyPlayer().setGameActor(new Human(world, bounds.getX(), bounds.getY()));
         }
 
-        //enemy
+        //monster
         for (MapObject object : map.getLayers().get(6).getObjects()) {
             if (!ClassReflection.isInstance(RectangleMapObject.class, object))
                 continue;
             Rectangle bounds = ((RectangleMapObject) object).getRectangle();
-            if (screen.getGame().isPlayingHuman())
+            if (LightSwitch.isPlayingHuman())
                 screen.getEnemyPlayer().setGameActor(new Monster(world, bounds.getX(), bounds.getY()));
             else
-                screen.getEnemyPlayer().setGameActor(new Human(world, bounds.getX(), bounds.getY()));
+                screen.getPlayer().setGameActor(new Monster(world, bounds.getX(), bounds.getY()));
         }
 
         //lights

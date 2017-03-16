@@ -23,9 +23,16 @@ public abstract class GameScreen implements Screen {
 
     public GameScreen() {
         buttons = new Array<Button>();
+        shapeRenderer = new ShapeRenderer();
     }
 
     protected abstract void initializeButtons();
+
+    public void update(float dt) {
+        for (int i = 0; i < getButtons().size; i++) {
+            getButtons().get(i).update(dt);
+        }
+    }
 
     public void touchDownButtons(float x, float y, int pointer) {
         for (int i = 0; i < getButtons().size; i++) {
@@ -83,7 +90,16 @@ public abstract class GameScreen implements Screen {
         return game;
     }
 
+    public Viewport getGamePort() {
+        return gamePort;
+    }
+
     public Array<Button> getButtons() {
         return buttons;
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        gamePort.update(width, height);
     }
 }

@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.utils.Array;
 import com.jacktheogre.lightswitch.Constants;
+import com.jacktheogre.lightswitch.LightSwitch;
 import com.jacktheogre.lightswitch.commands.TurnOffCommand;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
@@ -38,11 +39,11 @@ public class Lighting {
     public Lighting(GeneratingScreen screen) {
         this.screen = screen;
         rayHandler = new RayHandler(screen.getWorld());
-        rayHandler.setAmbientLight(screen.getGame().isPlayingHuman() ? AMBIENT_HUMAN : AMBIENT_MONSTER);
+        rayHandler.setAmbientLight(LightSwitch.isPlayingHuman() ? AMBIENT_HUMAN : AMBIENT_MONSTER);
         rayHandler.setBlurNum(3);
         pointLights = new Array<PointLight>();
 
-        actorLight = new PointLight(rayHandler, Constants.LIGHT_RAYS, screen.getGame().isPlayingHuman()? LIGHT_HUMAN : LIGHT_MONSTER,
+        actorLight = new PointLight(rayHandler, Constants.LIGHT_RAYS, LightSwitch.isPlayingHuman()? LIGHT_HUMAN : LIGHT_MONSTER,
                 0.6f*Constants.LIGHT_DISTANCE , 550, 100);
         transformActorLight(actorLight);
 
@@ -82,7 +83,7 @@ public class Lighting {
         }
         rayHandler.setCombinedMatrix(screen.getGameCam());
         actorLight.setPosition(screen.getPlayer().getGameActor().b2body.getPosition());
-//        if(!screen.getGame().isPlayingHuman())
+//        if(!LightSwitch.isPlayingHuman())
 //            actorLight.setActive(false);
         rayHandler.updateAndRender();
     }

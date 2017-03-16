@@ -1,7 +1,6 @@
 package com.jacktheogre.lightswitch.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -11,7 +10,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.jacktheogre.lightswitch.LightSwitch;
@@ -20,7 +18,6 @@ import com.jacktheogre.lightswitch.ai.Node;
 import com.jacktheogre.lightswitch.commands.AddTeleportCommand;
 import com.jacktheogre.lightswitch.commands.AddTrapCommand;
 import com.jacktheogre.lightswitch.commands.CommandHandler;
-import com.jacktheogre.lightswitch.objects.InteractiveObject;
 import com.jacktheogre.lightswitch.objects.Teleport;
 import com.jacktheogre.lightswitch.objects.Trap;
 import com.jacktheogre.lightswitch.sprites.Button;
@@ -29,7 +26,7 @@ import com.jacktheogre.lightswitch.sprites.Player;
 import com.jacktheogre.lightswitch.tools.AssetLoader;
 import com.jacktheogre.lightswitch.tools.Assets;
 import com.jacktheogre.lightswitch.tools.B2WorldCreator;
-import com.jacktheogre.lightswitch.tools.GenerateInputHandler;
+import com.jacktheogre.lightswitch.tools.input.GenerateInputHandler;
 import com.jacktheogre.lightswitch.tools.Lighting;
 
 /**
@@ -96,6 +93,8 @@ public class GeneratingScreen extends GameScreen {
         shapeRenderer.setAutoShapeType(true);
         commandHandler = new CommandHandler(this);
         Node.Indexer.nullify();
+        Teleport.Indexer.nullify();
+        Trap.Indexer.nullify();
         Gdx.input.setInputProcessor(new GenerateInputHandler(this));
     }
 
@@ -131,14 +130,15 @@ public class GeneratingScreen extends GameScreen {
                 generatingScreen.setState(GeneratingScreen.State.SETTING_TRAP);
             }
         };
-        undo.setScale(1.2f);
-        redo.setScale(1.2f);
-        start.setScale(1.2f);
+        undo.setScale(1.3f);
+        redo.setScale(1.3f);
+//        if(BluetoothSingleton.getInstance().bluetoothManager.isConnected())
+        start.setScale(1.3f);
         teleportButton.setScale(1.2f);
         trapButton.setScale(1.2f);
-        undo.setPosition(20, -25);
-        redo.setPosition(undo.getX() + undo.getBoundingRectangle().getWidth()+5, undo.getY());
-        start.setPosition(redo.getX() + redo.getBoundingRectangle().getWidth()+5, redo.getY());
+        undo.setPosition(30, -25);
+        redo.setPosition(undo.getX() + undo.getBoundingRectangle().getWidth()+10, undo.getY());
+        start.setPosition(redo.getX() + redo.getBoundingRectangle().getWidth()+10, redo.getY());
         teleportButton.setPosition(-teleportButton.getBoundingRectangle().getWidth() - 5, 100);
         trapButton.setPosition(teleportButton.getX(), teleportButton.getY() - trapButton.getHeight() - 10);
         undo.disable();

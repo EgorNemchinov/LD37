@@ -1,9 +1,6 @@
 package com.jacktheogre.lightswitch;
 
-import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.jacktheogre.lightswitch.screens.*;
 
@@ -12,12 +9,19 @@ public class LightSwitch extends Game {
     public SpriteBatch batch;
     public static final int WIDTH = 400;
     public static final int HEIGHT = 240;
-    private boolean playingHuman = true;
+    private static boolean playingHuman = true;
+
+    public enum State {
+        SINGLEPLAYER, MULTIPLAYER
+    }
+    private static State state;
+
 
     @Override
 	public void create () {
 		batch = new SpriteBatch();
 		this.setScreen(new MainMenuScreen(this));
+        state = State.SINGLEPLAYER;
 	}
 
 	@Override
@@ -25,11 +29,19 @@ public class LightSwitch extends Game {
 		super.render();
 	}
 
-    public boolean isPlayingHuman() {
+    public static boolean isPlayingHuman() {
         return playingHuman;
     }
 
-    public void setPlayingHuman(boolean playingHuman) {
-        this.playingHuman = playingHuman;
+    public static void setPlayingHuman(boolean playingHuman) {
+        LightSwitch.playingHuman = playingHuman;
+    }
+
+    public static State getState() {
+        return state;
+    }
+
+    public static void setState(State state) {
+        LightSwitch.state = state;
     }
 }

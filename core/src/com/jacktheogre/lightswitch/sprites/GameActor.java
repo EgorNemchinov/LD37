@@ -29,7 +29,29 @@ public abstract class GameActor extends Sprite {
     protected Agent agent;
     private boolean remakingPath;
 
-    public enum Direction {RIGHT, LEFT, UP, DOWN;}
+    public enum Direction {
+        RIGHT("R"), LEFT("L"), UP("U"), DOWN("D");
+
+        private String string;
+
+        Direction(String string) {
+            this.string = string;
+        }
+        public String toString() {
+            return string;
+        }
+        public static Direction getDirectionByLetter(String letter) {
+            if(letter.equals(RIGHT.toString()))
+                return RIGHT;
+            else if(letter.equals(LEFT.toString()))
+                return LEFT;
+            else if(letter.equals(UP.toString()))
+                return UP;
+            else
+                return DOWN;
+        }
+        // TODO: 13.02.17 nullDirection?
+    }
 
     protected Direction direction;
     protected Direction lastDirection;
@@ -120,6 +142,7 @@ public abstract class GameActor extends Sprite {
         setPosition(b2body.getPosition().x - getWidth() / 2 , b2body.getPosition().y - getHeight() / 2 );
     }
 
+
     public Direction calculateDirection() {
         xVel = b2body.getLinearVelocity().x;
         yVel = b2body.getLinearVelocity().y;
@@ -192,6 +215,14 @@ public abstract class GameActor extends Sprite {
 //            Gdx.app.log("getNextPosition","moving to "+currentNodePointer);
             return path.get(currentNodePointer).getPosition().scl(LevelManager.tilePixelWidth, LevelManager.tilePixelHeight).add(8, 8);
         }
+    }
+
+    void setFilter(short categoryBits, short maskBits, short groupIndex) {
+        Filter filter = new Filter();
+        filter.categoryBits = categoryBits;
+        filter.maskBits = maskBits;
+        filter.groupIndex = groupIndex;
+        fixture.setFilterData(filter);
     }
 
     public void setPath(GraphPathImp path) {

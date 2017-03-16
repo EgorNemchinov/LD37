@@ -2,31 +2,32 @@ package com.jacktheogre.lightswitch.sprites;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.jacktheogre.lightswitch.LightSwitch;
 import com.jacktheogre.lightswitch.ai.Agent;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 
 /**
  * Created by luna on 10.12.16.
  */
-public class EnemyPlayer {
+public class EnemyPlayer extends Player{
 
-    private GameActor gameActor;
     private GeneratingScreen screen;
-    private Agent agent;
 
     public EnemyPlayer(GeneratingScreen screen) {
+        super(screen);
         this.screen = screen;
-        agent = new Agent(screen.getWorld());
     }
 
     public void update(float dt) {
         //mb delegate to commands?
         //&& not multiplayer
-        if(screen.getGame().isPlayingHuman()) {
-            gameActor.setTarget(screen.getPlayer().getGameActor().b2body.getPosition());
-            agent.makePath(gameActor);
-        } else {
-            gameActor.setKeyboardControl(true);
+        gameActor.setKeyboardControl(true);
+        if(LightSwitch.getState() == LightSwitch.State.SINGLEPLAYER) {
+            if(LightSwitch.isPlayingHuman()) {
+                gameActor.setTarget(screen.getPlayer().getGameActor().b2body.getPosition());
+                agent.makePath(gameActor);
+                gameActor.setKeyboardControl(false);
+            }
         }
         gameActor.update(dt);
     }
@@ -52,7 +53,4 @@ public class EnemyPlayer {
         gameActor.dispose();
     }
 
-    public void render(SpriteBatch batch, float dt) {
-        batch.draw(gameActor.getFrame(dt), gameActor.getX(), gameActor.getY());
-    }
 }

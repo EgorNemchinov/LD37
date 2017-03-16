@@ -8,10 +8,15 @@ public abstract class Command {
 
     public abstract void undo();
     public abstract void redo();
+    public abstract String toLog();
+    protected boolean generated = false;
 
     @Override
     public String toString() {
         return "Command";
     }
 
+    public void setGenerated(boolean generated) {
+        this.generated = generated;
+    }
 }
