@@ -20,7 +20,6 @@ public class AssetLoader {
     public static final float LETTER_WIDTH = 20f * FONT_SCALE;
     public static final float LETTER_HEIGHT = 15 * FONT_SCALE;
     public static final int LEVEL_AMOUNT = 5;
-    private static int levelNum = 4;
     private AssetManager manager;
     public Texture characters, teleport, scale_fill, timer, trap;
     public Texture moon, buttons, joystick;
@@ -33,7 +32,7 @@ public class AssetLoader {
     public BitmapFont font;
     public Sound runningSound, teleportOpenSound;
     public Sound teleportCloseSound;
-    public FileHandle fileHandle;
+    public FileHandle logHandle, levelHandle;
 
     public AssetLoader() {
         this.manager = new AssetManager();
@@ -45,7 +44,8 @@ public class AssetLoader {
         if(manager == null)
             manager = new AssetManager();
 
-        fileHandle = Gdx.files.local("log.txt");
+        logHandle = Gdx.files.local("log.txt");
+        levelHandle = Gdx.files.local("levels.txt");
 
         manager.load("characters.png", Texture.class);
         manager.load("portals.png", Texture.class);
@@ -77,9 +77,9 @@ public class AssetLoader {
         teleportCloseSound = manager.get("tpClose.mp3", Sound.class);
         
 //        light_button = new TextureRegion(manager.get("light_button.png", Texture.class));
-        start_button = new TextureRegion(buttons, 1, 0, 188, 27);
-        undo_button = new TextureRegion(buttons, 0, 31, 156, 27);
-        redo_button = new TextureRegion(buttons, 0, 62, 156, 27);
+        start_button = new TextureRegion(buttons, 1, 0, 212, 27);
+        undo_button = new TextureRegion(buttons, 0, 31, 128, 27);
+        redo_button = new TextureRegion(buttons, 0, 62, 128, 27);
         teleport_button = new TextureRegion(buttons, 0, 93, 112, 26);
         trap_button = new TextureRegion(buttons, 0, 123, 112, 26);
         play_button = new TextureRegion(buttons, 0, 153, 492, 75);
@@ -88,7 +88,7 @@ public class AssetLoader {
         home_button = new TextureRegion(buttons, 0, 294, 156, 27);
         light_button = new TextureRegion(buttons, 0, 325, 98, 42);
         boy_button = new TextureRegion(buttons, 0, 371, 112, 73);
-        monster_button = new TextureRegion(buttons, 0, 444, 112, 73 );
+        monster_button = new TextureRegion(buttons, 0, 445, 112, 73 );
         scale = new TextureRegion(buttons, 0, 521, 49, 165);
         singleplayer_button = new TextureRegion(buttons, 51, 521, 62, 26);
         multiplayer_button = new TextureRegion(buttons, 51, 551, 62, 26);
@@ -100,33 +100,7 @@ public class AssetLoader {
     }
 
     public TiledMap getMap() {
-        return maps[levelNum];
-    }
-
-    public static int getLevelNum() {
-        return levelNum;
-    }
-
-    // TODO: 14.12.16 to each level
-    public int getAmountOfTeleports() {
-        return 2*(levelNum % 4);
-    }
-
-    public int getAmountOfTraps() {
-        return Math.max(0, (levelNum - 3));
-    }
-
-    public boolean isMaxLevel() {
-        if(levelNum == LEVEL_AMOUNT)
-            return true;
-        else
-            return false;
-    }
-    public void nextLevel() {
-        if(!isMaxLevel()) {
-            LevelManager.graph = null;
-            levelNum++;
-        }
+        return maps[LevelManager.getLevelNum()];
     }
 
     public float getLetterWidth() {
@@ -135,10 +109,6 @@ public class AssetLoader {
 
     public float getLetterHeight() {
         return (LETTER_HEIGHT/ FONT_SCALE)*font.getScaleY();
-    }
-
-    public void nullifyLevel() {
-        levelNum = 0;
     }
 
     public void dispose() {

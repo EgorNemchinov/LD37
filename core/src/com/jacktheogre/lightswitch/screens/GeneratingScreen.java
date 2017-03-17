@@ -239,14 +239,14 @@ public class GeneratingScreen extends GameScreen {
     }
 
     public boolean maxTeleports() {
-        if(teleports.size >= Assets.getAssetLoader().getAmountOfTeleports())
+        if(teleports.size >= LevelManager.getAmountOfTeleports())
             return true;
         else
             return false;
     }
 
     public boolean maxTraps() {
-        if(traps.size >= Assets.getAssetLoader().getAmountOfTraps())
+        if(traps.size >= LevelManager.getAmountOfTraps())
             return true;
         else
             return false;

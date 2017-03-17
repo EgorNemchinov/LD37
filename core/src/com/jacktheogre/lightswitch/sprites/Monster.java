@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.jacktheogre.lightswitch.Constants;
+import com.jacktheogre.lightswitch.ai.LevelManager;
 import com.jacktheogre.lightswitch.tools.AssetLoader;
 import com.jacktheogre.lightswitch.tools.Assets;
 
@@ -27,6 +28,7 @@ public class Monster extends GameActor {
     private State previousState;
     private float timeSinceTrapped = 0;
 
+    private boolean trapped = false;
     public Monster(World world, float x, float y) {
         super(world, x, y, Assets.getAssetLoader().characters);
 
@@ -36,7 +38,6 @@ public class Monster extends GameActor {
         initGraphics();
 
         texture = getTexture();
-//        playerStandRight = new TextureRegion(texture, 1, 1, 30, 30)
         setBounds(getX(), getY(), WIDTH, HEIGHT);
         setRegion(playerStandLeft);
 
@@ -90,9 +91,7 @@ public class Monster extends GameActor {
             trapped = false;
             isMoving = true;
         }
-//        Gdx.app.log("Monster", "Direction: "+getDirection() + ", speed: "+b2body.getLinearVelocity());
     }
-
 
     @Override
     public TextureRegion getFrame(float dt) {
@@ -211,6 +210,6 @@ public class Monster extends GameActor {
         if(trapped)
             return 0;
         else
-            return SPEED_BASE+6* AssetLoader.getLevelNum();
+            return SPEED_BASE+6*LevelManager.getLevelNum();
     }
 }

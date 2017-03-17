@@ -93,7 +93,7 @@ public class MainMenuScreen extends GameScreen{
 
             @Override
             protected void actUnpress() {
-                mainMenuScreen.setState(MainMenuScreen.State.CHOOSING_GAMEMODE);
+                mainMenuScreen.setState(MainMenuScreen.State.CHOOSING_CHARACTER);
             }
         };
         play_button.setPosition(gamePort.getWorldWidth() / 2 - play_button.getWidth() / 2, gamePort.getWorldHeight() / 2 - play_button.getHeight() / 2);

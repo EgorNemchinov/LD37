@@ -1,8 +1,5 @@
 package com.jacktheogre.lightswitch.multiplayer;
 
-import com.jacktheogre.lightswitch.tools.NullBluetoothManager;
-import com.jacktheogre.lightswitch.tools.iBluetooth;
-
 /**
  * Created by luna on 09.02.17.
  */

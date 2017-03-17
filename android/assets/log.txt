@@ -1,138 +1,19 @@
 stop 0
-setpos 0 0 216 88 0
+setpos 0 0 200 136 0
+setpos 0 0 200 136 0
 sm R U 0 0
-sm U L 1 0
+setpos 0 0 200 136 0
 sd U
-setpos 0 0 215 108 0
-sd L
-wtc 
-setpos 0 0 23 108 0
+stop 0
+sm U L 0 0
+setpos 0 0 175 136 0
+setpos 0 0 137 136 0
+setpos 0 0 99 136 0
+setpos 0 0 61 136 0
+teleport 1 2 0
+setpos 0 0 195 23 0
+setpos 0 0 157 23 0
+setpos 0 0 119 23 0
+setpos 0 0 82 23 0
+setpos 0 0 44 23 0
 sm L U 1 0
-sm U R 1 0
-sd U
-setpos 0 0 37 136 0
-sm R D 1 0
-sd R
-wtc 
-setpos 0 0 39 87 0
-sm D R 1 0
-sd D
-sm R D 1 0
-sd R
-setpos 0 0 58 87 0
-wtc 
-sm D R 1 0
-sd D
-setpos 0 0 62 23 0
-sm R U 1 0
-sd R
-wtc 
-setpos 0 0 82 88 0
-sm U R 1 0
-sd U
-sm R U 1 0
-sd U
-sm U U 1 0
-sd R
-setpos 0 0 99 88 0
-wtc 
-sm U R 1 0
-sd U
-setpos 0 0 118 136 0
-sm R D 1 0
-sd R
-wtc 
-sm D R 1 0
-sd D
-setpos 0 0 137 87 0
-sm R D 1 0
-sd R
-wtc 
-setpos 0 0 144 23 0
-sm D R 1 0
-sd D
-setpos 0 0 176 23 0
-sm R U 1 0
-sd R
-setpos 0 0 216 27 0
-sm U L 1 0
-sd U
-wtc 
-setpos 0 0 23 58 0
-setpos 0 0 23 58 0
-sm L R 1 0
-sd L
-wtc 
-setpos 0 0 216 58 0
-sm R U 1 0
-sd R
-sd U
-setpos 0 0 216 102 0
-wtc 
-sd R
-stop 0
-setpos 0 0 216 135 0
-sm U D 0 0
-setpos 0 0 216 119 0
-sm D R 1 0
-sd D
-setpos 0 0 216 108 0
-sd R
-stop 0
-wtc 
-setpos 0 0 216 108 0
-sm R R 0 0
-sm R L 1 0
-sd R
-setpos 0 0 215 108 0
-sm L U 1 0
-sd L
-sm U L 1 0
-sd U
-setpos 0 0 203 136 0
-wtc 
-setpos 0 0 159 136 0
-sd L
-stop 0
-sm L R 0 0
-setpos 0 0 168 136 0
-setpos 0 0 212 136 0
-sm R D 1 0
-sd R
-sm D L 1 0
-sd D
-setpos 0 0 215 110 0
-wtc 
-setpos 0 0 23 110 0
-wtc 
-setpos 0 0 23 110 0
-sd L
-sm L U 1 0
-setpos 0 0 23 136 0
-sm U L 1 0
-sd U
-wtc 
-sd L
-stop 0
-setpos 0 0 23 136 0
-sm L R 0 0
-setpos 0 0 45 136 0
-sm R D 1 0
-sd R
-wtc 
-setpos 0 0 64 87 0
-wtc 
-setpos 0 0 61 23 0
-wtc 
-sm D L 1 0
-sd D
-setpos 0 0 53 23 0
-wtc 
-setpos 0 0 23 23 0
-sm L R 1 0
-sd L
-wtc 
-setpos 0 0 58 23 0
-wtc 
-setpos 0 0 102 23 0
-setpos 0 0 146 23 0

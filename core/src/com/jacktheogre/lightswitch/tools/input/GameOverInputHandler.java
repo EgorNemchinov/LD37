@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.math.Vector3;
+import com.jacktheogre.lightswitch.ai.LevelManager;
 import com.jacktheogre.lightswitch.screens.GameOverScreen;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 import com.jacktheogre.lightswitch.screens.MainMenuScreen;
@@ -48,7 +49,7 @@ public class GameOverInputHandler implements InputProcessor {
         if(keycode == Input.Keys.ENTER) {
             enterButton.unpress();
             if(enterButton == screen.getNext_level())
-                Assets.getAssetLoader().nextLevel();
+                LevelManager.nextLevel();
             screen.getGame().setScreen(new GeneratingScreen(screen.getGame()));
         }
         if(keycode == Input.Keys.R) {
@@ -58,7 +59,7 @@ public class GameOverInputHandler implements InputProcessor {
         if(keycode == Input.Keys.N) {
             screen.getNext_level().unpress();
             if(screen.getNext_level().getState() == Button.State.DISABLED) {
-                Assets.getAssetLoader().nextLevel();
+                LevelManager.nextLevel();
                 screen.getGame().setScreen(new GeneratingScreen(screen.getGame()));
             }
         }

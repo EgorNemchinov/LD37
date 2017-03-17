@@ -16,7 +16,7 @@ public class Logger {
     private FileHandle fileHandle;
 
     public Logger() {
-        fileHandle = Assets.getAssetLoader().fileHandle;
+        fileHandle = Assets.getAssetLoader().logHandle;
         clearLog();
     }
 

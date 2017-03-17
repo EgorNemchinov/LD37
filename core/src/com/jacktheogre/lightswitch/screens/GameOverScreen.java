@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.jacktheogre.lightswitch.LightSwitch;
+import com.jacktheogre.lightswitch.ai.LevelManager;
 import com.jacktheogre.lightswitch.sprites.Button;
 import com.jacktheogre.lightswitch.tools.AssetLoader;
 import com.jacktheogre.lightswitch.tools.Assets;
@@ -60,7 +61,7 @@ public class GameOverScreen extends GameScreen{
         game.batch.begin();
         switch (state) {
             case WIN:
-                if(Assets.getAssetLoader().isMaxLevel()) {
+                if(LevelManager.isMaxLevel()) {
                     Assets.getAssetLoader().font.getData().setScale(1f);
                     Assets.getAssetLoader().font.draw(game.batch, "CONGRATULATIONS!",
                             gamePort.getWorldWidth() / 2 - 7.5f* Assets.getAssetLoader().getLetterWidth(),
@@ -117,11 +118,11 @@ public class GameOverScreen extends GameScreen{
         home.setPosition(replay.getBoundingRectangle().getX()+replay.getBoundingRectangle().getWidth() + INTERVAL, replay.getY());
         home.setScale(SCALE);
 
-        boolean nextLevelActive = !Assets.getAssetLoader().isMaxLevel() && state == State.WIN;
+        boolean nextLevelActive = !LevelManager.isMaxLevel() && state == State.WIN;
         next_level = new Button(Assets.getAssetLoader().next_level_button, nextLevelActive ? Button.State.ACTIVE : Button.State.DISABLED, this) {
             @Override
             protected void actUnpress() {
-                Assets.getAssetLoader().nextLevel();
+                LevelManager.nextLevel();
                 screen.getGame().setScreen(new GeneratingScreen(screen.getGame()));
             }
         };
