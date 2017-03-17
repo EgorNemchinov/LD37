@@ -10,7 +10,6 @@ import com.jacktheogre.lightswitch.tools.Assets;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.jacktheogre.lightswitch.tools.AssetLoader.LEVEL_AMOUNT;
 
 /**
  * Created by luna on 21.10.16.
@@ -26,9 +25,9 @@ public class LevelManager {
     public static int tilePixelHeight;
 
     static class Resourses {
+
         public Integer teleports;
         public Integer traps;
-
         public Resourses(Integer teleports, Integer traps) {
             this.teleports = teleports;
             this.traps = traps;
@@ -38,10 +37,12 @@ public class LevelManager {
         public String toString() {
             return String.format("%d teleports & %d traps", teleports, traps);
         }
-    }
 
+    }
     private static Map<Integer, Resourses> levelsMap;
-    private static int levelNum = 1;
+
+    public static final int LEVEL_AMOUNT = 6;
+    private static int levelNum = 6;
 
     static {
         levelsMap = new HashMap<Integer, Resourses>();

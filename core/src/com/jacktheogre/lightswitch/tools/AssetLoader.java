@@ -19,7 +19,6 @@ public class AssetLoader {
     public static final float FONT_SCALE = 1.5f;
     public static final float LETTER_WIDTH = 20f * FONT_SCALE;
     public static final float LETTER_HEIGHT = 15 * FONT_SCALE;
-    public static final int LEVEL_AMOUNT = 5;
     private AssetManager manager;
     public Texture characters, teleport, scale_fill, timer, trap;
     public Texture moon, buttons, joystick;
@@ -37,7 +36,7 @@ public class AssetLoader {
     public AssetLoader() {
         this.manager = new AssetManager();
         mapLoader = new TmxMapLoader();
-        maps = new TiledMap[LEVEL_AMOUNT+1];
+        maps = new TiledMap[LevelManager.LEVEL_AMOUNT+1];
     }
 
     public void load() {
@@ -61,7 +60,7 @@ public class AssetLoader {
         manager.load("joystick.png", Texture.class);
         manager.finishLoading();
 
-        for (int i = 1; i <= LEVEL_AMOUNT; i++) {
+        for (int i = 1; i <= LevelManager.LEVEL_AMOUNT; i++) {
             maps[i] = mapLoader.load("level"+i+".tmx");
         }
         characters = manager.get("characters.png",Texture.class);

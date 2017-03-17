@@ -148,14 +148,12 @@ public class Hud implements Disposable{
                 wallthroughButton = new Button(Assets.getAssetLoader().light_button, Button.State.ACTIVE, screen) {
                     @Override
                     protected void actPress() {
-                        if(!((Monster)playScreen.getPlayer().getGameActor()).isTransparency())
-                            playScreen.getCommandHandler().addCommand(new WallthroughCommand(playScreen.getPlayer()));
+                        playScreen.getCommandHandler().addCommand(new WallthroughCommand(playScreen.getPlayer()));
                     }
 
                     @Override
                     protected void actUnpress() {
-                        if(((Monster)playScreen.getPlayer().getGameActor()).isTransparency())
-                            playScreen.getCommandHandler().addCommand(new WallthroughCommand(playScreen.getPlayer()));
+                        playScreen.getCommandHandler().addCommand(new WallthroughCommand(playScreen.getPlayer()));
                     }
 
                     @Override

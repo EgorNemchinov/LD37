@@ -167,9 +167,17 @@ public class PlayScreen extends GameScreen {
         for (InteractiveObject object : objects) {
             object.render(game.batch, dt);
         }
-        player.getGameActor().draw(game.batch);
-        if(lighting.lightsOn() || !getGame().isPlayingHuman())
-            enemyPlayer.getGameActor().draw(game.batch);
+        if(higher(player.getGameActor(), enemyPlayer.getGameActor())) {
+            player.getGameActor().draw(game.batch);
+            if(lighting.lightsOn() || !getGame().isPlayingHuman()) {
+                enemyPlayer.getGameActor().draw(game.batch);
+            }
+        } else {
+            if(lighting.lightsOn() || !getGame().isPlayingHuman()) {
+                enemyPlayer.getGameActor().draw(game.batch);
+            }
+            player.getGameActor().draw(game.batch);
+        }
 
         game.batch.end();
 
@@ -190,6 +198,10 @@ public class PlayScreen extends GameScreen {
 //        player.getGameActor().getPath().render(shapeRenderer);
 //        enemyPlayer.getGameActor().getPath().render(shapeRenderer);
 //        fpsLogger.log();
+    }
+
+    private boolean higher(GameActor first, GameActor second) {
+        return first.b2body.getPosition().y > second.b2body.getPosition().y;
     }
 
     @Override
