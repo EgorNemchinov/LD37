@@ -1,0 +1,52 @@
+stop 0
+setpos 0 0 167 78 0
+sm R U 0 0
+setpos 0 0 167 83 0
+teleport 2 1 0
+setpos 0 0 23 136 0
+sd U
+stop 0
+sm U R 0 0
+setpos 0 0 28 136 0
+setpos 0 0 81 136 0
+sm R D 1 0
+sd R
+setpos 0 0 100 103 0
+sd D
+stop 0
+setpos 0 0 100 71 0
+sm D D 0 0
+sd D
+stop 0
+setpos 0 0 100 53 0
+setpos 0 0 100 53 0
+sm D D 0 0
+setpos 0 0 100 36 0
+sd D
+stop 0
+setpos 0 0 100 36 0
+sm D L 0 0
+setpos 0 0 88 36 0
+sm L D 1 0
+sd L
+sm D R 1 0
+sd D
+setpos 0 0 89 23 0
+setpos 0 0 89 23 0
+setpos 0 0 89 23 0
+sd R
+sm R U 1 0
+setpos 0 0 89 40 0
+setpos 0 0 89 93 0
+sm U L 1 0
+sd U
+setpos 0 0 78 136 0
+teleport 1 2 0
+setpos 0 0 149 135 0
+sd L
+stop 0
+sm L R 0 0
+setpos 0 0 157 135 0
+sd R
+stop 0
+setpos 0 0 168 135 0

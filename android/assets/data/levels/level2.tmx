@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="15" height="10" tilewidth="16" tileheight="16" nextobjectid="32">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="15" height="10" tilewidth="16" tileheight="16" nextobjectid="98">
  <tileset firstgid="1" name="tiles" tilewidth="16" tileheight="16" tilecount="18" columns="9">
-  <image source="tiles.png" width="144" height="32"/>
+  <image source="../textures/tiles.png" width="144" height="32"/>
  </tileset>
  <layer name="background" width="15" height="10">
   <data encoding="base64">
@@ -10,7 +10,7 @@
  </layer>
  <layer name="walls" width="15" height="10">
   <data encoding="base64">
-   BwAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAAGAAAABwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAABwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAABwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAABwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAABwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAABwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAABwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAABwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAACQAAAAUAAAAFAAAABQAAAAUAAAAFAAAABQAAAAUAAAAFAAAABQAAAAUAAAAFAAAABQAAAAUAAAAIAAAA
+   BwAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAAGAAAABwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAABwAAAAAAAAAKAAAACgAAAAAAAAAAAAAAAQAAAAEAAAABAAAAAQAAAAEAAAAAAAAACgAAAAAAAAAGAAAABwAAAAAAAAABAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAGAAAABwAAAAAAAAAAAAAAAAAAAAAAAAAKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAABwAAAAAAAAABAAAACgAAAAAAAAABAAAAAQAAAAEAAAABAAAAAAAAAAoAAAAAAAAACgAAAAAAAAAGAAAABwAAAAAAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAAAAAACgAAAAAAAAAGAAAABwAAAAAAAAABAAAAAQAAAAAAAAAAAAAAAQAAAAEAAAABAAAAAQAAAAEAAAAAAAAAAQAAAAAAAAAGAAAABwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAACQAAAAUAAAAFAAAABQAAAAUAAAAFAAAABQAAAAUAAAAFAAAABQAAAAUAAAAFAAAABQAAAAUAAAAIAAAA
   </data>
  </layer>
  <layer name="static_objects" width="15" height="10">
@@ -19,24 +19,33 @@
   </data>
  </layer>
  <objectgroup name="walls">
-  <object id="16" x="0" y="0" width="240" height="16"/>
-  <object id="17" x="224" y="16" width="16" height="144"/>
-  <object id="18" x="16" y="144" width="208" height="16"/>
-  <object id="19" x="0" y="16" width="16" height="144"/>
+  <object id="76" x="32" y="32" width="32" height="32"/>
+  <object id="77" x="96" y="32" width="80" height="16"/>
+  <object id="78" x="192" y="32" width="16" height="32"/>
+  <object id="79" x="192" y="80" width="16" height="48"/>
+  <object id="80" x="160" y="80" width="16" height="48"/>
+  <object id="81" x="96" y="112" width="64" height="16"/>
+  <object id="82" x="80" y="80" width="64" height="16"/>
+  <object id="83" x="80" y="64" width="16" height="16"/>
+  <object id="84" x="32" y="80" width="32" height="16"/>
+  <object id="85" x="48" y="96" width="16" height="32"/>
+  <object id="86" x="32" y="112" width="16" height="16"/>
+  <object id="93" x="0" y="0" width="240" height="16"/>
+  <object id="94" x="224" y="16" width="16" height="128"/>
+  <object id="95" x="0" y="16" width="16" height="128"/>
+  <object id="96" x="0" y="144" width="240" height="16"/>
  </objectgroup>
  <objectgroup name="static_objects"/>
  <objectgroup name="actors">
-  <object id="21" x="16" y="80" width="16" height="16"/>
+  <object id="66" x="16" y="112" width="16" height="16"/>
  </objectgroup>
  <objectgroup name="enemies">
-  <object id="22" x="208" y="80" width="16" height="16"/>
+  <object id="97" x="192" y="16" width="16" height="16"/>
  </objectgroup>
  <objectgroup name="lights">
-  <object id="23" x="48" y="48" width="16" height="16"/>
-  <object id="24" x="48" y="96" width="16" height="16"/>
-  <object id="25" x="128" y="96" width="16" height="16"/>
-  <object id="26" x="128" y="48" width="16" height="16"/>
-  <object id="27" x="192" y="48" width="16" height="16"/>
-  <object id="28" x="192" y="96" width="16" height="16"/>
+  <object id="89" x="64" y="96" width="16" height="16"/>
+  <object id="90" x="64" y="32" width="16" height="16"/>
+  <object id="91" x="160" y="32" width="16" height="16"/>
+  <object id="92" x="160" y="96" width="16" height="16"/>
  </objectgroup>
 </map>

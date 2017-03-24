@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.utils.Array;
 import com.jacktheogre.lightswitch.tools.Assets;
 
 import java.util.HashMap;
@@ -41,8 +40,8 @@ public class LevelManager {
     }
     private static Map<Integer, Resourses> levelsMap;
 
-    public static final int LEVEL_AMOUNT = 6;
-    private static int levelNum = 6;
+    public static final int LEVEL_AMOUNT = 7;
+    private static int levelNum = 2;
 
     static {
         levelsMap = new HashMap<Integer, Resourses>();
@@ -76,7 +75,6 @@ public class LevelManager {
                 teleportsNum = Integer.parseInt(columns[1]);
                 trapsNum = Integer.parseInt(columns[2]);
                 levelsMap.put(levelNum, new Resourses(teleportsNum, trapsNum));
-                Gdx.app.log("LevelManager", levelNum + " - " + teleportsNum + " - "+ trapsNum);
             } catch (Exception e) {
                 Gdx.app.error("LevelManager", "Error parsing file");
                 return false;

@@ -43,37 +43,37 @@ public class AssetLoader {
         if(manager == null)
             manager = new AssetManager();
 
-        logHandle = Gdx.files.local("log.txt");
-        levelHandle = Gdx.files.local("levels.txt");
+        logHandle = Gdx.files.internal("data/log.txt");
+        levelHandle = Gdx.files.internal("data/levels/levels.txt");
 
-        manager.load("characters.png", Texture.class);
-        manager.load("portals.png", Texture.class);
-        manager.load("traps.png", Texture.class);
-        manager.load("scale.png", Texture.class);
-        manager.load("scale_fill.png", Texture.class);
-        manager.load("moon.png", Texture.class);
-        manager.load("buttons.png", Texture.class);
-        manager.load("timer.png", Texture.class);
-        manager.load("running.mp3", Sound.class);
-        manager.load("tpOpen.mp3", Sound.class);
-        manager.load("tpClose.mp3", Sound.class);
-        manager.load("joystick.png", Texture.class);
+        manager.load("data/textures/characters.png", Texture.class);
+        manager.load("data/textures/portals.png", Texture.class);
+        manager.load("data/textures/traps.png", Texture.class);
+        manager.load("data/textures/scale.png", Texture.class);
+        manager.load("data/textures/scale_fill.png", Texture.class);
+        manager.load("data/textures/moon.png", Texture.class);
+        manager.load("data/textures/buttons.png", Texture.class);
+        manager.load("data/textures/timer.png", Texture.class);
+        manager.load("data/sounds/running.mp3", Sound.class);
+        manager.load("data/sounds/tpOpen.mp3", Sound.class);
+        manager.load("data/sounds/tpClose.mp3", Sound.class);
+        manager.load("data/textures/joystick.png", Texture.class);
         manager.finishLoading();
 
         for (int i = 1; i <= LevelManager.LEVEL_AMOUNT; i++) {
-            maps[i] = mapLoader.load("level"+i+".tmx");
+            maps[i] = mapLoader.load("data/levels/level"+i+".tmx");
         }
-        characters = manager.get("characters.png",Texture.class);
-        teleport = manager.get("portals.png", Texture.class);
-        trap = manager.get("traps.png", Texture.class);
-        buttons = manager.get("buttons.png",Texture.class);
-        scale_fill = manager.get("scale_fill.png", Texture.class);
-        moon = manager.get("moon.png",Texture.class);
-        timer = manager.get("timer.png", Texture.class);
-        joystick = manager.get("joystick.png", Texture.class);
-        runningSound = manager.get("running.mp3", Sound.class);
-        teleportOpenSound = manager.get("tpOpen.mp3", Sound.class);
-        teleportCloseSound = manager.get("tpClose.mp3", Sound.class);
+        characters = manager.get("data/textures/characters.png",Texture.class);
+        teleport = manager.get("data/textures/portals.png", Texture.class);
+        trap = manager.get("data/textures/traps.png", Texture.class);
+        buttons = manager.get("data/textures/buttons.png",Texture.class);
+        scale_fill = manager.get("data/textures/scale_fill.png", Texture.class);
+        moon = manager.get("data/textures/moon.png",Texture.class);
+        timer = manager.get("data/textures/timer.png", Texture.class);
+        joystick = manager.get("data/textures/joystick.png", Texture.class);
+        runningSound = manager.get("data/sounds/running.mp3", Sound.class);
+        teleportOpenSound = manager.get("data/sounds/tpOpen.mp3", Sound.class);
+        teleportCloseSound = manager.get("data/sounds/tpClose.mp3", Sound.class);
         
 //        light_button = new TextureRegion(manager.get("light_button.png", Texture.class));
         start_button = new TextureRegion(buttons, 1, 0, 212, 27);
@@ -94,7 +94,7 @@ public class AssetLoader {
         touchBg = new TextureRegion(joystick, 0, 0, 132, 132);
         touchKnob = new TextureRegion(joystick, 130, 0, 126, 126);
 
-        font = new BitmapFont(Gdx.files.internal("font.fnt"));
+        font = new BitmapFont(Gdx.files.internal("data/font.fnt"));
         font.getData().setScale(FONT_SCALE,FONT_SCALE);
     }
 
