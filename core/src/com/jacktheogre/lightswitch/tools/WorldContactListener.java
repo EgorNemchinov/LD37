@@ -11,7 +11,6 @@ import com.jacktheogre.lightswitch.LightSwitch;
 import com.jacktheogre.lightswitch.objects.InteractiveObject;
 import com.jacktheogre.lightswitch.objects.Trap;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
-import com.jacktheogre.lightswitch.sprites.GameActor;
 import com.jacktheogre.lightswitch.sprites.Monster;
 
 /**
@@ -51,7 +50,7 @@ public class WorldContactListener implements ContactListener {
                 }
                 break;
             case  Constants.BOY_BIT | Constants.MONSTER_BIT:
-                screen.endGame(!LightSwitch.isPlayingHuman());
+                screen.endGame();
                 break;
             case Constants.MONSTER_BIT | Constants.TRAP_BIT:
                 if(fixA.getFilterData().categoryBits == Constants.TRAP_BIT) {

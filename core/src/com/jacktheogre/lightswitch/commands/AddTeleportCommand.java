@@ -1,6 +1,7 @@
 package com.jacktheogre.lightswitch.commands;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.PixmapPacker;
 import com.badlogic.gdx.utils.Array;
 import com.jacktheogre.lightswitch.objects.Teleport;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
@@ -10,18 +11,22 @@ import com.jacktheogre.lightswitch.screens.GeneratingScreen;
  */
 public class AddTeleportCommand extends GlobalCommand {
 
-    private Array<Teleport> teleports;
     private int x, y;
     private Teleport teleport;
     private GeneratingScreen screen;
 
-    public AddTeleportCommand(GeneratingScreen generatingScreen, int x, int y, Array<Teleport> teleports) {
+    public AddTeleportCommand(GeneratingScreen generatingScreen, int x, int y, Teleport partner) {
         super(generatingScreen);
         this.screen = generatingScreen;
         this.x = x;
         this.y = y;
-        this.teleports = teleports;
         teleport = new Teleport(screen, x, y, false);
+        if(partner != null) {
+            Teleport.connect(teleport, partner);
+            screen.setUnpairedTeleport(null);
+        } else {
+            screen.setUnpairedTeleport(teleport);
+        }
     }
 
     @Override
@@ -39,12 +44,19 @@ public class AddTeleportCommand extends GlobalCommand {
         return true;
     }
 
+    // TODO: 18.03.17 implement pairing-unpairing
     @Override
     public void undo() {
         if(!screen.maxTeleports()) {
             screen.getTeleportButton().enable();
         }
-        teleports.removeValue(teleport, true);
+        screen.getTeleports().removeValue(teleport, true);
+        if(teleport.getPartner() != null) {
+            teleport.getPartner().removePartner();
+            screen.setUnpairedTeleport(teleport.getPartner());
+        } else {
+            screen.setUnpairedTeleport(null);
+        }
         if(screen.getTeleports().size == 0 && screen.getTraps().size == 0)
             screen.getUndo().disable();
     }
@@ -52,7 +64,13 @@ public class AddTeleportCommand extends GlobalCommand {
     @Override
     public void redo() {
         if(screen.maxTeleports()) {
-            teleports.add(teleport);
+            screen.getTeleports().add(teleport);
+            if(teleport.getPartner() != null) {
+                Teleport.connect(teleport, teleport.getPartner());
+                screen.setUnpairedTeleport(null);
+            } else {
+                screen.setUnpairedTeleport(teleport);
+            }
             if(screen.maxTeleports())
                 screen.getTeleportButton().disable();
         }

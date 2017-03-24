@@ -21,7 +21,7 @@ public class Logger {
     }
 
     public void clearLog() {
-        fileHandle.writeString("", false);
+//        fileHandle.writeString("", false);
     }
 
     public String readFromFile() {
@@ -29,7 +29,7 @@ public class Logger {
     }
 
     public void logStringToFile(String s) {
-        fileHandle.writeString(s+"\n", true);
+//        fileHandle.writeString(s+"\n", true);
     }
 
     public void printLog() {

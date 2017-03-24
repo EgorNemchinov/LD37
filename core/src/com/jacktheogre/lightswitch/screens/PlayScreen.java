@@ -111,7 +111,6 @@ public class PlayScreen extends GameScreen {
         Gdx.input.setInputProcessor(inputHandler);
         world.setContactListener(contactListener);
         lighting.turnOff();
-        makeTeleportConnections();
         commandHandler.addCommand(new StopCommand(player));
         energy = 100f;
         fixturesContacts = new Array<Contact>();
@@ -124,7 +123,7 @@ public class PlayScreen extends GameScreen {
         super.update(dt);
         runTime += dt;
         if (runTime > Constants.PLAYTIME) {
-            endGame(game.isPlayingHuman());
+            endGame();
         }
         addEnergy(Constants.ADD_ENERGY_PER_SEC * dt);
         if(Gdx.app.getType() == Application.ApplicationType.Android) {
@@ -274,21 +273,12 @@ public class PlayScreen extends GameScreen {
         return fixturesContacts;
     }
 
-    private void makeTeleportConnections() {
-        for (int i = 0; i < objects.size; i++) {
-            if(ClassReflection.isInstance(Teleport.class, objects.get(i))) {
-                Teleport tp = (Teleport) objects.get(i);
-                for (int j = 0; j < objects.size; j++) {
-                    if(ClassReflection.isInstance(Teleport.class, objects.get(j)) && j != i) {
-                        Teleport tpIns = (Teleport) objects.get(j);
-                        tp.addTeleport(tpIns);
-                    }
-                }
-            }
-        }
-    }
 
-    public void endGame(boolean win) {
+    public void endGame() {
+        boolean win = false;
+        if(runTime > Constants.PLAYTIME) {
+            win = game.isPlayingHuman();
+        }
         if(win)
             game.setScreen(new GameOverScreen(game, GameOverScreen.State.WIN));
         else

@@ -1,6 +1,5 @@
 package com.jacktheogre.lightswitch.ai;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -30,6 +29,11 @@ public class Node {
         connections.add(new ConnectionImp(this, toNode, cost));
     }
 
+    public void connnectTo(Node node, float cost) {
+        createConnection(node, 0);
+        node.createConnection(this, 0);
+    }
+
     public static class Indexer {
         private static int index = 0;
 
@@ -42,10 +46,6 @@ public class Node {
             index = 0;
         }
 
-    }
-
-    public static void nullify() {
-        Indexer.nullify();
     }
 
     public float getWorldX() {

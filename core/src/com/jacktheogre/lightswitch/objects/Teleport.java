@@ -19,7 +19,7 @@ import java.util.Random;
  */
 public class Teleport extends InteractiveObject {
 
-    private Array<Teleport> others;
+    private Teleport partner;
 
     public Teleport(GeneratingScreen screen, int x, int y, boolean initPhysics) {
         super(screen, x, y, initPhysics);
@@ -27,22 +27,29 @@ public class Teleport extends InteractiveObject {
         this.y = y;
         texture = Assets.getAssetLoader().teleport;
         initGraphics();
-        others = new Array<Teleport>();
         open = true;
         timeSinceClosure = 0f;
         stateTimer = 0f;
     }
 
+    public static void connect(Teleport first, Teleport second) {
+        first.setPartner(second);
+        second.setPartner(first);
+    }
+
+    public void setPartner(Teleport partner) {
+        this.partner = partner;
+    }
+
+    public void removePartner() {
+        setPartner(null);
+    }
+
     public boolean activate(Player player) {
-        if(others.size > 0){
-            Teleport dest = randomTeleport();
-            if(dest != null) {
-                screen.getCommandHandler().addCommand(new TeleportCommand(this, dest, player));
-                return true;
-            } else
-                return false;
-        }
-        else
+        if(partner != null) {
+            screen.getCommandHandler().addCommand(new TeleportCommand(this, partner, player));
+            return true;
+        } else
             return false;
     }
 
@@ -128,23 +135,7 @@ public class Teleport extends InteractiveObject {
         return filter;
     }
 
-    public void addTeleport(Teleport tp) {
-        if(tp != null)
-            others.add(tp);
-    }
-
-    private Teleport randomTeleport() {
-        Random random = new Random();
-        Teleport tp = null;
-        if(others.size > 0) {
-            for (int i = 0; i < others.size; i++) {
-                if(others.get(i).isOpen()) {
-                    tp = others.get(i);
-                    if(random.nextBoolean())
-                        break;
-                }
-            }
-        }
-        return tp;
+    public Teleport getPartner() {
+        return partner;
     }
 }

@@ -13,7 +13,6 @@ import com.badlogic.gdx.utils.Array;
  * Created by luna on 21.10.16.
  */
 public class GraphImp implements IndexedGraph<Node>{
-    // TODO: 21.10.16 remove node func
     // TODO: 21.10.16 implement default indexed
     private Array<Node> nodes = new Array<Node>();
 
@@ -21,25 +20,16 @@ public class GraphImp implements IndexedGraph<Node>{
         this.nodes = nodes;
     }
 
-    public GraphImp() {
-        this(new Array<Node>());
-    }
-
-    public GraphImp(int capacity) {
-        this(new Array<Node>(capacity));
-    }
-
     @Override
     public int getIndex(Node node) {
-//        if(node == null) Gdx.app.log("getIndex", "node is null");
-        return node.getIndex(); // FIXME: 21.10.16 or nodes.indexOF
+        return node.getIndex();
     }
 
     public int getNodeCount() {
         return nodes.size;
     }
 
-    public Node getNodeByXY(int x, int y) {// FIXME: 21.10.16  what is it
+    public Node getNodeByXY(int x, int y) {
         int modX = x / LevelManager.tilePixelWidth;
         int modY = (y)/ LevelManager.tilePixelHeight;
         if(modX < 0)

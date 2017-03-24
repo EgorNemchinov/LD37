@@ -29,6 +29,9 @@ import com.jacktheogre.lightswitch.tools.B2WorldCreator;
 import com.jacktheogre.lightswitch.tools.input.GenerateInputHandler;
 import com.jacktheogre.lightswitch.tools.Lighting;
 
+import static com.jacktheogre.lightswitch.tools.DrawingAssistant.drawDottedLine;
+import static com.jacktheogre.lightswitch.tools.DrawingAssistant.drawPulsingDottedLine;
+
 /**
  * Created by luna on 10.12.16.
  */
@@ -56,6 +59,10 @@ public class GeneratingScreen extends GameScreen {
     public Array<Trap> traps;
     private Node selectedNode;
 
+    private Teleport unpairedTeleport = null;
+
+    private float runTime;
+
     public GeneratingScreen(LightSwitch game) {
         super();
         this.game = game;
@@ -63,6 +70,8 @@ public class GeneratingScreen extends GameScreen {
         gamePort = new FitViewport(LightSwitch.WIDTH, LightSwitch.HEIGHT, gameCam);
         gameCam.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
         gameCam.zoom -= 0.2f;
+
+        runTime = 0;
 
         loader = Assets.getAssetLoader();
         LevelManager.loadLevel(loader.getMap());
@@ -93,8 +102,8 @@ public class GeneratingScreen extends GameScreen {
         shapeRenderer.setAutoShapeType(true);
         commandHandler = new CommandHandler(this);
         Node.Indexer.nullify();
-        Teleport.Indexer.nullify();
         Trap.Indexer.nullify();
+        Teleport.Indexer.nullify();
         Gdx.input.setInputProcessor(new GenerateInputHandler(this));
     }
 
@@ -153,6 +162,7 @@ public class GeneratingScreen extends GameScreen {
     }
 
     public void update(float dt){
+        runTime += dt;
         commandHandler.update(dt);
         if(commandHandler.newCommands())
             commandHandler.executeCommandsGenerate();
@@ -187,8 +197,20 @@ public class GeneratingScreen extends GameScreen {
         renderSelected();
 
         game.batch.begin();
-        for (Teleport teleport: teleports) {
+        boolean lineDrawn = false;
+        for (int i = 0; i < teleports.size; i++) {
+            Teleport teleport = teleports.get(i);
             teleport.render(game.batch, delta);
+            if(lineDrawn) {
+                lineDrawn = false;
+                continue;
+            }
+            if(teleport.getPartner() != null) {
+                game.batch.end();
+                drawPulsingDottedLine(shapeRenderer, 10, teleport.getX() + 8, teleport.getY() + 8, teleport.getPartner().getX() + 8, teleport.getPartner().getY() + 8, 0.5f, runTime);
+                game.batch.begin();
+                lineDrawn = true;
+            }
         }
         for (Trap trap: traps) {
             trap.render(game.batch, delta);
@@ -282,11 +304,19 @@ public class GeneratingScreen extends GameScreen {
 
     public void addTeleport() {
         if(selectedNode.getConnections().size > 0 && state == State.SETTING_TELEPORT && !existsObject()) {
-            commandHandler.addCommand(new AddTeleportCommand(this, (int) selectedNode.getWorldX() - LevelManager.tilePixelWidth / 2, (int)selectedNode.getWorldY() - LevelManager.tilePixelHeight / 2, teleports));
+            commandHandler.addCommand(new AddTeleportCommand(this, (int) selectedNode.getWorldX() - LevelManager.tilePixelWidth / 2, (int)selectedNode.getWorldY() - LevelManager.tilePixelHeight / 2, unpairedTeleport));
             undo.enable();
             state = State.DEFAULT;
             teleportButton.unpress();
         }
+    }
+
+    public Teleport getUnpairedTeleport() {
+        return unpairedTeleport;
+    }
+
+    public void setUnpairedTeleport(Teleport unpairedTeleport) {
+        this.unpairedTeleport = unpairedTeleport;
     }
 
     public void addTrap() {
