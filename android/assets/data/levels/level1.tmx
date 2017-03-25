@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="15" height="10" tilewidth="16" tileheight="16" nextobjectid="31">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="15" height="10" tilewidth="16" tileheight="16" nextobjectid="34">
  <tileset firstgid="1" name="tiles" tilewidth="16" tileheight="16" tilecount="18" columns="9">
   <image source="../textures/tiles.png" width="144" height="32"/>
  </tileset>
@@ -42,6 +42,11 @@
  </objectgroup>
  <objectgroup name="enemies">
   <object id="22" x="208" y="80" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup name="shards">
+  <object id="31" x="96" y="16" width="16" height="16"/>
+  <object id="32" x="208" y="128" width="16" height="16"/>
+  <object id="33" x="16" y="128" width="16" height="16"/>
  </objectgroup>
  <objectgroup name="lights">
   <object id="23" x="48" y="48" width="16" height="16"/>

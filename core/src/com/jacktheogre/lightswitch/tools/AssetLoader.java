@@ -21,11 +21,12 @@ public class AssetLoader {
     public static final float LETTER_HEIGHT = 15 * FONT_SCALE;
     private AssetManager manager;
     public Texture characters, teleport, scale_fill, timer, trap;
-    public Texture moon, buttons, joystick;
+    public Texture moon, buttons, joystick, shards_sheet;
     public TextureRegion touchBg, touchKnob, scale;
     public TextureRegion next_level_button, home_button, replay_button, light_button;
     public TextureRegion undo_button, redo_button, start_button, teleport_button, play_button;
     public TextureRegion boy_button, monster_button, trap_button, singleplayer_button, multiplayer_button;
+    public TextureRegion[] shards;
     public TiledMap[] maps;
     private TmxMapLoader mapLoader;
     public BitmapFont font;
@@ -37,6 +38,7 @@ public class AssetLoader {
         this.manager = new AssetManager();
         mapLoader = new TmxMapLoader();
         maps = new TiledMap[LevelManager.LEVEL_AMOUNT+1];
+        shards = new TextureRegion[3];
     }
 
     public void load() {
@@ -58,6 +60,7 @@ public class AssetLoader {
         manager.load("data/sounds/tpOpen.mp3", Sound.class);
         manager.load("data/sounds/tpClose.mp3", Sound.class);
         manager.load("data/textures/joystick.png", Texture.class);
+        manager.load("data/textures/shards.png", Texture.class);
         manager.finishLoading();
 
         for (int i = 1; i <= LevelManager.LEVEL_AMOUNT; i++) {
@@ -71,6 +74,7 @@ public class AssetLoader {
         moon = manager.get("data/textures/moon.png",Texture.class);
         timer = manager.get("data/textures/timer.png", Texture.class);
         joystick = manager.get("data/textures/joystick.png", Texture.class);
+        shards_sheet = manager.get("data/textures/shards.png", Texture.class);
         runningSound = manager.get("data/sounds/running.mp3", Sound.class);
         teleportOpenSound = manager.get("data/sounds/tpOpen.mp3", Sound.class);
         teleportCloseSound = manager.get("data/sounds/tpClose.mp3", Sound.class);
@@ -93,6 +97,10 @@ public class AssetLoader {
         multiplayer_button = new TextureRegion(buttons, 51, 551, 62, 26);
         touchBg = new TextureRegion(joystick, 0, 0, 132, 132);
         touchKnob = new TextureRegion(joystick, 130, 0, 126, 126);
+
+        for (int i = 0; i < 3; i++) {
+            shards[i] = new TextureRegion(shards_sheet, 1 + 15*i, 19, 11, 11);
+        }
 
         font = new BitmapFont(Gdx.files.internal("data/font.fnt"));
         font.getData().setScale(FONT_SCALE,FONT_SCALE);

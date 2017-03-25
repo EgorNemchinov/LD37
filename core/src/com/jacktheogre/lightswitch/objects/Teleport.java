@@ -8,11 +8,8 @@ import com.badlogic.gdx.utils.Array;
 import com.jacktheogre.lightswitch.Constants;
 import com.jacktheogre.lightswitch.commands.TeleportCommand;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
-import com.jacktheogre.lightswitch.sprites.GameActor;
 import com.jacktheogre.lightswitch.sprites.Player;
 import com.jacktheogre.lightswitch.tools.Assets;
-
-import java.util.Random;
 
 /**
  * Created by luna on 10.12.16.
@@ -25,7 +22,7 @@ public class Teleport extends InteractiveObject {
         super(screen, x, y, initPhysics);
         this.x = x;
         this.y = y;
-        texture = Assets.getAssetLoader().teleport;
+        textureRegion = new TextureRegion(Assets.getAssetLoader().teleport);
         initGraphics();
         open = true;
         timeSinceClosure = 0f;
@@ -59,7 +56,7 @@ public class Teleport extends InteractiveObject {
 
         float frameTime = 0.1f;
         for (int i = 0; i < 4; i++) {
-            frames.add(new TextureRegion(texture, i*16, 0, 16, 16));
+            frames.add(new TextureRegion(textureRegion, i*16, 0, 16, 16));
         }
         openAnimation = new Animation(frameTime, frames);
         openAnimation.setPlayMode(Animation.PlayMode.NORMAL);

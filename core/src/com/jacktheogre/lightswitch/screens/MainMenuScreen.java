@@ -89,11 +89,11 @@ public class MainMenuScreen extends GameScreen{
     @Override
     protected void initializeButtons() {
         play_button = new Button(Assets.getAssetLoader().play_button, Button.State.ACTIVE, this) {
-            MainMenuScreen mainMenuScreen = (MainMenuScreen) screen;
+//            MainMenuScreen mainMenuScreen = (MainMenuScreen) screen;
 
             @Override
             protected void actUnpress() {
-                mainMenuScreen.setState(MainMenuScreen.State.CHOOSING_CHARACTER);
+                screen.getGame().setScreen(new GeneratingScreen(screen.getGame()));
             }
         };
         play_button.setPosition(gamePort.getWorldWidth() / 2 - play_button.getWidth() / 2, gamePort.getWorldHeight() / 2 - play_button.getHeight() / 2);

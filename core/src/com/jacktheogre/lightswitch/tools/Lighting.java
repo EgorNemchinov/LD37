@@ -45,11 +45,11 @@ public class Lighting {
 
         actorLight = new PointLight(rayHandler, Constants.LIGHT_RAYS, LightSwitch.isPlayingHuman()? LIGHT_HUMAN : LIGHT_MONSTER,
                 0.6f*Constants.LIGHT_DISTANCE , 550, 100);
-        transformActorLight(actorLight);
 
         actorLightFilter = new Filter();
         actorLightFilter.categoryBits = Constants.LIGHT_BIT;
-        actorLightFilter.maskBits = Constants.WALLS_BIT | Constants.OBJECT_BIT;
+        actorLightFilter.maskBits = Constants.WALLS_BIT | Constants.OBJECT_BIT | Constants.MONSTER_BIT ;
+        transformActorLight(actorLight);
 
         aboveLightFilter = new Filter();
         aboveLightFilter.categoryBits = Constants.LIGHT_BIT;
@@ -68,7 +68,7 @@ public class Lighting {
 
     private void transformActorLight(PointLight light) {
         light.setContactFilter(actorLightFilter);
-        light.setStaticLight(true);
+        light.setStaticLight(false);
         light.setSoftnessLength(0);
     }
 

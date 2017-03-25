@@ -30,7 +30,7 @@ public class Trap extends InteractiveObject {
         super(screen, x, y, initPhysics);
         this.x = x;
         this.y = y;
-        texture = Assets.getAssetLoader().trap;
+        textureRegion = new TextureRegion(Assets.getAssetLoader().trap);
         initGraphics();
         open = true;
         timeSinceClosure = 0f;
@@ -49,7 +49,7 @@ public class Trap extends InteractiveObject {
 
         float frameTime = 0.1f;
         for (int i = 0; i < 4; i++) {
-            frames.add(new TextureRegion(texture, i*16, 0, 16, 16));
+            frames.add(new TextureRegion(textureRegion, i*16, 0, 16, 16));
         }
         openAnimation = new Animation(frameTime, frames);
         openAnimation.setPlayMode(Animation.PlayMode.NORMAL);

@@ -63,7 +63,8 @@ public class Monster extends GameActor {
                 Constants.OBJECT_BIT |
                 Constants.BOY_BIT |
                 Constants.TELEPORT_BIT |
-                Constants.TRAP_BIT;
+                Constants.TRAP_BIT |
+                Constants.LIGHT_BIT;
         fixtureDef.filter.groupIndex = Constants.MONSTER_GROUP;
         filter = fixtureDef.filter;
         fixture = b2body.createFixture(fixtureDef);
@@ -208,6 +209,6 @@ public class Monster extends GameActor {
         if(trapped)
             return 0;
         else
-            return SPEED_BASE+6*LevelManager.getLevelNum();
+            return SPEED_BASE+(int)4.5*LevelManager.getLevelNum();
     }
 }

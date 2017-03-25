@@ -9,6 +9,7 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 import com.jacktheogre.lightswitch.Constants;
 import com.jacktheogre.lightswitch.LightSwitch;
 import com.jacktheogre.lightswitch.objects.InteractiveObject;
+import com.jacktheogre.lightswitch.objects.Shard;
 import com.jacktheogre.lightswitch.objects.Trap;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
 import com.jacktheogre.lightswitch.sprites.Monster;
@@ -64,6 +65,13 @@ public class WorldContactListener implements ContactListener {
                        }
                 }
                 break;
+            case Constants.BOY_BIT | Constants.PICKABLE_BIT:
+                if(fixA.getFilterData().categoryBits == Constants.PICKABLE_BIT) {
+                    ((Shard) (fixA.getUserData())).activate(LightSwitch.isPlayingHuman()?screen.getPlayer():screen.getEnemyPlayer());
+                }
+                else {
+                    ((Shard) (fixB.getUserData())).activate(LightSwitch.isPlayingHuman()?screen.getPlayer():screen.getEnemyPlayer());
+                }
         }
     }
 

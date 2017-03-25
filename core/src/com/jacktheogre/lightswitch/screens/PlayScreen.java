@@ -25,6 +25,7 @@ import com.jacktheogre.lightswitch.commands.StopCommand;
 import com.jacktheogre.lightswitch.multiplayer.MessageHandler;
 import com.jacktheogre.lightswitch.objects.InteractiveObject;
 import com.jacktheogre.lightswitch.objects.NullInteractiveObject;
+import com.jacktheogre.lightswitch.objects.Shard;
 import com.jacktheogre.lightswitch.objects.Teleport;
 import com.jacktheogre.lightswitch.sprites.EnemyPlayer;
 import com.jacktheogre.lightswitch.sprites.GameActor;
@@ -42,6 +43,7 @@ public class PlayScreen extends GameScreen {
     private final WorldContactListener contactListener;
     private PlayInputHandler inputHandler;
     public Array<InteractiveObject> objects;
+    private Array<Shard> shards;
 
     private OrthogonalTiledMapRenderer mapRenderer;
 
@@ -64,6 +66,7 @@ public class PlayScreen extends GameScreen {
 
     private float runTime;
     private float energy;
+    private int shardsCollected;
 
     private CameraSettings currentSetings, targetSettings;
 
@@ -102,6 +105,11 @@ public class PlayScreen extends GameScreen {
             obj.initClose();
         }
 
+        shards = new Array<Shard>(screen.getShards());
+        for(Shard shard : shards) {
+            shard.setPlayScreen(this);
+        }
+
         commandHandler = screen.getCommandHandler();
         commandHandler.setScreen(this);
         commandHandler.setScreenState(CommandHandler.ScreenState.PLAYSCREEN);
@@ -115,6 +123,7 @@ public class PlayScreen extends GameScreen {
         energy = 100f;
         fixturesContacts = new Array<Contact>();
         runTime = 0;
+        shardsCollected = 0;
 
         initializeButtons();
     }
@@ -165,6 +174,9 @@ public class PlayScreen extends GameScreen {
         game.batch.begin();
         for (InteractiveObject object : objects) {
             object.render(game.batch, dt);
+        }
+        for (Shard shard: shards) {
+            shard.render(game.batch, dt);
         }
         if(higher(player.getGameActor(), enemyPlayer.getGameActor())) {
             player.getGameActor().draw(game.batch);
@@ -265,6 +277,10 @@ public class PlayScreen extends GameScreen {
         }
     }
 
+    public void collectShard(int number) {
+        hud.collectShard(number);
+    }
+
     public void addFixtureContact(Contact contact) {
         fixturesContacts.add(contact);
     }
@@ -346,6 +362,10 @@ public class PlayScreen extends GameScreen {
 
     public CommandHandler getCommandHandler() {
         return commandHandler;
+    }
+
+    public Array<Shard> getShards() {
+        return shards;
     }
 
     public LightSwitch getGame() {

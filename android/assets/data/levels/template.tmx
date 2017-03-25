@@ -28,6 +28,7 @@
   <object id="21" x="16" y="80" width="16" height="16"/>
  </objectgroup>
  <objectgroup name="enemies"/>
+ <objectgroup name="shards"/>
  <objectgroup name="lights">
   <object id="23" x="48" y="48" width="16" height="16"/>
   <object id="24" x="48" y="96" width="16" height="16"/>

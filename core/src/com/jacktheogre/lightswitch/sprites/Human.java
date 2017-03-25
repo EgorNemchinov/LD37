@@ -168,7 +168,8 @@ public class Human extends GameActor {
         fixtureDef.filter.maskBits = Constants.WALLS_BIT |
                 Constants.OBJECT_BIT |
                 Constants.MONSTER_BIT |
-                Constants.TELEPORT_BIT;
+                Constants.TELEPORT_BIT |
+                Constants.PICKABLE_BIT;
         fixtureDef.filter.groupIndex = Constants.BOY_GROUP;
         filter = fixtureDef.filter;
         fixtureDef.friction = 0;

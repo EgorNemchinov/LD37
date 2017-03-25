@@ -4,8 +4,10 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -35,6 +37,7 @@ public class Hud implements Disposable{
     private Label timeLabel;
     private PlayScreen screen;
     private Sprite energyBar, fill, timer;
+    private Sprite[] shards;
     private Button lightButton, wallthroughButton;
     private float energyBarScale = 1f;
 
@@ -42,11 +45,18 @@ public class Hud implements Disposable{
     private Touchpad.TouchpadStyle touchpadStyle;
     private Skin touchpadSkin;
 
+    private boolean[] shardsCollected;
 
     public Hud(PlayScreen screen) {
         this.screen = screen;
         viewport = new FitViewport(LightSwitch.WIDTH, LightSwitch.HEIGHT);
         stage = new Stage(viewport, screen.getGame().batch);
+
+        shards = new Sprite[3];
+        shardsCollected = new boolean[3];
+        for (int i = 0; i < 3; i++) {
+            shardsCollected[i] = false;
+        }
 
         initializeGraphicElements();
 
@@ -77,7 +87,9 @@ public class Hud implements Disposable{
         screen.getInputHandler().addActor(touchpad);
     }
 
+
     private void initializeGraphicElements() {
+        initializeMoonShards();
         energyBar = new Sprite(Assets.getAssetLoader().scale);
         energyBar.setPosition(energyBar.getWidth() / 2 - 10, 40);
         energyBar.setScale(1f);
@@ -206,8 +218,41 @@ public class Hud implements Disposable{
         return touchpad;
     }
 
+    private void initializeMoonShards() {
+        float scale = 2f;
+        Vector2 leftBottomCorner = new Vector2(viewport.getWorldWidth() - 50, viewport.getWorldHeight() - 50);
+        shards[0] = new Sprite(Assets.getAssetLoader().shards[0]);
+        shards[1] = new Sprite(Assets.getAssetLoader().shards[1]);
+        shards[2] = new Sprite(Assets.getAssetLoader().shards[2]);
+
+        for (Sprite shard :shards) {
+            shard.setOriginCenter();
+            shard.scale(scale);
+        }
+
+        shards[0].setPosition(leftBottomCorner.x - 2*scale, leftBottomCorner.y + 2*scale);
+        shards[1].setPosition(leftBottomCorner.x + 4*scale, leftBottomCorner.y - 4*scale);
+        shards[2].setPosition(leftBottomCorner.x + 7*scale, leftBottomCorner.y + 5*scale);
+    }
+
+    private void renderMoonShards() {
+        for (int i = 0; i < shards.length; i++) {
+            Color c = shards[i].getColor();
+            if(shardsCollected[i]) {
+                shards[i].setColor(c.r, c.g, c.b, 0.7f);
+                shards[i].draw(screen.getGame().batch);
+            } else {
+//                shards[i].setColor(c.r, c.g, c.b, 0.2f);
+//                screen.getGame().batch.setColor(color.r, color.g, color.b, 0.2f);
+//                shards[i].draw(screen.getGame().batch);
+            }
+        }
+//        screen.getGame().batch.setColor(color);
+    }
+
     public void render(float dt) {
         update(dt);
+        screen.getGame().batch.enableBlending();
         screen.getGame().batch.begin();
         screen.getGame().batch.setProjectionMatrix(stage.getCamera().combined);
 //        if(LightSwitch.isPlayingHuman()) {
@@ -226,6 +271,7 @@ public class Hud implements Disposable{
             screen.getGame().batch.setColor(color.r, color.g, color.b, 1);
             screen.renderButtons(stage.getCamera());
         }
+        renderMoonShards();
         if(screen.getGame().batch.isDrawing())
             screen.getGame().batch.end();
 
@@ -255,6 +301,10 @@ public class Hud implements Disposable{
 
     public void dispose() {
         //nothing to dispose
+    }
+
+    public void collectShard(int number) {
+        shardsCollected[number] = true;
     }
 
     public Button getWallthroughButton() {

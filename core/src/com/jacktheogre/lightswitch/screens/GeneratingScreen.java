@@ -18,6 +18,7 @@ import com.jacktheogre.lightswitch.ai.Node;
 import com.jacktheogre.lightswitch.commands.AddTeleportCommand;
 import com.jacktheogre.lightswitch.commands.AddTrapCommand;
 import com.jacktheogre.lightswitch.commands.CommandHandler;
+import com.jacktheogre.lightswitch.objects.Shard;
 import com.jacktheogre.lightswitch.objects.Teleport;
 import com.jacktheogre.lightswitch.objects.Trap;
 import com.jacktheogre.lightswitch.sprites.Button;
@@ -57,6 +58,7 @@ public class GeneratingScreen extends GameScreen {
 
     public Array<Teleport> teleports;
     public Array<Trap> traps;
+    public Array<Shard> shards;
     private Node selectedNode;
 
     private Teleport unpairedTeleport = null;
@@ -84,6 +86,7 @@ public class GeneratingScreen extends GameScreen {
         world = new World(new Vector2(0, 0), true);
         teleports = new Array<Teleport>();
         traps = new Array<Trap>();
+        shards = new Array<Shard>();
 
         player = new Player(this);
         enemyPlayer = new EnemyPlayer(this);
@@ -214,6 +217,9 @@ public class GeneratingScreen extends GameScreen {
         }
         for (Trap trap: traps) {
             trap.render(game.batch, delta);
+        }
+        for (Shard shard: shards) {
+            shard.render(game.batch, delta);
         }
 
         player.getGameActor().draw(game.batch);
@@ -377,6 +383,10 @@ public class GeneratingScreen extends GameScreen {
 
     public Array<Trap> getTraps() {
         return traps;
+    }
+
+    public Array<Shard> getShards() {
+        return shards;
     }
 
     public AssetLoader getLoader() {

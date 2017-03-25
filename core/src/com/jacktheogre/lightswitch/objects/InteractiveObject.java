@@ -24,7 +24,7 @@ import com.jacktheogre.lightswitch.sprites.Player;
 public abstract class InteractiveObject {
 
     protected int x, y;
-    protected Texture texture;
+    protected TextureRegion textureRegion;
     protected World world;
     protected Circle bounds;
     protected Body body;

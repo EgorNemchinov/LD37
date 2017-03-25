@@ -1,5 +1,6 @@
 package com.jacktheogre.lightswitch.tools;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -12,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.jacktheogre.lightswitch.Constants;
 import com.jacktheogre.lightswitch.LightSwitch;
+import com.jacktheogre.lightswitch.objects.Shard;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 import com.jacktheogre.lightswitch.sprites.Monster;
 import com.jacktheogre.lightswitch.sprites.Human;
@@ -50,7 +52,8 @@ public class B2WorldCreator {
             fixtureDef.filter.maskBits = Constants.WALLS_BIT |
                     Constants.OBJECT_BIT |
                     Constants.BOY_BIT |
-                    Constants.MONSTER_BIT;
+                    Constants.MONSTER_BIT |
+                    Constants.LIGHT_BIT;
 //            fixtureDef.filter.maskBits |= Constants.LIGHT_BIT;
             body.createFixture(fixtureDef);
         }
@@ -100,8 +103,22 @@ public class B2WorldCreator {
                 screen.getPlayer().setGameActor(new Monster(world, bounds.getX(), bounds.getY()));
         }
 
-        //lights
+        int number = 0;
         for (MapObject object : map.getLayers().get(7).getObjects()) {
+            if (!ClassReflection.isInstance(RectangleMapObject.class, object))
+                continue;
+            Rectangle bounds = ((RectangleMapObject) object).getRectangle();
+            if(number > 2) {
+                Gdx.app.error("", "More than 3 shards on a level.");
+                break;
+            }
+
+            screen.getShards().add(new Shard(screen, (int) bounds.getX() + 3, (int) bounds.getY() + 3, number));
+            number++;
+        }
+
+        //lights
+        for (MapObject object : map.getLayers().get(8).getObjects()) {
             if (!ClassReflection.isInstance(RectangleMapObject.class, object))
                 continue;
             Rectangle bounds = ((RectangleMapObject) object).getRectangle();
