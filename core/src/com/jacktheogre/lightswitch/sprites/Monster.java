@@ -209,6 +209,6 @@ public class Monster extends GameActor {
         if(trapped)
             return 0;
         else
-            return SPEED_BASE+(int)4.5*LevelManager.getLevelNum();
+            return LevelManager.getMonsterSpeed();
     }
 }

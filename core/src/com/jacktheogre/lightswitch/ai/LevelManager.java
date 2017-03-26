@@ -25,23 +25,25 @@ public class LevelManager {
 
     static class Resourses {
 
-        public Integer teleports;
-        public Integer traps;
-        public Resourses(Integer teleports, Integer traps) {
+        public int teleports;
+        public int traps;
+        public int monsterSpeed;
+        public Resourses(int teleports, int traps, int monsterSpeed) {
             this.teleports = teleports;
             this.traps = traps;
+            this.monsterSpeed = monsterSpeed;
         }
 
         @Override
         public String toString() {
-            return String.format("%d teleports & %d traps", teleports, traps);
+            return String.format("%d teleports & %d traps & %d is monster speed", teleports, traps, monsterSpeed);
         }
 
     }
     private static Map<Integer, Resourses> levelsMap;
 
     public static final int LEVEL_AMOUNT = 6;
-    private static int levelNum = 1;
+    private static int levelNum = 2;
 
     static {
         levelsMap = new HashMap<Integer, Resourses>();
@@ -69,12 +71,13 @@ public class LevelManager {
         String[] lines = levels.readString().split("\\r?\\n");
         for (int i = 0; i < lines.length; i++) {
             String[] columns = lines[i].split(" ");
-            int levelNum, teleportsNum, trapsNum;
+            int levelNum, teleportsNum, trapsNum, monsterSpeed;
             try {
                 levelNum = Integer.parseInt(columns[0]);
                 teleportsNum = Integer.parseInt(columns[1]);
                 trapsNum = Integer.parseInt(columns[2]);
-                levelsMap.put(levelNum, new Resourses(teleportsNum, trapsNum));
+                monsterSpeed = Integer.parseInt(columns[3]);
+                levelsMap.put(levelNum, new Resourses(teleportsNum, trapsNum, monsterSpeed));
             } catch (Exception e) {
                 Gdx.app.error("LevelManager", "Error parsing file");
                 return false;
@@ -93,6 +96,10 @@ public class LevelManager {
 
     public static int getAmountOfTraps() {
         return getLevelResourses(levelNum).traps;
+    }
+
+    public static int getMonsterSpeed() {
+        return getLevelResourses(levelNum).monsterSpeed;
     }
 
     public static int getLevelNum() {
