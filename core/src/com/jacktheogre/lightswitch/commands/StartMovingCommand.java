@@ -12,12 +12,9 @@ public class StartMovingCommand extends ActorCommand{
     private GameActor.Direction pastDirection, direction;
     public boolean disabled = false;
 
-    public StartMovingCommand(GameActor.Direction direction) {
-        this.direction = direction;
-    }
 
     public StartMovingCommand(GameActor.Direction direction, Player player) {
-        this(direction);
+        this.direction = direction;
         this.player = player;
     }
 

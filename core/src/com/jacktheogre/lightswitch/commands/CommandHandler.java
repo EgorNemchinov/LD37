@@ -1,5 +1,6 @@
 package com.jacktheogre.lightswitch.commands;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.jacktheogre.lightswitch.Constants;
@@ -38,8 +39,8 @@ public class CommandHandler {
     public void update(float dt) {
         timeSinceSynchronizing += dt;
         if(timeSinceSynchronizing > Constants.SYNCRONIZING_FREQUENCY_TIME) {
-            if(screenState == ScreenState.PLAYSCREEN)
-                synchronizePosition();
+//            if(screenState == ScreenState.PLAYSCREEN)
+//                synchronizePosition();
             timeSinceSynchronizing %= Constants.SYNCRONIZING_FREQUENCY_TIME;
         }
         if(newCommands) {
@@ -70,12 +71,14 @@ public class CommandHandler {
     }
 
     public void executeCommandsPlay() {
+        newCommands = false;
         for (int i = pointer; i < commands.size(); i++) {
             if(commands.get(i) != null) {
                 if(ClassReflection.isInstance(ActorCommand.class, commands.get(i))){
                     ActorCommand cmd = (ActorCommand)commands.get(i);
                     if(cmd.player!= null) {
-                        if(cmd.execute())
+//                        if(cmd.execute())
+                        cmd.execute();
                             logger.logStringToFile(cmd.toLog());
                     }
                 } else if(ClassReflection.isInstance(GlobalCommand.class, commands.get(i))){
@@ -85,9 +88,8 @@ public class CommandHandler {
                 }
             }
         }
-        if(commands.size() > 0)
+        if(commands.size()> 0)
             pointer = commands.size();
-        newCommands = false;
     }
 
     public void executeCommandsGenerate() {
@@ -109,13 +111,12 @@ public class CommandHandler {
 
     public void stopMoving(GameActor.Direction direction) {
         logger.logStringToFile("sd " + direction.toString());
+        //disabling all commands with that direction
         for (int i = commands.size() - 1; i >= 0 ; i--) {
             Command cmd = commands.get(i);
-            if(ClassReflection.isInstance(StartMovingCommand.class, cmd)) {
-                if (((StartMovingCommand) cmd).getDirection() == direction) {
-                    if (!((StartMovingCommand) cmd).disabled)
-                        ((StartMovingCommand) cmd).disabled = true;
-                }
+            if((ClassReflection.isInstance(StartMovingCommand.class, cmd)) &&
+                    (((StartMovingCommand) cmd).getDirection() == direction)) {
+                ((StartMovingCommand) cmd).disabled = true;
             }
         }
         for (int i = commands.size() - 1; i >= 0 ; i--) {
@@ -128,7 +129,7 @@ public class CommandHandler {
                     if(((StartMovingCommand) cmd).disabled) {
                         continue;
                     } else {
-                        addCommand(new StartMovingCommand(((StartMovingCommand) cmd).getDirection()));
+                        addCommand(new StartMovingCommand(((StartMovingCommand) cmd).getDirection(), ((PlayScreen)screen).getPlayer()));
                         return;
                     }
                 }
