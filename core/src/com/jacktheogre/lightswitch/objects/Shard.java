@@ -1,7 +1,6 @@
 package com.jacktheogre.lightswitch.objects;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
@@ -9,7 +8,6 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.utils.Array;
 import com.jacktheogre.lightswitch.Constants;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
@@ -30,9 +28,13 @@ public class Shard extends InteractiveObject {
 
     private int number;
 
-    public Shard(GeneratingScreen screen, int x, int y, int numberOfShard) {
+    public Shard(GeneratingScreen screen, int x, int y, int numberOfShard, int totalAmount) {
         super(screen, x, y, true);
-        this.textureRegion = Assets.getAssetLoader().shards[numberOfShard];
+        if(totalAmount == 3)
+            this.textureRegion = Assets.getAssetLoader().threeShards[numberOfShard];
+        else if(totalAmount == 2) {
+            this.textureRegion = Assets.getAssetLoader().twoShards[numberOfShard];
+        }
         rectBounds = new Rectangle(x, y, textureRegion.getRegionWidth(), textureRegion.getRegionHeight());
         initGraphics();
         stateTimer = 0f;

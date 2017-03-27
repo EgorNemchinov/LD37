@@ -3,10 +3,12 @@ package com.jacktheogre.lightswitch.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.jacktheogre.lightswitch.LightSwitch;
 import com.jacktheogre.lightswitch.ai.LevelManager;
+import com.jacktheogre.lightswitch.objects.InteractiveObject;
 import com.jacktheogre.lightswitch.sprites.Button;
 import com.jacktheogre.lightswitch.tools.AssetLoader;
 import com.jacktheogre.lightswitch.tools.Assets;
@@ -24,9 +26,12 @@ public class GameOverScreen extends GameScreen{
         return state;
     }
 
-    public enum State {WIN, LOSE}
+
+
+    public enum State {WIN, LOSE;}
     private State state;
     private Button next_level, replay, home;
+    private Array<InteractiveObject> interactiveObjects;
 
     public GameOverScreen(LightSwitch game, State state) {
         super();
@@ -40,9 +45,22 @@ public class GameOverScreen extends GameScreen{
         Gdx.input.setInputProcessor(new GameOverInputHandler(this));
     }
 
+    public GameOverScreen(LightSwitch game, State state, Array<InteractiveObject> objects) {
+        this(game, state);
+        this.interactiveObjects = objects;
+    }
+
+    public void setInteractiveObjects(Array<InteractiveObject> interactiveObjects) {
+        this.interactiveObjects = interactiveObjects;
+    }
+
     @Override
     public void show() {
 
+    }
+
+    public Array<InteractiveObject> getObjects() {
+        return interactiveObjects;
     }
 
     public Viewport getGamePort() {
@@ -103,7 +121,7 @@ public class GameOverScreen extends GameScreen{
         replay = new Button(Assets.getAssetLoader().replay_button, Button.State.ACTIVE, this) {
           @Override
           protected void actUnpress() {
-              screen.getGame().setScreen(new GeneratingScreen(screen.getGame()));
+              screen.getGame().setScreen(new GeneratingScreen(screen.getGame(), interactiveObjects));
           }
         };
         replay.setPosition(gamePort.getWorldWidth() / 2 - 2f*replay.getWidth()-INTERVAL, gamePort.getWorldHeight() / 2 - replay.getHeight() / 2 - 80);

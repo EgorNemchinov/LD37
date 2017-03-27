@@ -44,6 +44,14 @@ public abstract class InteractiveObject {
             return i;
         }
 
+        public static void decrement() {
+            i--;
+        }
+
+        public static void increment() {
+            i++;
+        }
+
         public static void nullify() {
             i = 0;
         }
@@ -62,6 +70,7 @@ public abstract class InteractiveObject {
         this.y = y;
         this.bounds = new Circle((x + LevelManager.tilePixelWidth / 2), (y + LevelManager.tilePixelHeight/ 2), LevelManager.tilePixelWidth / 2 - 1);
 
+        this.index = Indexer.getIndex();
         if(initPhysics)
             initPhysics();
     }
@@ -136,7 +145,6 @@ public abstract class InteractiveObject {
 
     public void initClose() {
         setTransparency(true);
-        index = Indexer.getIndex();
     }
 
      protected void initOpen() {

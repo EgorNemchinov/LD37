@@ -27,6 +27,7 @@ import com.jacktheogre.lightswitch.objects.InteractiveObject;
 import com.jacktheogre.lightswitch.objects.NullInteractiveObject;
 import com.jacktheogre.lightswitch.objects.Shard;
 import com.jacktheogre.lightswitch.objects.Teleport;
+import com.jacktheogre.lightswitch.objects.Trap;
 import com.jacktheogre.lightswitch.sprites.EnemyPlayer;
 import com.jacktheogre.lightswitch.sprites.GameActor;
 import com.jacktheogre.lightswitch.sprites.Player;
@@ -97,9 +98,9 @@ public class PlayScreen extends GameScreen {
         shapeRenderer.setProjectionMatrix(gameCam.combined);
         shapeRenderer.setAutoShapeType(true);
 
-        objects = new Array<InteractiveObject>();
-        objects.addAll(screen.getTeleports());
-        objects.addAll(screen.getTraps());
+        objects = combineTrapsAndTeleports(screen.getTeleports(), screen.getTraps());
+//        objects.addAll(screen.getTeleports());
+//        objects.addAll(screen.getTraps());
         for (InteractiveObject obj : objects) {
             obj.initPhysics();
             obj.initClose();
@@ -126,6 +127,31 @@ public class PlayScreen extends GameScreen {
         shardsCollected = 0;
 
         initializeButtons();
+    }
+
+    //sorts them out by index
+    private Array<InteractiveObject> combineTrapsAndTeleports(Array<Teleport> teleports, Array<Trap> traps) {
+        Array<InteractiveObject> objectArray = new Array<InteractiveObject>();
+        int index = 1, indexTeleports = 0, indexTraps = 0;
+        Teleport currentTeleport;
+        Trap currentTrap;
+        while(objectArray.size < teleports.size + traps.size) {
+            currentTeleport = teleports.size > indexTeleports ? teleports.get(indexTeleports) : null;
+            currentTrap = traps.size > indexTraps ? traps.get(indexTraps) : null;
+            if(currentTeleport != null && currentTeleport.getIndex() == index) {
+                    index++;
+                    indexTeleports++;
+                    objectArray.add(currentTeleport);
+            }
+            else if(currentTrap != null && currentTrap.getIndex() == index) {
+                    index++;
+                    indexTraps++;
+                    objectArray.add(currentTrap);
+            } else {
+                Gdx.app.log("", "No IO with such index");
+            }
+            }
+        return objectArray;
     }
 
     public void update(float dt) {
@@ -180,11 +206,11 @@ public class PlayScreen extends GameScreen {
         }
         if(higher(player.getGameActor(), enemyPlayer.getGameActor())) {
             player.getGameActor().draw(game.batch);
-            if(lighting.lightsOn() || !getGame().isPlayingHuman()) {
+            if(lighting.lightsOn() || !LightSwitch.isPlayingHuman()) {
                 enemyPlayer.getGameActor().draw(game.batch);
             }
         } else {
-            if(lighting.lightsOn() || !getGame().isPlayingHuman()) {
+            if(lighting.lightsOn() || !LightSwitch.isPlayingHuman()) {
                 enemyPlayer.getGameActor().draw(game.batch);
             }
             player.getGameActor().draw(game.batch);
@@ -295,10 +321,12 @@ public class PlayScreen extends GameScreen {
         if(runTime > Constants.PLAYTIME) {
             win = game.isPlayingHuman();
         }
-        if(win)
-            game.setScreen(new GameOverScreen(game, GameOverScreen.State.WIN));
-        else
-            game.setScreen(new GameOverScreen(game, GameOverScreen.State.LOSE));
+        if(win) {
+            game.setScreen(new GameOverScreen(game, GameOverScreen.State.WIN, objects));
+        }
+        else {
+            game.setScreen(new GameOverScreen(game, GameOverScreen.State.LOSE, objects));
+        }
     }
 
     private void lerpCamera(CameraSettings targetSettings, float dt) {

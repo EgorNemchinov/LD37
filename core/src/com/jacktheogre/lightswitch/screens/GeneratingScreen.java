@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.jacktheogre.lightswitch.LightSwitch;
@@ -17,7 +18,9 @@ import com.jacktheogre.lightswitch.ai.LevelManager;
 import com.jacktheogre.lightswitch.ai.Node;
 import com.jacktheogre.lightswitch.commands.AddTeleportCommand;
 import com.jacktheogre.lightswitch.commands.AddTrapCommand;
+import com.jacktheogre.lightswitch.commands.Command;
 import com.jacktheogre.lightswitch.commands.CommandHandler;
+import com.jacktheogre.lightswitch.objects.InteractiveObject;
 import com.jacktheogre.lightswitch.objects.Shard;
 import com.jacktheogre.lightswitch.objects.Teleport;
 import com.jacktheogre.lightswitch.objects.Trap;
@@ -108,7 +111,18 @@ public class GeneratingScreen extends GameScreen {
         Trap.Indexer.nullify();
         Teleport.Indexer.nullify();
         Gdx.input.setInputProcessor(new GenerateInputHandler(this));
+        initObjects = true;
     }
+
+    private Array<InteractiveObject> interactiveObjects;
+    boolean initObjects;
+
+    public GeneratingScreen(LightSwitch game, Array<InteractiveObject> interactiveObjects) {
+        this(game);
+        initObjects = false;
+        this.interactiveObjects = interactiveObjects;
+    }
+
 
     @Override
     protected void initializeButtons() {
@@ -167,14 +181,29 @@ public class GeneratingScreen extends GameScreen {
     public void update(float dt){
         runTime += dt;
         commandHandler.update(dt);
-        if(commandHandler.newCommands())
+        if(commandHandler.newCommands()) {
             commandHandler.executeCommandsGenerate();
+        }
         world.step(1/60f, 6, 2);
 
         lerpCamera(gamePort.getWorldWidth() / 4, gamePort.getWorldHeight() / 4, dt);
         gameCam.update();
 
         mapRenderer.setView(gameCam);
+
+        if(!initObjects) {
+            Array<Command> commandArray = new Array<Command>();
+            for (InteractiveObject interactiveObject : interactiveObjects) {
+                if(ClassReflection.isInstance(Teleport.class, interactiveObject)) {
+                    commandArray.add(new AddTeleportCommand(this, interactiveObject.getX(), interactiveObject.getY(), unpairedTeleport));
+                } else { //trap
+                    commandArray.add(new AddTrapCommand(this, interactiveObject.getX(), interactiveObject.getY()));
+                }
+                undo.enable();
+            }
+            commandHandler.addAllCommands(commandArray);
+            initObjects = true;
+        }
     }
 
     private void lerpCamera(float targetX, float targetY, float dt) {

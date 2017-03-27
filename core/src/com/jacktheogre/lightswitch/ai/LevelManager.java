@@ -23,6 +23,8 @@ public class LevelManager {
     public static int tilePixelWidth;
     public static int tilePixelHeight;
 
+    private static int amountOfShards;
+
     static class Resourses {
 
         public int teleports;
@@ -42,7 +44,7 @@ public class LevelManager {
     }
     private static Map<Integer, Resourses> levelsMap;
 
-    public static final int LEVEL_AMOUNT = 6;
+    public static final int LEVEL_AMOUNT = 5;
     private static int levelNum = 2;
 
     static {
@@ -104,6 +106,14 @@ public class LevelManager {
 
     public static int getLevelNum() {
         return levelNum;
+    }
+
+    public static int getAmountOfShards() {
+        return amountOfShards;
+    }
+
+    public static void setAmountOfShards(int amountOfShards) {
+        LevelManager.amountOfShards = amountOfShards;
     }
     public static boolean isMaxLevel() {
         if(levelNum == LEVEL_AMOUNT)

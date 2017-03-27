@@ -2,6 +2,7 @@ package com.jacktheogre.lightswitch.commands;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.jacktheogre.lightswitch.Constants;
 import com.jacktheogre.lightswitch.multiplayer.MessageHandler;
@@ -62,16 +63,29 @@ public class CommandHandler {
     }
 
     public void addCommand(Command command) {
+//        Gdx.app.log("Added command:", command+"");
         int pops = commands.size() - pointer;
         for (int i = 0; i < pops; i++) {
             commands.pop();
         }
         commands.push(command);
-        newCommands = true;
+        setNewCommands(true);
+    }
+
+    public void addAllCommands(Array<Command> commandsArray) {
+        int pops = commands.size() - pointer;
+        for (int i = 0; i < pops; i++) {
+            commands.pop();
+        }
+        for (Command command :commandsArray) {
+//            Gdx.app.log("Added command:", command+"");
+            commands.push(command);
+        }
+        setNewCommands(true);
     }
 
     public void executeCommandsPlay() {
-        newCommands = false;
+        setNewCommands(false);
         for (int i = pointer; i < commands.size(); i++) {
             if(commands.get(i) != null) {
                 if(ClassReflection.isInstance(ActorCommand.class, commands.get(i))){
@@ -93,6 +107,7 @@ public class CommandHandler {
     }
 
     public void executeCommandsGenerate() {
+        setNewCommands(false);
         for (int i = pointer; i < commands.size(); i++) {
             if(commands.get(i) != null) {
                  if(ClassReflection.isInstance(GlobalCommand.class, commands.get(i))){
@@ -102,7 +117,6 @@ public class CommandHandler {
         }
         if(commands.size() > 0)
             pointer = commands.size();
-        newCommands = false;
     }
 
     public Stack<Command> getCommands() {

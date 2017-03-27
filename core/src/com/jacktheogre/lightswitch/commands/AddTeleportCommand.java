@@ -3,6 +3,7 @@ package com.jacktheogre.lightswitch.commands;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.PixmapPacker;
 import com.badlogic.gdx.utils.Array;
+import com.jacktheogre.lightswitch.objects.InteractiveObject;
 import com.jacktheogre.lightswitch.objects.Teleport;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 
@@ -47,10 +48,11 @@ public class AddTeleportCommand extends GlobalCommand {
     // TODO: 18.03.17 implement pairing-unpairing
     @Override
     public void undo() {
+        screen.getTeleports().removeValue(teleport, true);
+        InteractiveObject.Indexer.decrement();
         if(!screen.maxTeleports()) {
             screen.getTeleportButton().enable();
         }
-        screen.getTeleports().removeValue(teleport, true);
         if(teleport.getPartner() != null) {
             teleport.getPartner().removePartner();
             screen.setUnpairedTeleport(teleport.getPartner());
@@ -59,19 +61,22 @@ public class AddTeleportCommand extends GlobalCommand {
         }
         if(screen.getTeleports().size == 0 && screen.getTraps().size == 0)
             screen.getUndo().disable();
+        else
+            screen.getUndo().enable();
     }
 
     @Override
     public void redo() {
-        if(screen.maxTeleports()) {
+        if (!screen.maxTeleports()) {
             screen.getTeleports().add(teleport);
-            if(teleport.getPartner() != null) {
+            InteractiveObject.Indexer.increment();
+            if (teleport.getPartner() != null) {
                 Teleport.connect(teleport, teleport.getPartner());
                 screen.setUnpairedTeleport(null);
             } else {
                 screen.setUnpairedTeleport(teleport);
             }
-            if(screen.maxTeleports())
+            if (screen.maxTeleports())
                 screen.getTeleportButton().disable();
         }
     }

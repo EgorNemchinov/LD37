@@ -1,6 +1,7 @@
 package com.jacktheogre.lightswitch.commands;
 
 import com.badlogic.gdx.Gdx;
+import com.jacktheogre.lightswitch.objects.InteractiveObject;
 import com.jacktheogre.lightswitch.objects.Trap;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 
@@ -40,11 +41,14 @@ public class AddTrapCommand extends GlobalCommand {
     //// TODO: 06.02.17 undo&&redo
     @Override
     public void undo() {
-        if(!screen.maxTraps())
-            screen.getUndo().enable();
         screen.getTraps().removeValue(trap, true);
+        InteractiveObject.Indexer.decrement();
+        if(!screen.maxTraps())
+            screen.getTrapButton().enable();
         if(screen.getTeleports().size == 0 && screen.getTraps().size == 0)
             screen.getUndo().disable();
+        else
+            screen.getUndo().enable();
 
     }
 
@@ -52,6 +56,7 @@ public class AddTrapCommand extends GlobalCommand {
     public void redo() {
         if(!screen.maxTraps()) {
             screen.getTraps().add(trap);
+            InteractiveObject.Indexer.increment();
             if(screen.maxTraps())
                 screen.getTrapButton().disable();
         }

@@ -26,7 +26,7 @@ public class AssetLoader {
     public TextureRegion next_level_button, home_button, replay_button, light_button;
     public TextureRegion undo_button, redo_button, start_button, teleport_button, play_button;
     public TextureRegion boy_button, monster_button, trap_button, singleplayer_button, multiplayer_button;
-    public TextureRegion[] shards;
+    public TextureRegion[] twoShards, threeShards;
     public TiledMap[] maps;
     private TmxMapLoader mapLoader;
     public BitmapFont font;
@@ -38,14 +38,15 @@ public class AssetLoader {
         this.manager = new AssetManager();
         mapLoader = new TmxMapLoader();
         maps = new TiledMap[LevelManager.LEVEL_AMOUNT+1];
-        shards = new TextureRegion[3];
+        twoShards = new TextureRegion[3];
+        threeShards = new TextureRegion[3];
     }
 
     public void load() {
         if(manager == null)
             manager = new AssetManager();
 
-        logHandle = Gdx.files.internal("data/log.txt");
+        logHandle = Gdx.files.local("data/log.txt");
         levelHandle = Gdx.files.internal("data/levels/levels.txt");
 
         manager.load("data/textures/characters.png", Texture.class);
@@ -98,8 +99,11 @@ public class AssetLoader {
         touchBg = new TextureRegion(joystick, 0, 0, 132, 132);
         touchKnob = new TextureRegion(joystick, 130, 0, 126, 126);
 
+        for (int i = 0; i < 2; i++) {
+            twoShards[i] = new TextureRegion(shards_sheet, 1 + 15*i, 52, 14, 14);
+        }
         for (int i = 0; i < 3; i++) {
-            shards[i] = new TextureRegion(shards_sheet, 1 + 15*i, 19, 11, 11);
+            threeShards[i] = new TextureRegion(shards_sheet, 1 + 15*i, 19, 11, 11);
         }
 
         font = new BitmapFont(Gdx.files.internal("data/font.fnt"));

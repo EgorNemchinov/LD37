@@ -4,7 +4,6 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -18,12 +17,12 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.jacktheogre.lightswitch.ai.LevelManager;
 import com.jacktheogre.lightswitch.commands.TurnOffCommand;
 import com.jacktheogre.lightswitch.commands.TurnOnCommand;
 import com.jacktheogre.lightswitch.commands.WallthroughCommand;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
 import com.jacktheogre.lightswitch.sprites.Button;
-import com.jacktheogre.lightswitch.sprites.Monster;
 import com.jacktheogre.lightswitch.tools.Assets;
 
 /**
@@ -52,9 +51,9 @@ public class Hud implements Disposable{
         viewport = new FitViewport(LightSwitch.WIDTH, LightSwitch.HEIGHT);
         stage = new Stage(viewport, screen.getGame().batch);
 
-        shards = new Sprite[3];
-        shardsCollected = new boolean[3];
-        for (int i = 0; i < 3; i++) {
+        shards = new Sprite[LevelManager.getAmountOfShards()];
+        shardsCollected = new boolean[shards.length];
+        for (int i = 0; i < shardsCollected.length; i++) {
             shardsCollected[i] = false;
         }
 
@@ -221,18 +220,25 @@ public class Hud implements Disposable{
     private void initializeMoonShards() {
         float scale = 2f;
         Vector2 leftBottomCorner = new Vector2(viewport.getWorldWidth() - 50, viewport.getWorldHeight() - 50);
-        shards[0] = new Sprite(Assets.getAssetLoader().shards[0]);
-        shards[1] = new Sprite(Assets.getAssetLoader().shards[1]);
-        shards[2] = new Sprite(Assets.getAssetLoader().shards[2]);
+        if(shards.length == 3) {
+            for (int i = 0; i < 3; i++) {
+                shards[i] = new Sprite(Assets.getAssetLoader().threeShards[i]);
+            }
+            shards[0].setPosition(leftBottomCorner.x - 2*scale, leftBottomCorner.y + 2*scale);
+            shards[1].setPosition(leftBottomCorner.x + 4*scale, leftBottomCorner.y - 4*scale);
+            shards[2].setPosition(leftBottomCorner.x + 7*scale, leftBottomCorner.y + 5*scale);
+        } else if(shards.length == 2) {
+            for (int i = 0; i < 2; i++) {
+                shards[i] = new Sprite(Assets.getAssetLoader().twoShards[i]);
+            }
+            shards[0].setPosition(leftBottomCorner.x + 0*scale, leftBottomCorner.y + 0*scale);
+            shards[1].setPosition(leftBottomCorner.x + 0.5f*scale, leftBottomCorner.y - 1.5f*scale);
+        }
 
         for (Sprite shard :shards) {
             shard.setOriginCenter();
             shard.scale(scale);
         }
-
-        shards[0].setPosition(leftBottomCorner.x - 2*scale, leftBottomCorner.y + 2*scale);
-        shards[1].setPosition(leftBottomCorner.x + 4*scale, leftBottomCorner.y - 4*scale);
-        shards[2].setPosition(leftBottomCorner.x + 7*scale, leftBottomCorner.y + 5*scale);
     }
 
     private void renderMoonShards() {
@@ -242,9 +248,9 @@ public class Hud implements Disposable{
                 shards[i].setColor(c.r, c.g, c.b, 0.7f);
                 shards[i].draw(screen.getGame().batch);
             } else {
-//                shards[i].setColor(c.r, c.g, c.b, 0.2f);
+//                threeShards[i].setColor(c.r, c.g, c.b, 0.2f);
 //                screen.getGame().batch.setColor(color.r, color.g, color.b, 0.2f);
-//                shards[i].draw(screen.getGame().batch);
+//                threeShards[i].draw(screen.getGame().batch);
             }
         }
 //        screen.getGame().batch.setColor(color);

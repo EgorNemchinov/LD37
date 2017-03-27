@@ -5,14 +5,17 @@ import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.jacktheogre.lightswitch.Constants;
 import com.jacktheogre.lightswitch.LightSwitch;
+import com.jacktheogre.lightswitch.ai.LevelManager;
 import com.jacktheogre.lightswitch.objects.Shard;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 import com.jacktheogre.lightswitch.sprites.Monster;
@@ -104,6 +107,7 @@ public class B2WorldCreator {
         }
 
         int number = 0;
+        Array<Vector2> shardsPositions = new Array<Vector2>();
         for (MapObject object : map.getLayers().get(7).getObjects()) {
             if (!ClassReflection.isInstance(RectangleMapObject.class, object))
                 continue;
@@ -112,10 +116,21 @@ public class B2WorldCreator {
                 Gdx.app.error("", "More than 3 shards on a level.");
                 break;
             }
+            shardsPositions.add(new Vector2(bounds.getX(), bounds.getY()));
 
-            screen.getShards().add(new Shard(screen, (int) bounds.getX() + 3, (int) bounds.getY() + 3, number));
             number++;
         }
+        if(number < 2)
+            Gdx.app.error("", "Less than 2 moonshards");;
+        int offset = 0;
+        if(number == 2)
+            offset = 1;
+        else if(number == 3)
+            offset = 3;
+        for (int i = 0; i < number; i++) {
+            screen.getShards().add(new Shard(screen, (int)shardsPositions.get(i).x + offset, (int)shardsPositions.get(i).y + offset, i, number));
+        }
+        LevelManager.setAmountOfShards(number);
 
         //lights
         for (MapObject object : map.getLayers().get(8).getObjects()) {
