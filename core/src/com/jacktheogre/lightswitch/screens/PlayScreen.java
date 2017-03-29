@@ -99,8 +99,6 @@ public class PlayScreen extends GameScreen {
         shapeRenderer.setAutoShapeType(true);
 
         objects = combineTrapsAndTeleports(screen.getTeleports(), screen.getTraps());
-//        objects.addAll(screen.getTeleports());
-//        objects.addAll(screen.getTraps());
         for (InteractiveObject obj : objects) {
             obj.initPhysics();
             obj.initClose();

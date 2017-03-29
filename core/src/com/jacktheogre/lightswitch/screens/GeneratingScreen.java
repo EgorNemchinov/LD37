@@ -57,7 +57,7 @@ public class GeneratingScreen extends GameScreen {
     private World world;
     private CommandHandler commandHandler;
 
-    private Button undo, redo, start, teleportButton, trapButton;
+    private Button undo, redo, start, teleportButton, trapButton, clearButton;
 
     public Array<Teleport> teleports;
     public Array<Trap> traps;
@@ -121,6 +121,7 @@ public class GeneratingScreen extends GameScreen {
         this(game);
         initObjects = false;
         this.interactiveObjects = interactiveObjects;
+        clearButton.setState(Button.State.ACTIVE);
     }
 
 
@@ -156,17 +157,35 @@ public class GeneratingScreen extends GameScreen {
                 generatingScreen.setState(GeneratingScreen.State.SETTING_TRAP);
             }
         };
+        clearButton = new Button(Assets.getAssetLoader().clear_button, Button.State.DISABLED, this) {
+            @Override
+            protected void actUnpress() {
+                traps.clear();
+                teleports.clear();
+                InteractiveObject.Indexer.nullify();
+                undo.disable();
+                redo.disable();
+                clearButton.disable();
+                unpairedTeleport = null;
+                if(!maxTeleports())
+                    teleportButton.enable();
+                if(!maxTraps())
+                    trapButton.enable();
+            }
+        };
         undo.setScale(1.3f);
         redo.setScale(1.3f);
+        clearButton.setScale(1.3f);
 //        if(BluetoothSingleton.getInstance().bluetoothManager.isConnected())
         start.setScale(1.3f);
         teleportButton.setScale(1.2f);
         trapButton.setScale(1.2f);
-        undo.setPosition(30, -25);
+        undo.setPosition(60, -25);
         redo.setPosition(undo.getX() + undo.getBoundingRectangle().getWidth()+10, undo.getY());
         start.setPosition(redo.getX() + redo.getBoundingRectangle().getWidth()+10, redo.getY());
         teleportButton.setPosition(-teleportButton.getBoundingRectangle().getWidth() - 5, 100);
         trapButton.setPosition(teleportButton.getX(), teleportButton.getY() - trapButton.getHeight() - 10);
+        clearButton.setPosition(undo.getX() - undo.getBoundingRectangle().getWidth() - 10, undo.getY());
         undo.disable();
         redo.disable();
         teleportButton.setAutoUnpress(false);
@@ -176,6 +195,7 @@ public class GeneratingScreen extends GameScreen {
         buttons.add(start);
         buttons.add(teleportButton);
         buttons.add(trapButton);
+        buttons.add(clearButton);
     }
 
     public void update(float dt){
@@ -295,6 +315,10 @@ public class GeneratingScreen extends GameScreen {
         return state;
     }
 
+    public boolean anyObjects() {
+        return teleports.size + traps.size > 0;
+    }
+
     public boolean maxTeleports() {
         if(teleports.size >= LevelManager.getAmountOfTeleports())
             return true;
@@ -323,6 +347,10 @@ public class GeneratingScreen extends GameScreen {
 
     public Button getStart() {
         return start;
+    }
+
+    public Button getClearButton() {
+        return clearButton;
     }
 
     public Button getTeleportButton() {

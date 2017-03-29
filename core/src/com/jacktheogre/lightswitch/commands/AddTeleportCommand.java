@@ -41,6 +41,11 @@ public class AddTeleportCommand extends GlobalCommand {
             screen.getTeleports().add(teleport);
             if(screen.maxTeleports())
                 screen.getTeleportButton().disable();
+
+            if(screen.anyObjects())
+                screen.getClearButton().enable();
+            else
+                screen.getClearButton().disable();
         }
         return true;
     }
@@ -63,6 +68,10 @@ public class AddTeleportCommand extends GlobalCommand {
             screen.getUndo().disable();
         else
             screen.getUndo().enable();
+        if(screen.anyObjects())
+            screen.getClearButton().enable();
+        else
+            screen.getClearButton().disable();
     }
 
     @Override
@@ -79,6 +88,10 @@ public class AddTeleportCommand extends GlobalCommand {
             if (screen.maxTeleports())
                 screen.getTeleportButton().disable();
         }
+        if(screen.anyObjects())
+            screen.getClearButton().enable();
+        else
+            screen.getClearButton().disable();
     }
 
     @Override

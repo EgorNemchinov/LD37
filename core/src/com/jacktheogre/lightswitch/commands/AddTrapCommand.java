@@ -35,6 +35,7 @@ public class AddTrapCommand extends GlobalCommand {
             if(screen.maxTraps())
                 screen.getTrapButton().disable();
         }
+        screen.getClearButton().enable();
         return true;
     }
 
@@ -50,6 +51,10 @@ public class AddTrapCommand extends GlobalCommand {
         else
             screen.getUndo().enable();
 
+        if(screen.anyObjects())
+            screen.getClearButton().enable();
+        else
+            screen.getClearButton().disable();
     }
 
     @Override
@@ -60,6 +65,10 @@ public class AddTrapCommand extends GlobalCommand {
             if(screen.maxTraps())
                 screen.getTrapButton().disable();
         }
+        if(screen.anyObjects())
+            screen.getClearButton().enable();
+        else
+            screen.getClearButton().disable();
     }
 
     @Override
