@@ -318,6 +318,8 @@ public class Hud implements Disposable{
     }
 
     public Button getLightButton() {
+        if(lightButton == null)
+            Gdx.app.log("", "lightbutton is null");
         return lightButton;
     }
 }

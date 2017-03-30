@@ -88,6 +88,7 @@ public abstract class InteractiveObject {
 
         shape.setRadius(bounds.radius);
         fdef.shape = shape;
+        fdef.isSensor = true;
         fdef.filter.categoryBits = getFilter().categoryBits;
         fdef.filter.maskBits = getFilter().maskBits;
         fdef.filter.groupIndex = getFilter().groupIndex;

@@ -49,7 +49,6 @@ public class PlayScreen extends GameScreen {
     private OrthogonalTiledMapRenderer mapRenderer;
 
     private World world;
-
     private Box2DDebugRenderer b2dRenderer;
 
     private Hud hud;
@@ -115,7 +114,6 @@ public class PlayScreen extends GameScreen {
 
         lighting = screen.getLighting();
         lighting.setPlayScreen(this);
-        Gdx.input.setInputProcessor(inputHandler);
         world.setContactListener(contactListener);
         lighting.turnOff();
         commandHandler.addCommand(new StopCommand(player));
@@ -125,6 +123,8 @@ public class PlayScreen extends GameScreen {
         shardsCollected = 0;
 
         initializeButtons();
+
+        Gdx.input.setInputProcessor(inputHandler);
     }
 
     //sorts them out by index
@@ -154,6 +154,7 @@ public class PlayScreen extends GameScreen {
 
     public void update(float dt) {
         super.update(dt);
+        inputHandler.update();
         runTime += dt;
         if (runTime > Constants.PLAYTIME) {
             endGame();

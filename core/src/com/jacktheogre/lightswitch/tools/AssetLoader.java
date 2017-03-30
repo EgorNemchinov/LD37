@@ -32,6 +32,7 @@ public class AssetLoader {
     public BitmapFont font;
     public Sound runningSound, teleportOpenSound;
     public Sound teleportCloseSound;
+    public Sound[] shardsSounds;
     public FileHandle logHandle, levelHandle;
 
     public AssetLoader() {
@@ -40,6 +41,7 @@ public class AssetLoader {
         maps = new TiledMap[LevelManager.LEVEL_AMOUNT+1];
         twoShards = new TextureRegion[3];
         threeShards = new TextureRegion[3];
+        shardsSounds = new Sound[3];
     }
 
     public void load() {
@@ -62,6 +64,9 @@ public class AssetLoader {
         manager.load("data/sounds/tpClose.mp3", Sound.class);
         manager.load("data/textures/joystick.png", Texture.class);
         manager.load("data/textures/shards.png", Texture.class);
+        manager.load("data/sounds/shards1.mp3", Sound.class);
+        manager.load("data/sounds/shards2.mp3", Sound.class);
+        manager.load("data/sounds/shards3.mp3", Sound.class);
         manager.finishLoading();
 
         for (int i = 1; i <= LevelManager.LEVEL_AMOUNT; i++) {
@@ -79,6 +84,9 @@ public class AssetLoader {
         runningSound = manager.get("data/sounds/running.mp3", Sound.class);
         teleportOpenSound = manager.get("data/sounds/tpOpen.mp3", Sound.class);
         teleportCloseSound = manager.get("data/sounds/tpClose.mp3", Sound.class);
+        for (int i = 1; i <= 3; i++) {
+            shardsSounds[i-1] = manager.get("data/sounds/shards"+i+".mp3", Sound.class);
+        }
         
 //        light_button = new TextureRegion(manager.get("light_button.png", Texture.class));
         start_button = new TextureRegion(buttons, 1, 0, 212, 27);

@@ -27,6 +27,7 @@ public class Shard extends InteractiveObject {
     private boolean risingAlpha = false;
 
     private int number;
+    private boolean picked = false;
 
     public Shard(GeneratingScreen screen, int x, int y, int numberOfShard, int totalAmount) {
         super(screen, x, y, true);
@@ -44,7 +45,10 @@ public class Shard extends InteractiveObject {
 
     @Override
     public boolean activate(Player player) {
-        // TODO: 24.03.17 play sound(in closing) and add one fragmen to global
+        if(picked)
+            return false;
+        Assets.getAssetLoader().shardsSounds[number].play();
+        picked = true;
         playScreen.getShards().removeValue(this, true);
         playScreen.collectShard(number);
         return false;
@@ -74,6 +78,10 @@ public class Shard extends InteractiveObject {
         if(alpha > 1) alpha = 1;
 
         return alpha;
+    }
+
+    public boolean isPicked() {
+        return picked;
     }
 
     @Override

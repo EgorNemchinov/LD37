@@ -45,7 +45,7 @@ public class LevelManager {
     private static Map<Integer, Resourses> levelsMap;
 
     public static final int LEVEL_AMOUNT = 6;
-    private static int levelNum = 6;
+    private static int levelNum = 2;
 
     static {
         levelsMap = new HashMap<Integer, Resourses>();
