@@ -1,8 +1,16 @@
 package com.jacktheogre.lightswitch.commands;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
+import com.jacktheogre.lightswitch.ai.LevelManager;
+import com.jacktheogre.lightswitch.ai.Node;
 import com.jacktheogre.lightswitch.objects.Teleport;
+import com.jacktheogre.lightswitch.screens.LevelChoosingScreen;
 import com.jacktheogre.lightswitch.sprites.Player;
+
+import java.util.Random;
 
 /**
  * Created by luna on 11.12.16.
@@ -23,7 +31,7 @@ public class TeleportCommand extends ActorCommand {
             return false;
 //        player.getGameActor().moveTo(destination.getX(), destination.getY());
         if(start.isOpen() && destination.isOpen()) {
-            player.getGameActor().b2body.setTransform(new Vector2(destination.getX(), destination.getY()), 0);
+            player.getGameActor().b2body.setTransform(new Vector2(destination.getX() + 8, destination.getY() + 8), 0);
             player.getGameActor().setRemakingPath(true);
             start.close();
             destination.close();
@@ -32,7 +40,6 @@ public class TeleportCommand extends ActorCommand {
 //        Gdx.app.log("TeleportCommand", "executed");
         return true;
     }
-
 
     @Override
     public void undo() {

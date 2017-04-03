@@ -19,6 +19,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.jacktheogre.lightswitch.Constants;
 import com.jacktheogre.lightswitch.Hud;
 import com.jacktheogre.lightswitch.LightSwitch;
+import com.jacktheogre.lightswitch.ai.LevelManager;
 import com.jacktheogre.lightswitch.commands.CommandHandler;
 import com.jacktheogre.lightswitch.commands.StartMovingCommand;
 import com.jacktheogre.lightswitch.commands.StopCommand;

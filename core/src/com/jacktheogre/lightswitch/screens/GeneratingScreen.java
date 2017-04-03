@@ -79,6 +79,7 @@ public class GeneratingScreen extends GameScreen {
         runTime = 0;
 
         loader = Assets.getAssetLoader();
+        Node.Indexer.nullify();
         LevelManager.loadLevel(loader.getMap());
         mapRenderer = new OrthogonalTiledMapRenderer(loader.getMap());
 
@@ -107,7 +108,6 @@ public class GeneratingScreen extends GameScreen {
         shapeRenderer.setProjectionMatrix(gameCam.combined);
         shapeRenderer.setAutoShapeType(true);
         commandHandler = new CommandHandler(this);
-        Node.Indexer.nullify();
         Trap.Indexer.nullify();
         Teleport.Indexer.nullify();
         Gdx.input.setInputProcessor(new GenerateInputHandler(this));

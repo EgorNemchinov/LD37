@@ -26,8 +26,6 @@ public class GameOverScreen extends GameScreen{
         return state;
     }
 
-
-
     public enum State {WIN, LOSE;}
     private State state;
     private Button next_level, replay, home;

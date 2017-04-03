@@ -93,7 +93,7 @@ public class MainMenuScreen extends GameScreen{
 
             @Override
             protected void actUnpress() {
-                screen.getGame().setScreen(new GeneratingScreen(screen.getGame()));
+                screen.getGame().setScreen(new LevelChoosingScreen(screen.getGame()));
             }
         };
         play_button.setPosition(gamePort.getWorldWidth() / 2 - play_button.getWidth() / 2, gamePort.getWorldHeight() / 2 - play_button.getHeight() / 2);

@@ -75,10 +75,10 @@ public class B2WorldCreator {
             shape.setAsBox(bounds.getWidth() / 2, bounds.getHeight() / 2);
             fixtureDef.shape = shape;
             fixtureDef.filter.categoryBits = Constants.OBJECT_BIT;
-            fixtureDef.filter.maskBits = Constants.WALLS_BIT |
-                    Constants.OBJECT_BIT |
-                    Constants.BOY_BIT |
-                    Constants.MONSTER_BIT;
+            fixtureDef.filter.maskBits = (short) (Constants.WALLS_BIT |
+                                Constants.OBJECT_BIT |
+                                Constants.BOY_BIT |
+                                Constants.MONSTER_BIT);
 //            fixtureDef.filter.maskBits |= Constants.LIGHT_BIT;
             body.createFixture(fixtureDef);
         }
