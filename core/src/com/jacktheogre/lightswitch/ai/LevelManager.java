@@ -44,8 +44,8 @@ public class LevelManager {
     }
     private static Map<Integer, Resourses> levelsMap;
 
-    public static final int LEVEL_AMOUNT = 6;
-    private static int levelNum = 2;
+    public static final int LEVEL_AMOUNT = 7;
+    private static int levelNum = 1;
 
     static {
         levelsMap = new HashMap<Integer, Resourses>();
@@ -100,6 +100,14 @@ public class LevelManager {
         return getLevelResourses(levelNum).traps;
     }
 
+    public static int getAmountOfTeleports(int levelNum) {
+        return getLevelResourses(levelNum).teleports;
+    }
+
+    public static int getAmountOfTraps(int levelNum) {
+        return getLevelResourses(levelNum).traps;
+    }
+
     public static int getMonsterSpeed() {
         return getLevelResourses(levelNum).monsterSpeed;
     }
@@ -115,11 +123,19 @@ public class LevelManager {
     public static void setAmountOfShards(int amountOfShards) {
         LevelManager.amountOfShards = amountOfShards;
     }
+
+    public static void setLevelNum(int levelNum) {
+        if(levelNum != LevelManager.levelNum)
+            LevelManager.graph = null;
+        LevelManager.levelNum = levelNum;
+    }
+
     public static boolean isMaxLevel() {
-        if(levelNum == LEVEL_AMOUNT)
-            return true;
-        else
-            return false;
+        return levelNum == LEVEL_AMOUNT;
+    }
+
+    public static boolean isMaxLevel(int level) {
+        return level == LEVEL_AMOUNT;
     }
 
     public static void nextLevel() {
