@@ -1,6 +1,7 @@
 package com.jacktheogre.lightswitch.tools;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
@@ -35,6 +36,8 @@ public class AssetLoader {
     public Sound[] shardsSounds;
     public FileHandle logHandle, levelHandle;
 
+    private Preferences collectedShards;
+
     public AssetLoader() {
         this.manager = new AssetManager();
         mapLoader = new TmxMapLoader();
@@ -42,6 +45,7 @@ public class AssetLoader {
         twoShards = new TextureRegion[3];
         threeShards = new TextureRegion[3];
         shardsSounds = new Sound[3];
+        collectedShards = Gdx.app.getPreferences("Shards Collected");
     }
 
     public void load() {
@@ -121,6 +125,10 @@ public class AssetLoader {
 
     public TiledMap getMap() {
         return maps[LevelManager.getLevelNum()];
+    }
+
+    public Preferences getCollectedShards() {
+        return collectedShards;
     }
 
     public float getLetterWidth() {

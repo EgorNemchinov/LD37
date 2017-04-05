@@ -1,5 +1,6 @@
 package com.jacktheogre.lightswitch.objects;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -47,10 +48,13 @@ public class Shard extends InteractiveObject {
     public boolean activate(Player player) {
         if(picked)
             return false;
+//        Gdx.app.log("Shard", "activate.start");
         Assets.getAssetLoader().shardsSounds[number].play();
         picked = true;
         playScreen.getShards().removeValue(this, true);
+//        Gdx.app.log("Shard", "shard removed");
         playScreen.collectShard(number);
+//        Gdx.app.log("Shard", "shard collected");
         return false;
     }
 

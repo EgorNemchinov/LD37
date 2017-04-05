@@ -153,6 +153,7 @@ public class Trap extends InteractiveObject {
 
         shape.setRadius(4);
         fdef.shape = shape;
+        fdef.isSensor = true;
         fdef.filter.categoryBits = getFilter().categoryBits;
         fdef.filter.maskBits = getFilter().maskBits;
         fdef.filter.groupIndex = getFilter().groupIndex;

@@ -14,7 +14,6 @@ import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.jacktheogre.lightswitch.Constants;
 import com.jacktheogre.lightswitch.Hud;
@@ -67,7 +66,6 @@ public class PlayScreen extends GameScreen {
 
     private float runTime;
     private float energy;
-    private int shardsCollected;
 
     private CameraSettings currentSetings, targetSettings;
 
@@ -121,7 +119,6 @@ public class PlayScreen extends GameScreen {
         energy = 100f;
         fixturesContacts = new Array<Contact>();
         runTime = 0;
-        shardsCollected = 0;
 
         initializeButtons();
 
@@ -317,11 +314,14 @@ public class PlayScreen extends GameScreen {
 
 
     public void endGame() {
+        Gdx.app.log("PlayScreen", "endGame called");
         boolean win = false;
         if(runTime > Constants.PLAYTIME) {
             win = game.isPlayingHuman();
         }
         if(win) {
+            if(LevelManager.getAmountOfCollectedShards() < hud.getAmountOfCollectedShards())
+                LevelManager.collectShards(hud.collectedShardsAsString());
             game.setScreen(new GameOverScreen(game, GameOverScreen.State.WIN, objects));
         }
         else {

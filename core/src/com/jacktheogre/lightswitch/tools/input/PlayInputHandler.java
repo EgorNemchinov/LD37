@@ -1,5 +1,6 @@
 package com.jacktheogre.lightswitch.tools.input;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector3;
@@ -27,7 +28,7 @@ public class PlayInputHandler extends Stage{
     }
 
     public void update() {
-        if(screen.getLighting().lightsOn() && !Gdx.input.isKeyPressed(Input.Keys.SPACE))
+        if(screen.getLighting().lightsOn() && !Gdx.input.isKeyPressed(Input.Keys.SPACE) && Gdx.app.getType() != Application.ApplicationType.Android)
             screen.getCommandHandler().addCommand(new TurnOffCommand(screen));
     }
 

@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Touchpad.*;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.StringBuilder;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.jacktheogre.lightswitch.ai.LevelManager;
@@ -115,6 +116,11 @@ public class Hud implements Disposable{
 
                     @Override
                     public void update(float dt) {
+                        if(playScreen.getEnergy() >= Constants.WASTE_ENERGY_PER_SWITCH) {
+//                            setState(State.DISABLED);
+                            enable();
+                        }
+                        // FIXME: 04.04.17 why is turning off
                         if(playScreen.getLighting().lightsOn() && !isPressed())
                             playScreen.getCommandHandler().addCommand(new TurnOffCommand(playScreen));
                     }
@@ -124,16 +130,17 @@ public class Hud implements Disposable{
                         if(pressed)
                             return false;
                         pressed = true;
+                        if(disabled)
+                            Gdx.app.log("Hud", "disabled is true");
                         if(!disabled) {
                             if(playScreen.getEnergy() < Constants.WASTE_ENERGY_PER_SWITCH)
-                                return false;
+                                return true;
                             setState(State.PRESSED);
                             actPress();
-                            return true;
                         } else {
                             setState(State.DISABLED);
-                            return false;
                         }
+                        return true;
                     }
 
                     @Override
@@ -242,6 +249,8 @@ public class Hud implements Disposable{
     }
 
     private void renderMoonShards() {
+        if(!screen.getGame().batch.isDrawing())
+            screen.getGame().batch.begin();
         for (int i = 0; i < shards.length; i++) {
             Color c = shards[i].getColor();
             if(shardsCollected[i]) {
@@ -311,6 +320,23 @@ public class Hud implements Disposable{
 
     public void collectShard(int number) {
         shardsCollected[number] = true;
+    }
+
+    public int getAmountOfCollectedShards() {
+        int count = 0;
+        for (int i = 0; i < shardsCollected.length; i++) {
+            if(shardsCollected[i])
+                count++;
+        }
+        return count;
+    }
+
+    public String collectedShardsAsString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < shardsCollected.length; i++) {
+            stringBuilder.append(shardsCollected[i] ? "1":"0");
+        }
+        return stringBuilder.toString();
     }
 
     public Button getWallthroughButton() {

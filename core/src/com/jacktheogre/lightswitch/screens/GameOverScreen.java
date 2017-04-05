@@ -14,6 +14,8 @@ import com.jacktheogre.lightswitch.tools.AssetLoader;
 import com.jacktheogre.lightswitch.tools.Assets;
 import com.jacktheogre.lightswitch.tools.input.GameOverInputHandler;
 
+import static com.jacktheogre.lightswitch.screens.GameOverScreen.State.WIN;
+
 /**
  * Created by luna on 10.12.16.
  */
@@ -134,12 +136,16 @@ public class GameOverScreen extends GameScreen{
         home.setPosition(replay.getBoundingRectangle().getX()+replay.getBoundingRectangle().getWidth() + INTERVAL, replay.getY());
         home.setScale(SCALE);
 
-        boolean nextLevelActive = !LevelManager.isMaxLevel() && state == State.WIN;
+        boolean nextLevelActive = !LevelManager.isMaxLevel() && state == WIN;
         next_level = new Button(Assets.getAssetLoader().next_level_button, nextLevelActive ? Button.State.ACTIVE : Button.State.DISABLED, this) {
+            //fixme: actUnpress called even when buton is disabled
             @Override
             protected void actUnpress() {
-                LevelManager.nextLevel();
-                screen.getGame().setScreen(new GeneratingScreen(screen.getGame()));
+                if(!LevelManager.isMaxLevel() && !disabled)
+                {
+                    LevelManager.nextLevel();
+                    screen.getGame().setScreen(new GeneratingScreen(screen.getGame()));
+                }
             }
         };
         next_level.setPosition(home.getBoundingRectangle().getX()+home.getBoundingRectangle().getWidth() + INTERVAL, home.getY());
@@ -149,6 +155,8 @@ public class GameOverScreen extends GameScreen{
         buttons.add(next_level);
         buttons.add(home);
     }
+
+
 
     public Button getNext_level() {
         return next_level;

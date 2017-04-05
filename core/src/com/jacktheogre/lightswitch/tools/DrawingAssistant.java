@@ -58,4 +58,21 @@ public class DrawingAssistant {
             drawDottedLine(shapeRenderer, dotDist, x1, y1, x2, y2, true);
         }
     }
+
+    public static void roundedRect(ShapeRenderer shapeRenderer, float x, float y, float width, float height, float radius){
+        // Central rectangle
+        shapeRenderer.rect(x + radius, y + radius, width - 2*radius, height - 2*radius);
+
+        // Four side rectangles, in clockwise order
+        shapeRenderer.rect(x + radius, y, width - 2*radius, radius);
+        shapeRenderer.rect(x + width - radius, y + radius, radius, height - 2*radius);
+        shapeRenderer.rect(x + radius, y + height - radius, width - 2*radius, radius);
+        shapeRenderer.rect(x, y + radius, radius, height - 2*radius);
+
+        // Four arches, clockwise too
+        shapeRenderer.arc(x + radius, y + radius, radius, 180f, 90f);
+        shapeRenderer.arc(x + width - radius, y + radius, radius, 270f, 90f);
+        shapeRenderer.arc(x + width - radius, y + height - radius, radius, 0f, 90f);
+        shapeRenderer.arc(x + radius, y + height - radius, radius, 90f, 90f);
+    }
 }

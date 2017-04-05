@@ -23,7 +23,7 @@ public class LevelManager {
     public static int tilePixelWidth;
     public static int tilePixelHeight;
 
-    private static int amountOfShards;
+    private static int[] amountOfShards;
 
     static class Resourses {
 
@@ -52,6 +52,7 @@ public class LevelManager {
         if(!parseLevelsFile()) {
             Gdx.app.exit();
         }
+        amountOfShards = new int[LEVEL_AMOUNT+1];
     }
 
     public static void loadLevel(TiledMap map) {
@@ -88,6 +89,33 @@ public class LevelManager {
         return true;
     }
 
+    public static void collectShards(int levelNum, String collectedShards) {
+        Assets.getAssetLoader().getCollectedShards().putString(levelNum+"", collectedShards);
+        Assets.getAssetLoader().getCollectedShards().flush();
+    }
+
+    public static void collectShards(String collectedShards) {
+        collectShards(levelNum, collectedShards);
+    }
+
+    public static String getCollectedShards(int levelNum) {
+        return Assets.getAssetLoader().getCollectedShards().getString(levelNum+"", "");
+    }
+
+    public static String getCollectedShards() {
+        return Assets.getAssetLoader().getCollectedShards().getString(levelNum+"", "");
+    }
+
+    public static int getAmountOfCollectedShards() {
+        String shardsStr = getCollectedShards();
+        int count = 0;
+        for (int i = 0; i < shardsStr.length(); i++) {
+            if (shardsStr.charAt(i) == '1')
+                count++;
+        }
+        return count;
+    }
+
     public static Resourses getLevelResourses(int levelNum) {
         return levelsMap.get(levelNum);
     }
@@ -117,11 +145,11 @@ public class LevelManager {
     }
 
     public static int getAmountOfShards() {
-        return amountOfShards;
+        return amountOfShards[levelNum];
     }
 
     public static void setAmountOfShards(int amountOfShards) {
-        LevelManager.amountOfShards = amountOfShards;
+        LevelManager.amountOfShards[levelNum] = amountOfShards;
     }
 
     public static void setLevelNum(int levelNum) {
