@@ -136,7 +136,7 @@ public class GameOverScreen extends GameScreen{
         home.setPosition(replay.getBoundingRectangle().getX()+replay.getBoundingRectangle().getWidth() + INTERVAL, replay.getY());
         home.setScale(SCALE);
 
-        boolean nextLevelActive = !LevelManager.isMaxLevel() && state == WIN;
+        boolean nextLevelActive = !LevelManager.isMaxLevel() && state == WIN && LevelManager.isOpenLevel(LevelManager.getLevelNum() + 1);
         next_level = new Button(Assets.getAssetLoader().next_level_button, nextLevelActive ? Button.State.ACTIVE : Button.State.DISABLED, this) {
             //fixme: actUnpress called even when buton is disabled
             @Override

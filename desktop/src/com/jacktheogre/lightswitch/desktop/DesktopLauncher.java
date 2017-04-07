@@ -9,7 +9,7 @@ public class DesktopLauncher {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
         config.width = 2 * LightSwitch.WIDTH;
         config.height = 2 * LightSwitch.HEIGHT;
-        config.title = "SLUMBER ROOM";
+        config.title = "Somniphobia";
         new LwjglApplication(new LightSwitch(), config);
 	}
 }

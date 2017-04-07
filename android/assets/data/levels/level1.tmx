@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="15" height="10" tilewidth="16" tileheight="16" nextobjectid="34">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="15" height="10" tilewidth="16" tileheight="16" nextobjectid="108">
  <tileset firstgid="1" name="tiles" tilewidth="16" tileheight="16" tilecount="18" columns="9">
   <image source="../textures/tiles.png" width="144" height="32"/>
  </tileset>
@@ -19,22 +19,77 @@
   </data>
  </layer>
  <objectgroup name="walls">
-  <object id="1" x="32" y="32" width="16" height="48"/>
-  <object id="2" x="48" y="32" width="48" height="16"/>
-  <object id="4" x="128" y="32" width="32" height="16"/>
-  <object id="5" x="144" y="48" width="16" height="32"/>
-  <object id="7" x="176" y="32" width="32" height="16"/>
-  <object id="9" x="176" y="48" width="16" height="32"/>
-  <object id="10" x="176" y="96" width="32" height="16"/>
-  <object id="11" x="176" y="112" width="16" height="16"/>
-  <object id="12" x="144" y="96" width="16" height="32"/>
-  <object id="13" x="128" y="112" width="16" height="16"/>
-  <object id="14" x="32" y="96" width="16" height="32"/>
-  <object id="15" x="48" y="112" width="48" height="16"/>
   <object id="16" x="0" y="0" width="240" height="16"/>
   <object id="17" x="224" y="16" width="16" height="144"/>
   <object id="18" x="16" y="144" width="208" height="16"/>
   <object id="19" x="0" y="16" width="16" height="144"/>
+  <object id="62" x="48" y="48" height="16"/>
+  <object id="71" x="32" y="40" width="16" height="32"/>
+  <object id="73" x="40" y="32" width="48" height="16"/>
+  <object id="74" x="32" y="32" width="16" height="16">
+   <ellipse/>
+  </object>
+  <object id="75" x="80" y="32" width="16" height="16">
+   <ellipse/>
+  </object>
+  <object id="76" x="32" y="64" width="16" height="16">
+   <ellipse/>
+  </object>
+  <object id="78" x="80" y="112" width="16" height="16">
+   <ellipse/>
+  </object>
+  <object id="79" x="32" y="96" width="16" height="16">
+   <ellipse/>
+  </object>
+  <object id="80" x="32" y="104" width="16" height="16"/>
+  <object id="81" x="40" y="112" width="48" height="16"/>
+  <object id="82" x="32" y="112" width="16" height="16">
+   <ellipse/>
+  </object>
+  <object id="85" x="128" y="32" width="16" height="16">
+   <ellipse/>
+  </object>
+  <object id="86" x="144" y="64" width="16" height="16">
+   <ellipse/>
+  </object>
+  <object id="88" x="144" y="40" width="16" height="32"/>
+  <object id="90" x="136" y="32" width="16" height="16"/>
+  <object id="91" x="144" y="32" width="16" height="16">
+   <ellipse/>
+  </object>
+  <object id="92" x="128" y="112" width="16" height="16">
+   <ellipse/>
+  </object>
+  <object id="94" x="144" y="96" width="16" height="16">
+   <ellipse/>
+  </object>
+  <object id="95" x="176" y="64" width="16" height="16">
+   <ellipse/>
+  </object>
+  <object id="96" x="176" y="32" width="16" height="16">
+   <ellipse/>
+  </object>
+  <object id="97" x="192" y="32" width="16" height="16">
+   <ellipse/>
+  </object>
+  <object id="98" x="192" y="96" width="16" height="16">
+   <ellipse/>
+  </object>
+  <object id="99" x="176" y="112" width="16" height="16">
+   <ellipse/>
+  </object>
+  <object id="100" x="184" y="32" width="16" height="16"/>
+  <object id="101" x="176" y="40" width="16" height="32"/>
+  <object id="102" x="184" y="96" width="16" height="16"/>
+  <object id="103" x="176" y="104" width="16" height="16"/>
+  <object id="104" x="176" y="96" width="16" height="16">
+   <ellipse/>
+  </object>
+  <object id="105" x="144" y="112" width="16" height="16">
+   <ellipse/>
+  </object>
+  <object id="106" x="144" y="104" width="16" height="16"/>
+  <object id="107" x="136" y="112" width="16" height="16"/>
  </objectgroup>
  <objectgroup name="static_objects"/>
  <objectgroup name="actors">

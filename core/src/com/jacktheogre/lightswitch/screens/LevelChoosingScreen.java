@@ -321,7 +321,7 @@ public class LevelChoosingScreen extends GameScreen {
             } else if(shards.length == 2) {
                 for (int i = 0; i < 2; i++) {
                     shards[i] = new Image(Assets.getAssetLoader().twoShards[i]);
-//                    if(shardsCollected[i])
+                    if(shardsCollected[i])
                         shardsImages.addActor(shards[i]);
                 }
                 shardsImages.setPosition(leftBottomCorner.x ,leftBottomCorner.y);

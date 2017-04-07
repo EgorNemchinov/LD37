@@ -78,12 +78,14 @@ public abstract class GameScreen implements Screen {
 
     public void renderButtons(Camera camera) {
         game.batch.setProjectionMatrix(camera.combined);
-        if(!game.batch.isDrawing())
+        boolean wasDrawing = game.batch.isDrawing();
+        if(!wasDrawing)
             game.batch.begin();
         for (int i = 0; i < getButtons().size; i++) {
             getButtons().get(i).draw(game.batch);
         }
-        game.batch.end();
+        if(!wasDrawing)
+            game.batch.end();
     }
 
     public LightSwitch getGame() {

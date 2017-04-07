@@ -165,9 +165,6 @@ public class PlayScreen extends GameScreen {
         MessageHandler.getMessage(commandHandler);
         //messages are sent from commandhandler
         commandHandler.update(dt);
-        if (commandHandler.newCommands()) {
-            commandHandler.executeCommandsPlay();
-        }
         for (InteractiveObject object :objects) {
             object.update(dt);
         }

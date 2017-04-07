@@ -2,12 +2,17 @@ package com.jacktheogre.lightswitch.tools;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.objects.CircleMapObject;
+import com.badlogic.gdx.maps.objects.EllipseMapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Ellipse;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
@@ -34,23 +39,40 @@ public class B2WorldCreator {
         map = Assets.getAssetLoader().getMap();
 
         BodyDef bodyDef = new BodyDef();
-        PolygonShape shape = new PolygonShape();
+        PolygonShape polygonShape = new PolygonShape();
+        CircleShape circleShape = new CircleShape();
         FixtureDef fixtureDef = new FixtureDef();
         Body body;
 
         //walls
         for (MapObject object : map.getLayers().get(3).getObjects()) {
-            if (!ClassReflection.isInstance(RectangleMapObject.class, object))
-                continue;
-            Rectangle bounds = ((RectangleMapObject) object).getRectangle();
+            Rectangle rectangle = null;
+            Ellipse ellipse = null;
+            if(ClassReflection.isInstance(EllipseMapObject.class, object)) {
+                ellipse = ((EllipseMapObject) object).getEllipse();
+            } else if (ClassReflection.isInstance(RectangleMapObject.class, object)) {
+                rectangle = ((RectangleMapObject) object).getRectangle();
+            }
+            else continue;
 
             bodyDef.type = BodyDef.BodyType.StaticBody;
-            bodyDef.position.set(bounds.getX() + bounds.getWidth() / 2, bounds.getY() + bounds.getHeight() / 2);
+            if(rectangle != null)
+                bodyDef.position.set(rectangle.getX() + rectangle.getWidth() / 2, rectangle.getY() + rectangle.getHeight() / 2);
+            else
+                bodyDef.position.set(ellipse.x + ellipse.width / 2, ellipse.y + ellipse.height / 2);
 
             body = world.createBody(bodyDef);
 
-            shape.setAsBox(bounds.getWidth() / 2, bounds.getHeight() / 2);
-            fixtureDef.shape = shape;
+            if(rectangle != null) {
+                polygonShape.setAsBox(rectangle.getWidth() / 2, rectangle.getHeight() / 2);
+                fixtureDef.shape = polygonShape;
+            }
+
+            if(ellipse != null) {
+                circleShape.setRadius(ellipse.width / 2);
+                fixtureDef.shape = circleShape;
+            }
+//            circleShape.setPosition(bodyDef.position);
             fixtureDef.filter.categoryBits = Constants.WALLS_BIT;
             fixtureDef.filter.maskBits = Constants.WALLS_BIT |
                     Constants.OBJECT_BIT |
@@ -72,8 +94,8 @@ public class B2WorldCreator {
 
             body = world.createBody(bodyDef);
 
-            shape.setAsBox(bounds.getWidth() / 2, bounds.getHeight() / 2);
-            fixtureDef.shape = shape;
+            polygonShape.setAsBox(bounds.getWidth() / 2, bounds.getHeight() / 2);
+            fixtureDef.shape = polygonShape;
             fixtureDef.filter.categoryBits = Constants.OBJECT_BIT;
             fixtureDef.filter.maskBits = (short) (Constants.WALLS_BIT |
                                 Constants.OBJECT_BIT |

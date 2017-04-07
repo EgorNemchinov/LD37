@@ -97,7 +97,7 @@ public class Trap extends InteractiveObject {
     @Override
     public boolean activate(Player player) {
         if(!triggered)
-            screen.getCommandHandler().addCommandGenerate(new TrapTriggerCommand(this, player));
+            screen.getCommandHandler().addCommandPlay(new TrapTriggerCommand(this, player));
         // TODO: 06.02.17 when false?
         return true;
     }

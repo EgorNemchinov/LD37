@@ -31,7 +31,12 @@ public class TeleportCommand extends ActorCommand {
             return false;
 //        player.getGameActor().moveTo(destination.getX(), destination.getY());
         if(start.isOpen() && destination.isOpen()) {
-            player.getGameActor().b2body.setTransform(new Vector2(destination.getX() + 8, destination.getY() + 8), 0);
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run () {
+                    player.getGameActor().b2body.setTransform(new Vector2(destination.getX() + 8, destination.getY() + 8), 0);
+                }
+            });
             player.getGameActor().setRemakingPath(true);
             start.close();
             destination.close();

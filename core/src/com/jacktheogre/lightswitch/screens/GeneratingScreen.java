@@ -9,6 +9,8 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -58,6 +60,7 @@ public class GeneratingScreen extends GameScreen {
     private CommandHandler commandHandler;
 
     private Button undo, redo, start, teleportButton, trapButton, clearButton;
+    private Label teleportsLeft, trapsLeft;
 
     public Array<Teleport> teleports;
     public Array<Trap> traps;
@@ -103,6 +106,8 @@ public class GeneratingScreen extends GameScreen {
         if(maxTraps()) {
             trapButton.disable();
         }
+
+        initializeLabels();
 
         shapeRenderer = new ShapeRenderer();
         shapeRenderer.setProjectionMatrix(gameCam.combined);
@@ -183,7 +188,7 @@ public class GeneratingScreen extends GameScreen {
         undo.setPosition(60, -25);
         redo.setPosition(undo.getX() + undo.getBoundingRectangle().getWidth()+10, undo.getY());
         start.setPosition(redo.getX() + redo.getBoundingRectangle().getWidth()+10, redo.getY());
-        teleportButton.setPosition(-teleportButton.getBoundingRectangle().getWidth() - 5, 100);
+        teleportButton.setPosition(-teleportButton.getBoundingRectangle().getWidth() + 10, 100);
         trapButton.setPosition(teleportButton.getX(), teleportButton.getY() - trapButton.getHeight() - 10);
         clearButton.setPosition(undo.getX() - undo.getBoundingRectangle().getWidth() - 10, undo.getY());
         undo.disable();
@@ -196,6 +201,32 @@ public class GeneratingScreen extends GameScreen {
         buttons.add(teleportButton);
         buttons.add(trapButton);
         buttons.add(clearButton);
+    }
+
+    private void initializeLabels() {
+        Color fontColor = new Color(40/256f, 20/256f, 60/256f, 1f);
+        teleportsLeft = new Label(teleportsLeft()+"x", new Label.LabelStyle(Assets.getAssetLoader().font, fontColor)) {
+            @Override
+            public void act(float delta) {
+                this.setText(teleportsLeft()+"x");
+            }
+        };
+        teleportsLeft.setSize(teleportButton.getWidth() * 1.5f, teleportButton.getHeight());
+        teleportsLeft.setPosition(teleportButton.getX()/* - teleportsLeft.getWidth() */, teleportButton.getY() + teleportButton.getHeight() / 2 + 5, Align.right);
+        teleportsLeft.setFontScale(0.8f);
+        teleportsLeft.setAlignment(Align.right);
+
+        trapsLeft = new Label(trapsLeft()+"x", new Label.LabelStyle(Assets.getAssetLoader().font, fontColor)) {
+            @Override
+            public void act(float delta) {
+                this.setText(trapsLeft()+"x");
+            }
+        };
+        trapsLeft.setSize(trapButton.getWidth() * 1.5f, trapButton.getHeight());
+        trapsLeft.setPosition(trapButton.getX()/* - trapsLeft.getWidth() */, trapButton.getY() + trapButton.getHeight() / 2 + 5, Align.right);
+        trapsLeft.setFontScale(0.8f);
+        trapsLeft.setAlignment(Align.right);
+//        Gdx.app.log("teleportsLabel", teleportsLeft.getX() + " "+teleportsLeft.getY());
     }
 
     public void update(float dt){
@@ -238,6 +269,7 @@ public class GeneratingScreen extends GameScreen {
     public void render(float delta) {
         shapeRenderer.setProjectionMatrix(gameCam.combined);
         shapeRenderer.setAutoShapeType(true);
+        game.batch.setProjectionMatrix(gameCam.combined);
         update(delta);
 
         Gdx.gl.glClearColor(BACKGROUND_COLOR.r,BACKGROUND_COLOR.g, BACKGROUND_COLOR.b, BACKGROUND_COLOR.a);
@@ -285,8 +317,16 @@ public class GeneratingScreen extends GameScreen {
         game.batch.draw(Assets.getAssetLoader().moon, Assets.getAssetLoader().moon.getWidth()-gamePort.getWorldWidth() / 4, -gameCam.position.y / 2);
         //buttons
         renderButtons(gameCam);
+        renderLabels();
         if(game.batch.isDrawing())
             game.batch.end();
+    }
+
+    private void renderLabels() {
+        teleportsLeft.act(0);
+        teleportsLeft.draw(game.batch, 1f);
+        trapsLeft.act(0);
+        trapsLeft.draw(game.batch, 1f);
     }
 
     public void renderSelected() {
@@ -317,6 +357,14 @@ public class GeneratingScreen extends GameScreen {
 
     public boolean anyObjects() {
         return teleports.size + traps.size > 0;
+    }
+
+    public int teleportsLeft() {
+        return LevelManager.getAmountOfTeleports() - teleports.size;
+    }
+
+    public int trapsLeft() {
+        return LevelManager.getAmountOfTraps() - traps.size;
     }
 
     public boolean maxTeleports() {
