@@ -46,7 +46,7 @@ public class CommandHandler {
         }
         if(newCommands) {
             if (screenState == ScreenState.PLAYSCREEN) {
-                executeCommandsPlay();
+                return;
             } else if (screenState == ScreenState.GENERATINGSCREEN) {
                 executeCommandsGenerate();
             }
@@ -62,7 +62,14 @@ public class CommandHandler {
         // TODO: 13.02.17  log and\or send message with setposition command
     }
 
-    public void addCommand(Command command) {
+    public void addCommandPlay(Command command) {
+        Gdx.app.log("Added command:", command+"");
+        commands.push(command);
+        command.execute();
+        pointer++;
+    }
+
+    public void addCommandGenerate(Command command) {
 //        Gdx.app.log("Added command:", command+"");
         int pops = commands.size() - pointer;
         for (int i = 0; i < pops; i++) {
@@ -82,28 +89,6 @@ public class CommandHandler {
             commands.push(command);
         }
         setNewCommands(true);
-    }
-
-    public void executeCommandsPlay() {
-        setNewCommands(false);
-        for (int i = pointer; i < commands.size(); i++) {
-            if(commands.get(i) != null) {
-                if(ClassReflection.isInstance(ActorCommand.class, commands.get(i))){
-                    ActorCommand cmd = (ActorCommand)commands.get(i);
-                    if(cmd.player!= null) {
-//                        if(cmd.execute())
-                        cmd.execute();
-                            logger.logStringToFile(cmd.toLog());
-                    }
-                } else if(ClassReflection.isInstance(GlobalCommand.class, commands.get(i))){
-                    GlobalCommand cmd = (GlobalCommand)commands.get(i);
-                    if(cmd.execute())
-                        logger.logStringToFile(cmd.toLog());
-                }
-            }
-        }
-        if(commands.size()> 0)
-            pointer = commands.size();
     }
 
     public void executeCommandsGenerate() {
@@ -136,20 +121,20 @@ public class CommandHandler {
         for (int i = commands.size() - 1; i >= 0 ; i--) {
             Command cmd = commands.get(i);
             if(ClassReflection.isInstance(StopCommand.class, cmd) || ClassReflection.isInstance(MoveToCommand.class, cmd)) {
-                addCommand(new StopCommand(((PlayScreen) screen).getPlayer()));
+                addCommandPlay(new StopCommand(((PlayScreen) screen).getPlayer()));
                 return;
             } else if(ClassReflection.isInstance(StartMovingCommand.class, cmd)) {
                 if(((StartMovingCommand) cmd).getDirection() != direction) {
                     if(((StartMovingCommand) cmd).disabled) {
                         continue;
                     } else {
-                        addCommand(new StartMovingCommand(((StartMovingCommand) cmd).getDirection(), ((PlayScreen)screen).getPlayer()));
+                        addCommandPlay(new StartMovingCommand(((StartMovingCommand) cmd).getDirection(), ((PlayScreen)screen).getPlayer()));
                         return;
                     }
                 }
             }
         }
-        addCommand(new StopCommand(((PlayScreen) screen).getPlayer()));
+        addCommandPlay(new StopCommand(((PlayScreen) screen).getPlayer()));
     }
 
     public boolean undo() {

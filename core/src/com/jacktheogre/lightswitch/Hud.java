@@ -105,13 +105,13 @@ public class Hud implements Disposable{
                     @Override
                     protected void actPress() {
                         if(!playScreen.getLighting().lightsOn())
-                            playScreen.getCommandHandler().addCommand(new TurnOnCommand(playScreen));
+                            playScreen.getCommandHandler().addCommandPlay(new TurnOnCommand(playScreen));
                     }
 
                     @Override
                     protected void actUnpress() {
                         if(playScreen.getLighting().lightsOn())
-                            playScreen.getCommandHandler().addCommand(new TurnOffCommand(playScreen));
+                            playScreen.getCommandHandler().addCommandPlay(new TurnOffCommand(playScreen));
                     }
 
                     @Override
@@ -122,7 +122,7 @@ public class Hud implements Disposable{
                         }
                         // FIXME: 04.04.17 why is turning off
                         if(playScreen.getLighting().lightsOn() && !isPressed())
-                            playScreen.getCommandHandler().addCommand(new TurnOffCommand(playScreen));
+                            playScreen.getCommandHandler().addCommandPlay(new TurnOffCommand(playScreen));
                     }
 
                     @Override
@@ -166,18 +166,18 @@ public class Hud implements Disposable{
                 wallthroughButton = new Button(Assets.getAssetLoader().light_button, Button.State.ACTIVE, screen) {
                     @Override
                     protected void actPress() {
-                        playScreen.getCommandHandler().addCommand(new WallthroughCommand(playScreen.getPlayer()));
+                        playScreen.getCommandHandler().addCommandPlay(new WallthroughCommand(playScreen.getPlayer()));
                     }
 
                     @Override
                     protected void actUnpress() {
-                        playScreen.getCommandHandler().addCommand(new WallthroughCommand(playScreen.getPlayer()));
+                        playScreen.getCommandHandler().addCommandPlay(new WallthroughCommand(playScreen.getPlayer()));
                     }
 
                     @Override
                     public void update(float dt) {
 //                        if(playScreen.getLighting().lightsOn() && !isPressed())
-//                            playScreen.getCommandHandler().addCommand(new TurnOffCommand(playScreen));
+//                            playScreen.getCommandHandler().addCommandPlay(new TurnOffCommand(playScreen));
                     }
 
                     @Override

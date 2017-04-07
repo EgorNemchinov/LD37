@@ -12,7 +12,6 @@ public abstract class ActorCommand extends Command{
 
     protected Player player;
 
-    public abstract boolean execute();
     public void setGameActor(GameActor gameActor) {
         this.player.setGameActor(gameActor);
     }

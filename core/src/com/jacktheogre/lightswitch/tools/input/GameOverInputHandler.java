@@ -38,7 +38,7 @@ public class GameOverInputHandler implements InputProcessor {
         if(keycode == Input.Keys.N) {
             screen.getNext_level().press();
         }
-        if(keycode == Input.Keys.BACKSPACE) {
+        if(keycode == Input.Keys.BACK || keycode == Input.Keys.BACKSPACE) {
             screen.getHome().press();
         }
         return true;

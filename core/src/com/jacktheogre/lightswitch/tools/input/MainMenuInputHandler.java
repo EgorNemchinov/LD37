@@ -23,7 +23,7 @@ public class MainMenuInputHandler implements InputProcessor {
     public boolean keyDown(int keycode) {
         if(keycode == Input.Keys.ENTER)
             screen.getPlayButton().press();
-        if(keycode == Input.Keys.BACK) {
+        if(keycode == Input.Keys.BACK || keycode == Input.Keys.BACKSPACE) {
             screen.returnBack();
         }
         return true;

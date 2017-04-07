@@ -25,6 +25,19 @@ public class LevelManager {
 
     private static int[] amountOfShards;
 
+    public static boolean isOpenLevel(int levelNumber) {
+        if(levelNumber == 1)
+            return true;
+        if(getAmountOfCollectedShards(levelNumber - 1) == countAmountOfShards(levelNumber - 1))
+            return true;
+        else
+            return false;
+    }
+
+    public static int countAmountOfShards(int levelNumber) {
+        return Assets.getAssetLoader().maps[levelNumber].getLayers().get(7).getObjects().getCount();
+    }
+
     static class Resourses {
 
         public int teleports;
@@ -116,6 +129,17 @@ public class LevelManager {
         return count;
     }
 
+
+    public static int getAmountOfCollectedShards(int levelNum) {
+        String shardsStr = getCollectedShards(levelNum);
+        int count = 0;
+        for (int i = 0; i < shardsStr.length(); i++) {
+            if (shardsStr.charAt(i) == '1')
+                count++;
+        }
+        return count;
+    }
+
     public static Resourses getLevelResourses(int levelNum) {
         return levelsMap.get(levelNum);
     }
@@ -145,6 +169,10 @@ public class LevelManager {
     }
 
     public static int getAmountOfShards() {
+        return amountOfShards[levelNum];
+    }
+
+    public static int getAmountOfShards(int levelNum) {
         return amountOfShards[levelNum];
     }
 

@@ -13,8 +13,6 @@ public abstract class GlobalCommand extends Command {
         this.screen = screen;
     }
 
-    public abstract boolean execute();
-
     public void setScreen(Screen screen) {
         this.screen = screen;
     }

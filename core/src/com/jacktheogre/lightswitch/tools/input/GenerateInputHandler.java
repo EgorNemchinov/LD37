@@ -6,6 +6,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.math.Vector3;
 import com.jacktheogre.lightswitch.ai.LevelManager;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
+import com.jacktheogre.lightswitch.screens.LevelChoosingScreen;
 import com.jacktheogre.lightswitch.screens.MainMenuScreen;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
 
@@ -34,8 +35,8 @@ public class GenerateInputHandler implements InputProcessor{
         if(keycode == Input.Keys.T) {
             screen.getTeleportButton().press();
         }
-        if(keycode == Input.Keys.BACK) {
-            screen.getGame().setScreen(new MainMenuScreen(screen.getGame(), MainMenuScreen.State.CHOOSING_CHARACTER));
+        if(keycode == Input.Keys.BACK || keycode == Input.Keys.BACKSPACE) {
+            screen.getGame().setScreen(new LevelChoosingScreen(screen.getGame()));
         }
         return true;
     }

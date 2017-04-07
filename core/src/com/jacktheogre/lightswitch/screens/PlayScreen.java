@@ -115,7 +115,7 @@ public class PlayScreen extends GameScreen {
         lighting.setPlayScreen(this);
         world.setContactListener(contactListener);
         lighting.turnOff();
-        commandHandler.addCommand(new StopCommand(player));
+        commandHandler.addCommandPlay(new StopCommand(player));
         energy = 100f;
         fixturesContacts = new Array<Contact>();
         runTime = 0;
@@ -255,7 +255,7 @@ public class PlayScreen extends GameScreen {
         GameActor.Direction direction;
         if(x == 0 && y == 0) {
             if(player.getGameActor().isMoving())
-                commandHandler.addCommand(new StopCommand(player));
+                commandHandler.addCommandPlay(new StopCommand(player));
             return;
         }
         if(x >= 0) {
@@ -287,7 +287,7 @@ public class PlayScreen extends GameScreen {
         }
 
         if(player.getGameActor().getDirection() != direction || !player.getGameActor().isMoving())
-            commandHandler.addCommand(new StartMovingCommand(direction, getPlayer()));
+            commandHandler.addCommandPlay(new StartMovingCommand(direction, getPlayer()));
         player.getGameActor().setMoving(true);
     }
 

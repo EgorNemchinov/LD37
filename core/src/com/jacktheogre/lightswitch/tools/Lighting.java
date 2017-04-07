@@ -79,7 +79,7 @@ public class Lighting {
     public void render(float dt) {
         if(lightsOn && playScreen != null) {
             if(!playScreen.subEnergy(Constants.WASTE_ENERGY_PER_SEC *dt))
-                playScreen.getCommandHandler().addCommand(new TurnOffCommand(playScreen));
+                playScreen.getCommandHandler().addCommandPlay(new TurnOffCommand(playScreen));
         }
         rayHandler.setCombinedMatrix(screen.getGameCam());
         actorLight.setPosition(screen.getPlayer().getGameActor().b2body.getPosition());

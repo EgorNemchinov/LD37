@@ -45,7 +45,7 @@ public class AssetLoader {
         twoShards = new TextureRegion[3];
         threeShards = new TextureRegion[3];
         shardsSounds = new Sound[3];
-        collectedShards = Gdx.app.getPreferences("Shards Collected");
+        collectedShards = Gdx.app.getPreferences("ShardsCollected");
     }
 
     public void load() {

@@ -44,7 +44,7 @@ public class Teleport extends InteractiveObject {
 
     public boolean activate(Player player) {
         if(partner != null) {
-            screen.getCommandHandler().addCommand(new TeleportCommand(this, partner, player));
+            screen.getCommandHandler().addCommandGenerate(new TeleportCommand(this, partner, player));
             return true;
         } else
             return false;

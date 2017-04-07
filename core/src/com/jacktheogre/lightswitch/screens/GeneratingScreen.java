@@ -367,7 +367,7 @@ public class GeneratingScreen extends GameScreen {
 
     public void addTeleport() {
         if(selectedNode.getConnections().size > 0 && state == State.SETTING_TELEPORT && !existsObject()) {
-            commandHandler.addCommand(new AddTeleportCommand(this, (int) selectedNode.getWorldX() - LevelManager.tilePixelWidth / 2, (int)selectedNode.getWorldY() - LevelManager.tilePixelHeight / 2, unpairedTeleport));
+            commandHandler.addCommandGenerate(new AddTeleportCommand(this, (int) selectedNode.getWorldX() - LevelManager.tilePixelWidth / 2, (int)selectedNode.getWorldY() - LevelManager.tilePixelHeight / 2, unpairedTeleport));
             undo.enable();
             state = State.DEFAULT;
             teleportButton.unpress();
@@ -384,7 +384,7 @@ public class GeneratingScreen extends GameScreen {
 
     public void addTrap() {
         if(selectedNode.getConnections().size > 0 && state == State.SETTING_TRAP && !existsObject()) {
-            commandHandler.addCommand(new AddTrapCommand(this, (int) selectedNode.getWorldX() - LevelManager.tilePixelWidth / 2, (int)selectedNode.getWorldY() - LevelManager.tilePixelHeight / 2));
+            commandHandler.addCommandGenerate(new AddTrapCommand(this, (int) selectedNode.getWorldX() - LevelManager.tilePixelWidth / 2, (int)selectedNode.getWorldY() - LevelManager.tilePixelHeight / 2));
             undo.enable();
             state = State.DEFAULT;
             trapButton.unpress();

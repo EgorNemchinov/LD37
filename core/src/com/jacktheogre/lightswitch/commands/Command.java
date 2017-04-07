@@ -6,6 +6,7 @@ package com.jacktheogre.lightswitch.commands;
 public abstract class Command {
     protected boolean executed;
 
+    public abstract boolean execute();
     public abstract void undo();
     public abstract void redo();
     public abstract String toLog();

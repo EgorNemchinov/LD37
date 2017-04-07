@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
@@ -66,6 +67,7 @@ public class LevelChoosingScreen extends GameScreen {
         this.game = game;
         gamePort = new FitViewport(LightSwitch.WIDTH, LightSwitch.HEIGHT);
         stage = new Stage(gamePort, game.batch);
+        Gdx.input.setInputProcessor(stage);
         stage.addListener(new InputListener() {
             @Override
             public boolean keyUp(InputEvent event, int keycode) {
@@ -77,7 +79,7 @@ public class LevelChoosingScreen extends GameScreen {
                 } else if(keycode == Input.Keys.ENTER) {
                     LevelManager.setLevelNum(screenActor.screen.framesArray[1].getLevelNumber());
                     screenActor.screen.getGame().setScreen(new GeneratingScreen(screenActor.screen.getGame()));
-                } else if(keycode == Input.Keys.BACK) {
+                } else if(keycode == Input.Keys.BACK || keycode == Input.Keys.BACKSPACE) {
                     screenActor.screen.getGame().setScreen(new MainMenuScreen(screenActor.screen.getGame()));
                 }
                 return true;
@@ -120,7 +122,7 @@ public class LevelChoosingScreen extends GameScreen {
         private int levelNumber;
 
         private ActorSettings targetSettings, currentSettings;
-        private float time = 1f;
+        private float time = 0.2f;
         private Vector2 deltaPerSec;
         private float scalePerSec;
 
@@ -131,27 +133,37 @@ public class LevelChoosingScreen extends GameScreen {
         private Image[] shards;
         private Group shardsImages;
 
+        private boolean open;
+        private boolean drawing;
+
         public Frame(final int levelNumber) {
             firstFrame = true;
+            drawing = true;
+            open = LevelManager.isOpenLevel(levelNumber);
             this.setSize(frameWidth, frameHeight);
             this.levelNumber = levelNumber;
 
             initializeTable();
 //            main.setPosition(((getWidth() - main.getWidth()) / 2), main.getY());
             this.addActor(main);
+            this.addListener(new InputListener() {
+                @Override
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                    Gdx.app.log("Frame", "touchDown");
+                    return super.touchDown(event, x, y, pointer, button);
+                }
+            });
+            this.setTouchable(Touchable.enabled);
+//            stage.addActor(this);
 
 //            Gdx.app.log("Levelmanager", LevelManager.getLevelNum() + " - " +LevelManager.getAmountOfShards());
-            shardsCollected = new boolean[countAmountOfShards()];
-            shards = new Image[countAmountOfShards()];
+            shardsCollected = new boolean[LevelManager.countAmountOfShards(levelNumber)];
+            shards = new Image[LevelManager.countAmountOfShards(levelNumber)];
             initializeCollectedShardsArray();
             initializeMoonShards();
 
 //            main.setDebug(true);
             targetSettings = currentSettings = new ActorSettings(1f, getX(), getY());
-        }
-
-        private int countAmountOfShards() {
-            return mapActor.map.getLayers().get(7).getObjects().getCount();
         }
 
         private void initializeTable() {
@@ -176,9 +188,17 @@ public class LevelChoosingScreen extends GameScreen {
                     playButtonTexture.getRegionWidth() / 4, playButtonTexture.getRegionHeight())),
                     new TextureRegionDrawable(new TextureRegion(playButtonTexture, playButtonTexture.getRegionWidth()*3 / 4, 0,
                             playButtonTexture.getRegionWidth() / 4, playButtonTexture.getRegionHeight())));
+            playButton.setBounds(playButton.getX(), playButton.getY(), playButton.getWidth(), playButton.getHeight());
             playButton.addListener(new ClickListener() {
                 @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    Gdx.app.log("playButton", "clicked");
+                    super.clicked(event, x, y);
+                }
+
+                @Override
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                    Gdx.app.log("playButton", "touchDown");
                     return true;
                 }
 
@@ -188,6 +208,9 @@ public class LevelChoosingScreen extends GameScreen {
                     game.setScreen(new GeneratingScreen(game));
                 }
             });
+            playButton.setTouchable(open? Touchable.enabled: Touchable.disabled);
+//            playButton.setDisabled(!open);
+//            stage.addActor(playButton);
 
             main.align(Align.top | Align.center);
             main.add(levelLabel).expandX().colspan(4).row();
@@ -211,7 +234,14 @@ public class LevelChoosingScreen extends GameScreen {
             this.toBeDeleted = toBeDeleted;
             if(toBeDeleted)
                 framesToBeDeleted.add(this);
+        }
 
+        public void setDrawing(boolean drawing) {
+            this.drawing = drawing;
+        }
+
+        public boolean isDrawing() {
+            return drawing;
         }
 
         public void setTargetSettings(ActorSettings targetSettings) {
@@ -224,6 +254,12 @@ public class LevelChoosingScreen extends GameScreen {
         public void setPosition(float x, float y) {
             super.setPosition(x, y);
             currentSettings.position = new Vector2(x, y);
+        }
+
+        @Override
+        public void draw(Batch batch, float parentAlpha) {
+            if(drawing)
+                super.draw(batch, parentAlpha);
         }
 
         @Override
@@ -307,9 +343,9 @@ public class LevelChoosingScreen extends GameScreen {
                 shardsCollected[i] = false;
             }
             if(shardsStr.length() != 0) {
-                Gdx.app.log("LevelChoosingScreen", levelNumber+" - "+shardsStr);
+//                Gdx.app.log("LevelChoosingScreen", levelNumber+" - "+shardsStr);
                 if(shardsStr.length() > shardsCollected.length)
-                    Gdx.app.log("LevelChoosingScreen", shardsStr +", but shardsCollected length is "+shardsCollected.length );
+                    Gdx.app.error("LevelChoosingScreen", shardsStr +", but shardsCollected length is "+shardsCollected.length );
                 for (int i = 0; i < shardsStr.length(); i++) {
                     if(shardsStr.charAt(i) == '1')
                         shardsCollected[i] = true;
@@ -340,7 +376,7 @@ public class LevelChoosingScreen extends GameScreen {
             shapeRenderer.setColor(new Color(80/255f, 56/255f, 80/255f, 0.8f));
             DrawingAssistant.roundedRect(shapeRenderer, getX() + main.getX()*getScaleX(), getY() + main.getY()*getScaleY(),
                     main.getWidth()*getScaleX(), main.getHeight()*getScaleY(), 10);
-            shapeRenderer.setColor(new Color(56/255f, 56/255f, 113/255f, 1f));
+            shapeRenderer.setColor(open ? new Color(56/255f, 56/255f, 113/255f, 1f) : new Color(30/255f, 30/255f, 60/255f, 1f));
             int borderSize = 2;
             DrawingAssistant.roundedRect(shapeRenderer, getX() + main.getX()*getScaleX() + borderSize, getY() + main.getY()*getScaleY() + borderSize,
                     main.getWidth()*getScaleX() - 2*borderSize, main.getHeight()*getScaleY() - 2*borderSize, 6);
@@ -451,6 +487,7 @@ public class LevelChoosingScreen extends GameScreen {
 
         framesArray[1] = frame1;
         framesArray[2] = frame2;
+//        stage.setDebugAll(true);
     }
 
     private Frame nextFrame() {
@@ -466,6 +503,8 @@ public class LevelChoosingScreen extends GameScreen {
 
     public  void nextLevel() {
         if(framesArray[framesArray.length - 1] == null) //already the last one
+            return;
+        if(!framesArray[framesArray.length - 1].open) //next level not avialable
             return;
         if(framesArray[0] != null) {
             framesArray[0].setTargetSettings(new ActorSettings(sideFramesScale / 2, prevFramePosition.x - 100, prevFramePosition.y + 30));
@@ -523,63 +562,65 @@ public class LevelChoosingScreen extends GameScreen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0f, 0f, 0.1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+//        stage.act(delta);
+//        stage.draw();
         drawFrames(delta);
     }
 
     private void drawFrames(float delta) {
+        stage.act(delta);
         for (Frame frame :framesArray) {
             if(frame != null)
-                frame.setVisible(false);
+                frame.setDrawing(false);
         }
 
         //drawing disappearing frames
         for(Frame frame: framesToBeDeleted) {
-            frame.setVisible(true);
+            frame.setDrawing(true);
             frame.drawBackground();
         }
-        stage.act(delta);
+        stage.draw();
         for(Frame frame: framesToBeDeleted) {
             frame.drawMap();
             frame.drawShards();
-            frame.setVisible(false);
+            frame.setDrawing(false);
         }
 
         //drawing side frames
         Frame frameLeft = framesArray[0];
         if(frameLeft != null) {
-            frameLeft.setVisible(true);
+            frameLeft.setDrawing(true);
             frameLeft.drawBackground();
         }
         Frame frameRight = framesArray[2];
         if(frameRight != null) {
-            frameRight.setVisible(true);
+            frameRight.setDrawing(true);
             frameRight.drawBackground();
         }
-        stage.act(delta);
         stage.draw();
         if(frameLeft != null) {
             frameLeft.drawMap();
             frameLeft.drawShards();
-            frameLeft.setVisible(false);
+            frameLeft.setDrawing(false);
         }
         if(frameRight != null) {
             frameRight.drawMap();
             frameRight.drawShards();
-            frameRight.setVisible(false);
+            frameRight.setDrawing(false);
         }
 
         //middle one
         Frame frameMiddle = framesArray[1];
         if(frameMiddle != null) {
-            frameMiddle.setVisible(true);
+            frameMiddle.setDrawing(true);
             frameMiddle.drawBackground();
         }
-        stage.act(delta);
         stage.draw();
         if(frameMiddle != null) {
             frameMiddle.drawMap();
             frameMiddle.drawShards();
-            frameMiddle.setVisible(false);
+            frameMiddle.setDrawing(false);
         }
     }
 
