@@ -2,6 +2,7 @@ package com.jacktheogre.lightswitch.objects;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.jacktheogre.lightswitch.LightSwitch;
 import com.jacktheogre.lightswitch.screens.GeneratingScreen;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
@@ -14,6 +15,11 @@ import com.jacktheogre.lightswitch.sprites.Player;
 public class NullInteractiveObject extends InteractiveObject {
     public NullInteractiveObject(LightSwitch game) {
         super(new GeneratingScreen(game), 0, 0, false);
+    }
+
+    @Override
+    public void render(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, float dt) {
+
     }
 
     @Override

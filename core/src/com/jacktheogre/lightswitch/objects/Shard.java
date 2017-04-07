@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Filter;
@@ -58,6 +59,7 @@ public class Shard extends InteractiveObject {
         return false;
     }
 
+    //fixme: new render method
     @Override
     public void render(SpriteBatch spriteBatch, float dt) {
         Color c = spriteBatch.getColor();
@@ -65,6 +67,11 @@ public class Shard extends InteractiveObject {
             spriteBatch.setColor(c.r, c.g, c.b, currentAlpha(dt));
         spriteBatch.draw(textureRegion, x, y, rectBounds.getWidth(), rectBounds.getHeight());
         spriteBatch.setColor(c);
+    }
+
+    @Override
+    public void render(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, float dt) {
+        render(spriteBatch, dt);
     }
 
     private float currentAlpha(float dt) {

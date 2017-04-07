@@ -44,7 +44,7 @@ public class GraphGenerator {
                         cell = tiles.getCell(x1, y1);
                         if(x1>=0 && x1 < mapWidth && y1 >= 0 && y1 < mapHeight) {
                             Node node = nodes.get(mapWidth * y1 + x1);
-                            targetNode.createConnection(node, 1);
+                            targetNode.createConnection(node, (float)Math.sqrt((x1-x)*(x1-x) + (y1-y)*(y1-y)));
                         }
                         cells.add(cell);
 

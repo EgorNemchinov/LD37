@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -60,6 +61,7 @@ public abstract class InteractiveObject {
 
     private boolean initialOpen = false;
 
+    public abstract void render(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, float dt);
     public abstract void render(SpriteBatch spriteBatch, float dt);
     public abstract boolean activate(Player player);
 

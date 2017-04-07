@@ -1,8 +1,12 @@
 package com.jacktheogre.lightswitch.objects;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.utils.Array;
 import com.jacktheogre.lightswitch.Constants;
@@ -17,6 +21,7 @@ import com.jacktheogre.lightswitch.tools.Assets;
 public class Teleport extends InteractiveObject {
 
     private Teleport partner;
+    private final Color REFRESH_COLOR = new Color(1, 1, 1, 0.5f);
 
     public Teleport(GeneratingScreen screen, int x, int y, boolean initPhysics) {
         super(screen, x, y, initPhysics);
@@ -78,6 +83,20 @@ public class Teleport extends InteractiveObject {
 
         stateTimer += dt;
         return region;
+    }
+
+    @Override
+    public void render(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer, float dt) {
+        spriteBatch.draw(getFrame(dt), x, y, 2*bounds.radius, 2*bounds.radius);
+        spriteBatch.end();
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(REFRESH_COLOR);
+        shapeRenderer.arc(x + bounds.radius, y + bounds.radius, bounds.radius, 90f,
+                360*(timeSinceClosure / Constants.TELEPORT_INTERVAL), (int) (60*(timeSinceClosure / Constants.TELEPORT_INTERVAL)) + 1);
+        shapeRenderer.end();
+        Gdx.gl.glDisable(GL20.GL_BLEND);
+        spriteBatch.begin();
     }
 
     @Override
