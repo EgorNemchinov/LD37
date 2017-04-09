@@ -24,11 +24,15 @@ public class LevelManager {
     public static int tilePixelHeight;
 
     private static int[] amountOfShards;
+    private static int[] totalAmountOfShardsBefore;
+    private static int totalShardsCollected = 0;
 
     public static boolean isOpenLevel(int levelNumber) {
         if(levelNumber == 1)
             return true;
-        if(getAmountOfCollectedShards(levelNumber - 1) == countAmountOfShards(levelNumber - 1))
+//        if(getAmountOfCollectedShards(levelNumber - 1) == countAmountOfShards(levelNumber - 1))
+//            return true;
+        if(totalShardsCollected >= getAmountOfShardsToUnlock(levelNumber))
             return true;
         else
             return false;
@@ -38,15 +42,26 @@ public class LevelManager {
         return Assets.getAssetLoader().maps[levelNumber].getLayers().get(7).getObjects().getCount();
     }
 
+    public static void recountShards() {
+        int collected = 0;
+        for (int i = 1; i <= LEVEL_AMOUNT; i++) {
+            collected += getAmountOfCollectedShards(i);
+        }
+        totalShardsCollected = collected;
+    }
+
     static class Resourses {
 
-        public int teleports;
-        public int traps;
-        public int monsterSpeed;
-        public Resourses(int teleports, int traps, int monsterSpeed) {
+        int teleports;
+        int traps;
+        int monsterSpeed;
+        int shardsToUnlock;
+
+        Resourses(int teleports, int traps, int monsterSpeed, int shardsToUnlock) {
             this.teleports = teleports;
             this.traps = traps;
             this.monsterSpeed = monsterSpeed;
+            this.shardsToUnlock = shardsToUnlock;
         }
 
         @Override
@@ -66,6 +81,7 @@ public class LevelManager {
             Gdx.app.exit();
         }
         amountOfShards = new int[LEVEL_AMOUNT+1];
+//        totalAmountOfShardsBefore = new int[LEVEL_AMOUNT + 1];
     }
 
     public static void loadLevel(TiledMap map) {
@@ -87,15 +103,18 @@ public class LevelManager {
         String[] lines = levels.readString().split("\\r?\\n");
         for (int i = 0; i < lines.length; i++) {
             String[] columns = lines[i].split(" ");
-            int levelNum, teleportsNum, trapsNum, monsterSpeed;
+            int levelNum, teleportsNum, trapsNum, monsterSpeed, shardsToUnlock;
             try {
                 levelNum = Integer.parseInt(columns[0]);
                 teleportsNum = Integer.parseInt(columns[1]);
                 trapsNum = Integer.parseInt(columns[2]);
                 monsterSpeed = Integer.parseInt(columns[3]);
-                levelsMap.put(levelNum, new Resourses(teleportsNum, trapsNum, monsterSpeed));
+                shardsToUnlock = Integer.parseInt(columns[4]);
+                levelsMap.put(levelNum, new Resourses(teleportsNum, trapsNum, monsterSpeed, shardsToUnlock));
             } catch (Exception e) {
                 Gdx.app.error("LevelManager", "Error parsing file");
+                // TODO: 09.04.17 dialog mb?
+                Gdx.app.exit();
                 return false;
             }
         }
@@ -103,24 +122,26 @@ public class LevelManager {
     }
 
     public static void collectShards(int levelNum, String collectedShards) {
+        //// FIXME: 09.04.17 we can just add the difference to totalAmountOfShardsBefore
         Assets.getAssetLoader().getCollectedShards().putString(levelNum+"", collectedShards);
         Assets.getAssetLoader().getCollectedShards().flush();
+        LevelManager.recountShards();
     }
 
     public static void collectShards(String collectedShards) {
         collectShards(levelNum, collectedShards);
     }
 
-    public static String getCollectedShards(int levelNum) {
+    public static String getCollectedShardsString(int levelNum) {
         return Assets.getAssetLoader().getCollectedShards().getString(levelNum+"", "");
     }
 
-    public static String getCollectedShards() {
+    public static String getCollectedShardsString() {
         return Assets.getAssetLoader().getCollectedShards().getString(levelNum+"", "");
     }
 
     public static int getAmountOfCollectedShards() {
-        String shardsStr = getCollectedShards();
+        String shardsStr = getCollectedShardsString();
         int count = 0;
         for (int i = 0; i < shardsStr.length(); i++) {
             if (shardsStr.charAt(i) == '1')
@@ -131,7 +152,7 @@ public class LevelManager {
 
 
     public static int getAmountOfCollectedShards(int levelNum) {
-        String shardsStr = getCollectedShards(levelNum);
+        String shardsStr = getCollectedShardsString(levelNum);
         int count = 0;
         for (int i = 0; i < shardsStr.length(); i++) {
             if (shardsStr.charAt(i) == '1')
@@ -156,7 +177,15 @@ public class LevelManager {
         return getLevelResourses(levelNum).teleports;
     }
 
-    public static int getAmountOfTraps(int levelNum) {
+    public static int getAmountOfShardsToUnlock(int levelNum) {
+        return getLevelResourses(levelNum).shardsToUnlock;
+    }
+
+    public static int getAmountOfShardsToUnlock() {
+        return getAmountOfShardsToUnlock(levelNum);
+    }
+
+        public static int getAmountOfTraps(int levelNum) {
         return getLevelResourses(levelNum).traps;
     }
 
@@ -168,11 +197,11 @@ public class LevelManager {
         return levelNum;
     }
 
-    public static int getAmountOfShards() {
+    public static int getAmountOfShardsOnLevel() {
         return amountOfShards[levelNum];
     }
 
-    public static int getAmountOfShards(int levelNum) {
+    public static int getAmountOfShardsOnLevel(int levelNum) {
         return amountOfShards[levelNum];
     }
 
@@ -184,6 +213,10 @@ public class LevelManager {
         if(levelNum != LevelManager.levelNum)
             LevelManager.graph = null;
         LevelManager.levelNum = levelNum;
+    }
+
+    public static int getTotalShardsCollected() {
+        return totalShardsCollected;
     }
 
     public static boolean isMaxLevel() {
@@ -198,6 +231,13 @@ public class LevelManager {
         if(!isMaxLevel()) {
             LevelManager.graph = null;
             levelNum++;
+        }
+    }
+
+    public static void setLevel(int levelNumber) {
+        if(1 <= levelNumber && levelNumber <= LEVEL_AMOUNT ) {
+            LevelManager.graph = null;
+            levelNum = levelNumber;
         }
     }
 

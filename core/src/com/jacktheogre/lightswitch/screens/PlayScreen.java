@@ -183,6 +183,7 @@ public class PlayScreen extends GameScreen {
     public void render(float dt) {
         shapeRenderer.setProjectionMatrix(gameCam.combined);
         shapeRenderer.setAutoShapeType(true);
+        shapeRenderer.setColor(Color.WHITE);
         update(dt);
 
         Gdx.gl.glClearColor(0f, 0f, 0.1f, 1);
@@ -192,8 +193,9 @@ public class PlayScreen extends GameScreen {
 
         game.batch.setProjectionMatrix(gameCam.combined);
         game.batch.begin();
+//        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         for (InteractiveObject object : objects) {
-            object.render(game.batch, dt);
+            object.render(game.batch, shapeRenderer, dt);
         }
         for (Shard shard: shards) {
             shard.render(game.batch, dt);

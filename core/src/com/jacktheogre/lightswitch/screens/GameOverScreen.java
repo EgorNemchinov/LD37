@@ -77,6 +77,7 @@ public class GameOverScreen extends GameScreen{
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         game.batch.setProjectionMatrix(gameCam.combined);
         game.batch.begin();
+        Assets.getAssetLoader().font.getData().setScale(AssetLoader.FONT_SCALE);
         switch (state) {
             case WIN:
                 if(LevelManager.isMaxLevel()) {
@@ -143,7 +144,7 @@ public class GameOverScreen extends GameScreen{
             protected void actUnpress() {
                 if(!LevelManager.isMaxLevel() && !disabled)
                 {
-                    LevelManager.nextLevel();
+                    LevelManager.setLevel(LevelManager.getLevelNum() + 1);
                     screen.getGame().setScreen(new GeneratingScreen(screen.getGame()));
                 }
             }

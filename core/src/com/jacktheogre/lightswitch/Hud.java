@@ -52,7 +52,7 @@ public class Hud implements Disposable{
         viewport = new FitViewport(LightSwitch.WIDTH, LightSwitch.HEIGHT);
         stage = new Stage(viewport, screen.getGame().batch);
 
-        shards = new Sprite[LevelManager.getAmountOfShards()];
+        shards = new Sprite[LevelManager.getAmountOfShardsOnLevel()];
         shardsCollected = new boolean[shards.length];
         for (int i = 0; i < shardsCollected.length; i++) {
             shardsCollected[i] = false;
@@ -82,7 +82,7 @@ public class Hud implements Disposable{
         touchpadStyle.background = touchpadSkin.getDrawable("touchBackground");
         touchpadStyle.knob = touchpadSkin.getDrawable("touchKnob");
         touchpad = new Touchpad(15, touchpadStyle);
-        touchpad.setBounds(viewport.getScreenWidth() - 420, 20 , 400, 400);
+        touchpad.setBounds(viewport.getScreenWidth() - 470, 70 , 500, 500);
 
         screen.getInputHandler().addActor(touchpad);
     }

@@ -26,11 +26,10 @@ public class GraphGenerator {
             for (int x = 0; x < mapWidth; x++) {
 
                 Node node = new Node();
-                node.type = Node.Type.REGULAR; // TODO: 21.10.16 whats this
+                node.type = Node.Type.REGULAR;
                 nodes.add(node);
             }
         }
-        Gdx.app.log("GraphGenerator", "Nodes size is " + nodes.size);
 
         for (int y = 0; y < mapHeight; y++) {
             for (int x = 0; x < mapWidth; x++) {

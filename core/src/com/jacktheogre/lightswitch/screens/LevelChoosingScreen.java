@@ -3,14 +3,14 @@ package com.jacktheogre.lightswitch.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -21,7 +21,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
-import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -62,12 +61,14 @@ public class LevelChoosingScreen extends GameScreen {
 
     private TextureRegion teleport, trap;
 
+    private FPSLogger fpsLogger;
 
     public LevelChoosingScreen(LightSwitch game) {
         this.game = game;
         gamePort = new FitViewport(LightSwitch.WIDTH, LightSwitch.HEIGHT);
         stage = new Stage(gamePort, game.batch);
         Gdx.input.setInputProcessor(stage);
+        fpsLogger = new FPSLogger();
         stage.addListener(new InputListener() {
             @Override
             public boolean keyUp(InputEvent event, int keycode) {
@@ -105,6 +106,8 @@ public class LevelChoosingScreen extends GameScreen {
         frameWidth = (int)stage.getWidth() / 2;
         frameHeight = (int) stage.getHeight() - 30;
 
+        LevelManager.recountShards();
+
         initializeGraphicElements();
         Gdx.input.setInputProcessor(stage);
     }
@@ -133,7 +136,10 @@ public class LevelChoosingScreen extends GameScreen {
         private Image[] shards;
         private Group shardsImages;
 
-        private boolean open;
+        private Label shardsToUnlock;
+        private Group shardsCounter;
+
+        private boolean open; //determines whether level is playable
         private boolean drawing;
 
         public Frame(final int levelNumber) {
@@ -144,19 +150,16 @@ public class LevelChoosingScreen extends GameScreen {
             this.levelNumber = levelNumber;
 
             initializeTable();
-//            main.setPosition(((getWidth() - main.getWidth()) / 2), main.getY());
+            initializeShardsCount();
             this.addActor(main);
             this.addListener(new InputListener() {
                 @Override
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                    Gdx.app.log("Frame", "touchDown");
                     return super.touchDown(event, x, y, pointer, button);
                 }
             });
             this.setTouchable(Touchable.enabled);
-//            stage.addActor(this);
 
-//            Gdx.app.log("Levelmanager", LevelManager.getLevelNum() + " - " +LevelManager.getAmountOfShards());
             shardsCollected = new boolean[LevelManager.countAmountOfShards(levelNumber)];
             shards = new Image[LevelManager.countAmountOfShards(levelNumber)];
             initializeCollectedShardsArray();
@@ -192,13 +195,13 @@ public class LevelChoosingScreen extends GameScreen {
             playButton.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    Gdx.app.log("playButton", "clicked");
+//                    Gdx.app.log("playButton", "clicked");
                     super.clicked(event, x, y);
                 }
 
                 @Override
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                    Gdx.app.log("playButton", "touchDown");
+//                    Gdx.app.log("playButton", "touchDown");
                     return true;
                 }
 
@@ -209,15 +212,12 @@ public class LevelChoosingScreen extends GameScreen {
                 }
             });
             playButton.setTouchable(open? Touchable.enabled: Touchable.disabled);
-//            playButton.setDisabled(!open);
-//            stage.addActor(playButton);
 
             main.align(Align.top | Align.center);
             main.add(levelLabel).expandX().colspan(4).row();
             main.padLeft(0);
             Cell<MapActor> cell = main.add(mapActor).expandX().colspan(4);
             cell.row();
-//            main.padLeft(0);
 
             int cellHeight = (int) ((mapActor.getWidth() / 4)*0.7f);
             main.add(teleportImage).minHeight(cellHeight).fill(0.7f, 1f);
@@ -238,10 +238,6 @@ public class LevelChoosingScreen extends GameScreen {
 
         public void setDrawing(boolean drawing) {
             this.drawing = drawing;
-        }
-
-        public boolean isDrawing() {
-            return drawing;
         }
 
         public void setTargetSettings(ActorSettings targetSettings) {
@@ -293,6 +289,8 @@ public class LevelChoosingScreen extends GameScreen {
                     getY() +main.getY() - mapActor.getHeight()*(getScaleY() - 0.5f) +main.getHeight()*getScaleY()- (levelLabel.getHeight() + 5)*getScaleY());
             shardsImages.setPosition(getX() + (main.getX() + main.getWidth())*getScaleY() - shardsImages.getScaleX()*shardsImages.getWidth(),
                     getY()+  getScaleY()*(main.getY() + main.getHeight() - levelLabel.getHeight()) - shardsImages.getHeight()*shardsImages.getScaleY());
+            shardsCounter.setPosition(getX()+(main.getX() + main.getWidth() / 2)*getScaleX() - shardsCounter.getScaleX()*shardsCounter.getWidth() / 2,
+                    getY() + getScaleY()*(main.getY() + main.getHeight() / 2) - shardsCounter.getScaleY()*shardsCounter.getHeight()/2 + 10);
 //            mapActor.centerAt(mapActor.getX()+mapActor.getWidth() / 2, mapActor.getY()+mapActor.getHeight() / 2);
             super.act(delta);
         }
@@ -338,7 +336,7 @@ public class LevelChoosingScreen extends GameScreen {
         }
 
         public void initializeCollectedShardsArray() {
-            String shardsStr = LevelManager.getCollectedShards(levelNumber);
+            String shardsStr = LevelManager.getCollectedShardsString(levelNumber);
             for (int i = 0; i < shardsCollected.length; i++) {
                 shardsCollected[i] = false;
             }
@@ -356,11 +354,29 @@ public class LevelChoosingScreen extends GameScreen {
             }
         }
 
+        private void initializeShardsCount() {
+            if(open) {
+                shardsCounter = new Group();
+                return;
+            }
+            shardsToUnlock = new Label(LevelManager.getTotalShardsCollected() +"/"+LevelManager.getAmountOfShardsToUnlock(levelNumber),
+                    new Label.LabelStyle(Assets.getAssetLoader().font, new Color(100/256f, 100/256f, 150/256f, 1f)));
+            shardsToUnlock.setSize(main.getWidth(), mapActor.getHeight() / 2); // FIXME: 09.04.17 set correct height
+            shardsToUnlock.setAlignment(Align.center);
+            shardsToUnlock.setFontScale(1.5f);
+            shardsCounter = new Group();
+            shardsCounter.setSize(shardsToUnlock.getWidth(), shardsToUnlock.getHeight());
+            shardsCounter.addActor(shardsToUnlock);
+            shardsCounter.setPosition(getX()+main.getX() + main.getWidth() / 2 - shardsToUnlock.getWidth() / 2,
+                    getY() + main.getY() + mapActor.getY() + mapActor.getHeight() / 2);
+        }
+
         @Override
         public void setScale(float scaleXY) {
             super.setScale(scaleXY);
             mapActor.setScale(scaleXY);
             shardsImages.setScale(2*scaleXY);
+            shardsCounter.setScale(scaleXY);
             currentSettings.scale = scaleXY;
         }
 
@@ -368,8 +384,24 @@ public class LevelChoosingScreen extends GameScreen {
             return levelNumber;
         }
 
-        public void drawBackground() {
-//            screenActor.screen.game.batch
+        public void drawBefore() {
+            setDrawing(true);
+            drawBackground();
+        }
+
+        public void drawAfter() {
+            drawMap();
+            boolean wasActive = stage.getBatch().isDrawing();
+            if(!wasActive)
+                stage.getBatch().begin();
+            drawShards();
+            drawShardsCounter();
+            setDrawing(false);
+            if(!wasActive)
+                stage.getBatch().end();
+        }
+
+        private void drawBackground() {
             shapeRenderer.setProjectionMatrix(stage.getCamera().combined);
             shapeRenderer.setAutoShapeType(true);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
@@ -383,26 +415,26 @@ public class LevelChoosingScreen extends GameScreen {
             shapeRenderer.end();
         }
 
-        public void drawMap() {
+        private void drawMap() {
             mapActor.act(0);
             if(!firstFrame) {
                 mapActor.getMapRenderer().render();
             } else firstFrame = false;
         }
 
-        public void drawShards() {
-            boolean wasActive = stage.getBatch().isDrawing();
-            if(!wasActive)
-                stage.getBatch().begin();
+        private void drawShards() {
             shardsImages.draw(stage.getBatch(), 1f);
-            if(!wasActive)
-                stage.getBatch().end();
+        }
+
+        private void drawShardsCounter() {
+            if(!open)
+                shardsCounter.draw(game.batch, 1f);
         }
     }
 
     class MapActor extends Actor {
 
-        private OrthogonalTiledMapRenderer mapRenderer;
+        private MyMapRenderer mapRenderer;
         private OrthographicCamera camera;
         private TiledMap map;
 
@@ -412,7 +444,7 @@ public class LevelChoosingScreen extends GameScreen {
             initialScale = scale;
             this.map = map;
             LevelManager.loadLevel(map);
-            mapRenderer = new OrthogonalTiledMapRenderer(map, initialScale);
+            mapRenderer = new MyMapRenderer(map, initialScale);
             this.setSize(LevelManager.lvlPixelWidth*scale, LevelManager.lvlPixelHeight*scale);
             camera = new OrthographicCamera(gamePort.getWorldWidth(), gamePort.getWorldHeight());
             camera.position.set(stage.getCamera().position.x - getX(), stage.getCamera().position.y - getY(), 0);
@@ -425,7 +457,8 @@ public class LevelChoosingScreen extends GameScreen {
         @Override
         public void setScale(float scaleXY) {
 //            LevelManager.loadLevel(map);
-            mapRenderer = new OrthogonalTiledMapRenderer(map, initialScale*scaleXY);
+//            mapRenderer = new MyMapRenderer(map, initialScale*scaleXY);
+            mapRenderer.setUnitScale(initialScale*scaleXY);
         }
 
         @Override
@@ -434,7 +467,7 @@ public class LevelChoosingScreen extends GameScreen {
             mapRenderer.setView(camera);
         }
 
-        public OrthogonalTiledMapRenderer getMapRenderer() {
+        public MyMapRenderer getMapRenderer() {
             return mapRenderer;
         }
 
@@ -442,6 +475,33 @@ public class LevelChoosingScreen extends GameScreen {
             camera.position.x = stage.getCamera().position.x - x;
             camera.position.y = stage.getCamera().position.y - y;
             camera.update();
+        }
+    }
+
+    class MyMapRenderer extends OrthogonalTiledMapRenderer {
+        public MyMapRenderer(TiledMap map) {
+            super(map);
+        }
+
+        public MyMapRenderer(TiledMap map, Batch batch) {
+            super(map, batch);
+        }
+
+        public MyMapRenderer(TiledMap map, float unitScale) {
+            super(map, unitScale);
+        }
+
+        public MyMapRenderer(TiledMap map, float unitScale, Batch batch) {
+            super(map, unitScale, batch);
+        }
+
+        @Override
+        public void renderTileLayer(TiledMapTileLayer layer) {
+            super.renderTileLayer(layer);
+        }
+
+        public void setUnitScale(float scale) {
+            unitScale = scale;
         }
     }
 
@@ -469,8 +529,8 @@ public class LevelChoosingScreen extends GameScreen {
         trap = new TextureRegion(trap, trap.getRegionWidth()*3 / 4, 0, trap.getRegionWidth() / 4, trap.getRegionHeight());
 //        Gdx.app.log("Actors", frame.getChildren().size +"");
         currentFramePosition = new Vector2(stage.getWidth() / 2 - frameWidth / 2, 15);
-        prevFramePosition = new Vector2(currentFramePosition.x - frameWidth*sideFramesScale/ 2, stage.getHeight() / 2 - frameHeight*sideFramesScale / 2);
-        nextFramePosition = new Vector2(currentFramePosition.x + frameWidth - 40 , stage.getHeight() / 2 - frameHeight*sideFramesScale / 2);
+        prevFramePosition = new Vector2(currentFramePosition.x - frameWidth*sideFramesScale/ 2 - 20, stage.getHeight() / 2 - frameHeight*sideFramesScale / 2);
+        nextFramePosition = new Vector2(currentFramePosition.x + frameWidth - 20 , stage.getHeight() / 2 - frameHeight*sideFramesScale / 2);
         Frame frame1 = new Frame(1);
         frame1.setPosition(currentFramePosition.x, currentFramePosition.y);
         frame1.setTargetSettings(frame1.currentSettings);
@@ -563,8 +623,7 @@ public class LevelChoosingScreen extends GameScreen {
         Gdx.gl.glClearColor(0f, 0f, 0.1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-//        stage.act(delta);
-//        stage.draw();
+//        fpsLogger.log();
         drawFrames(delta);
     }
 
@@ -577,50 +636,38 @@ public class LevelChoosingScreen extends GameScreen {
 
         //drawing disappearing frames
         for(Frame frame: framesToBeDeleted) {
-            frame.setDrawing(true);
-            frame.drawBackground();
+            frame.drawBefore();
         }
         stage.draw();
         for(Frame frame: framesToBeDeleted) {
-            frame.drawMap();
-            frame.drawShards();
-            frame.setDrawing(false);
+            frame.drawAfter();
         }
 
         //drawing side frames
         Frame frameLeft = framesArray[0];
         if(frameLeft != null) {
-            frameLeft.setDrawing(true);
-            frameLeft.drawBackground();
+            frameLeft.drawBefore();
         }
         Frame frameRight = framesArray[2];
         if(frameRight != null) {
-            frameRight.setDrawing(true);
-            frameRight.drawBackground();
+            frameRight.drawBefore();
         }
         stage.draw();
         if(frameLeft != null) {
-            frameLeft.drawMap();
-            frameLeft.drawShards();
-            frameLeft.setDrawing(false);
+            frameLeft.drawAfter();
         }
         if(frameRight != null) {
-            frameRight.drawMap();
-            frameRight.drawShards();
-            frameRight.setDrawing(false);
+            frameRight.drawAfter();
         }
 
         //middle one
         Frame frameMiddle = framesArray[1];
         if(frameMiddle != null) {
-            frameMiddle.setDrawing(true);
-            frameMiddle.drawBackground();
+            frameMiddle.drawBefore();
         }
         stage.draw();
         if(frameMiddle != null) {
-            frameMiddle.drawMap();
-            frameMiddle.drawShards();
-            frameMiddle.setDrawing(false);
+            frameMiddle.drawAfter();
         }
     }
 
