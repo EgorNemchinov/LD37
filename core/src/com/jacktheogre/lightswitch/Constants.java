@@ -32,9 +32,10 @@ public class Constants {
 
     public static final float WASTE_ENERGY_PER_SWITCH = 15f;
     public static final float WASTE_ENERGY_PER_SEC = 30f;
-    public static final float ADD_ENERGY_PER_SEC = 10f;
+    public static final float ADD_ENERGY_PER_SEC = 13f;
 
     public static float PLAYTIME = 20f;
+    public static float GAME_SPEED = 1.5f;
 
     public static final float SYNCRONIZING_FREQUENCY_TIME = 0.5f;
 

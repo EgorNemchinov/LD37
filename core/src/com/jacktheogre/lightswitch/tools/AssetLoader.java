@@ -17,9 +17,7 @@ import com.jacktheogre.lightswitch.ai.LevelManager;
  */
 public class AssetLoader {
 
-    public static final float FONT_SCALE = 1.5f;
-    public static final float LETTER_WIDTH = 20f * FONT_SCALE;
-    public static final float LETTER_HEIGHT = 15 * FONT_SCALE;
+    public static final float FONT_SCALE = 1f;
     private AssetManager manager;
     public Texture characters, teleport, scale_fill, timer, trap;
     public Texture moon, buttons, joystick, shards_sheet;
@@ -119,7 +117,7 @@ public class AssetLoader {
             threeShards[i] = new TextureRegion(shards_sheet, 1 + 15*i, 19, 11, 11);
         }
 
-        font = new BitmapFont(Gdx.files.internal("data/font.fnt"));
+        font = new BitmapFont(Gdx.files.internal("data/manaspace.fnt"));
         font.getData().setScale(FONT_SCALE,FONT_SCALE);
     }
 
@@ -129,14 +127,6 @@ public class AssetLoader {
 
     public Preferences getCollectedShards() {
         return collectedShards;
-    }
-
-    public float getLetterWidth() {
-        return (LETTER_WIDTH / FONT_SCALE)*font.getScaleX();
-    }
-
-    public float getLetterHeight() {
-        return (LETTER_HEIGHT/ FONT_SCALE)*font.getScaleY();
     }
 
     public void dispose() {

@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -46,20 +47,21 @@ public class Shard extends InteractiveObject {
     }
 
     @Override
+    public Vector2 getCenter() {
+        return new Vector2(x + textureRegion.getRegionWidth() / 2, y + textureRegion.getRegionHeight() / 2);
+    }
+
+    @Override
     public boolean activate(Player player) {
         if(picked)
             return false;
-//        Gdx.app.log("Shard", "activate.start");
         Assets.getAssetLoader().shardsSounds[number].play();
         picked = true;
         playScreen.getShards().removeValue(this, true);
-//        Gdx.app.log("Shard", "shard removed");
         playScreen.collectShard(number);
-//        Gdx.app.log("Shard", "shard collected");
         return false;
     }
 
-    //fixme: new render method
     @Override
     public void render(SpriteBatch spriteBatch, float dt) {
         Color c = spriteBatch.getColor();

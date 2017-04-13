@@ -63,7 +63,7 @@ public class CommandHandler {
     }
 
     public void addCommandPlay(Command command) {
-        Gdx.app.log("Added command:", command+"");
+//        Gdx.app.log("Added command:", command+"");
         commands.push(command);
         command.execute();
         pointer++;

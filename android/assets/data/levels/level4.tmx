@@ -72,10 +72,8 @@
  </objectgroup>
  <objectgroup name="lights">
   <object id="12" x="48" y="96" width="16" height="16"/>
-  <object id="13" x="112" y="96" width="16" height="16"/>
   <object id="14" x="176" y="96" width="16" height="16"/>
   <object id="16" x="48" y="48" width="16" height="16"/>
-  <object id="17" x="112" y="48" width="16" height="16"/>
   <object id="18" x="176" y="48" width="16" height="16"/>
  </objectgroup>
 </map>

@@ -29,7 +29,6 @@ public class TeleportCommand extends ActorCommand {
     public boolean execute() {
         if(executed)
             return false;
-//        player.getGameActor().moveTo(destination.getX(), destination.getY());
         if(start.isOpen() && destination.isOpen()) {
             Gdx.app.postRunnable(new Runnable() {
                 @Override

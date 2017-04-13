@@ -1,8 +1,11 @@
 package com.jacktheogre.lightswitch.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -12,6 +15,7 @@ import com.jacktheogre.lightswitch.objects.InteractiveObject;
 import com.jacktheogre.lightswitch.sprites.Button;
 import com.jacktheogre.lightswitch.tools.AssetLoader;
 import com.jacktheogre.lightswitch.tools.Assets;
+import com.jacktheogre.lightswitch.tools.ColorLoader;
 import com.jacktheogre.lightswitch.tools.input.GameOverInputHandler;
 
 import static com.jacktheogre.lightswitch.screens.GameOverScreen.State.WIN;
@@ -20,6 +24,8 @@ import static com.jacktheogre.lightswitch.screens.GameOverScreen.State.WIN;
  * Created by luna on 10.12.16.
  */
 public class GameOverScreen extends GameScreen{
+
+    private final Color BACKGROUND_COLOR = ColorLoader.colorMap.get("GAMEOVER_SCREEN_BACKGROUND");
 
     private static final float INTERVAL = 10;
     private static final float SCALE = 1.5f;
@@ -32,6 +38,7 @@ public class GameOverScreen extends GameScreen{
     private State state;
     private Button next_level, replay, home;
     private Array<InteractiveObject> interactiveObjects;
+    private Label result;
 
     public GameOverScreen(LightSwitch game, State state) {
         super();
@@ -41,6 +48,15 @@ public class GameOverScreen extends GameScreen{
         gamePort = new FitViewport(LightSwitch.WIDTH, LightSwitch.HEIGHT, gameCam);
         gameCam.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
         initializeButtons();
+        result = new Label(state == WIN ? "YOU WIN!" : "GAME OVER",
+                new Label.LabelStyle(Assets.getAssetLoader().font, ColorLoader.colorMap.get("GAMEOVER_LABELS_COLOR")));
+        if(LevelManager.isMaxLevel() && state == WIN)
+            result.setText("CONGRATULATIONS!");
+        result.setAlignment(Align.center);
+        result.setFontScale(1.2f);
+        result.setSize(gamePort.getWorldWidth() * 0.6f, gamePort.getWorldHeight() / 2);
+        result.setPosition(gamePort.getWorldWidth() / 2 - result.getWidth() / 2,
+                gamePort.getWorldHeight() / 2 - result.getHeight() / 2);
 
         Gdx.input.setInputProcessor(new GameOverInputHandler(this));
     }
@@ -73,38 +89,12 @@ public class GameOverScreen extends GameScreen{
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0f, 0f, 0.1f, 1);
+        Gdx.gl.glClearColor(BACKGROUND_COLOR.r, BACKGROUND_COLOR.g, BACKGROUND_COLOR.b, BACKGROUND_COLOR.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         game.batch.setProjectionMatrix(gameCam.combined);
         game.batch.begin();
-        Assets.getAssetLoader().font.getData().setScale(AssetLoader.FONT_SCALE);
-        switch (state) {
-            case WIN:
-                if(LevelManager.isMaxLevel()) {
-                    Assets.getAssetLoader().font.getData().setScale(1f);
-                    Assets.getAssetLoader().font.draw(game.batch, "CONGRATULATIONS!",
-                            gamePort.getWorldWidth() / 2 - 7.5f* Assets.getAssetLoader().getLetterWidth(),
-                            gamePort.getWorldHeight() / 2);
-                    Assets.getAssetLoader().font.getData().setScale(Assets.getAssetLoader().FONT_SCALE);
-                } else {
-
-                    Assets.getAssetLoader().font.draw(game.batch, "YOU",
-                            gamePort.getWorldWidth() / 2 - 2f* AssetLoader.LETTER_WIDTH,
-                            gamePort.getWorldHeight() / 2 + 1.2f * AssetLoader.LETTER_HEIGHT);
-                    Assets.getAssetLoader().font.draw(game.batch, "WIN!",
-                            gamePort.getWorldWidth() / 2 - 2f* AssetLoader.LETTER_WIDTH,
-                            gamePort.getWorldHeight() / 2);
-                }
-                break;
-            case LOSE:
-                Assets.getAssetLoader().font.draw(game.batch, "GAME",
-                                gamePort.getWorldWidth() / 2 - 2f* AssetLoader.LETTER_WIDTH,
-                                gamePort.getWorldHeight() / 2 + 1.3f * AssetLoader.LETTER_HEIGHT);
-                Assets.getAssetLoader().font.draw(game.batch, "OVER",
-                        gamePort.getWorldWidth() / 2 - 2f* AssetLoader.LETTER_WIDTH,
-                        gamePort.getWorldHeight() / 2);
-                break;
-        }
+//        Assets.getAssetLoader().font.getData().setScale(AssetLoader.FONT_SCALE);
+        result.draw(game.batch, 1f);
         renderButtons(gameCam);
         if(game.batch.isDrawing())
             game.batch.end();

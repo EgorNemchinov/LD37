@@ -48,12 +48,12 @@ public class GameOverInputHandler implements InputProcessor {
     public boolean keyUp(int keycode) {
         if(keycode == Input.Keys.ENTER) {
             enterButton.unpress();
-            if(enterButton == screen.getNext_level()) {
-                LevelManager.nextLevel();
-                screen.getGame().setScreen(new GeneratingScreen(screen.getGame()));
-            } else {
-                screen.getGame().setScreen(new GeneratingScreen(screen.getGame(), screen.getObjects()));
-            }
+//            if(enterButton == screen.getNext_level()) {
+//                LevelManager.nextLevel();
+//                screen.getGame().setScreen(new GeneratingScreen(screen.getGame()));
+//            } else {
+//                screen.getGame().setScreen(new GeneratingScreen(screen.getGame(), screen.getObjects()));
+//            }
         }
         if(keycode == Input.Keys.R) {
             screen.getReplay().unpress();

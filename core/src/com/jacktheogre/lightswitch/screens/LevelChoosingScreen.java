@@ -35,6 +35,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.jacktheogre.lightswitch.LightSwitch;
 import com.jacktheogre.lightswitch.ai.LevelManager;
 import com.jacktheogre.lightswitch.tools.Assets;
+import com.jacktheogre.lightswitch.tools.ColorLoader;
 import com.jacktheogre.lightswitch.tools.DrawingAssistant;
 
 
@@ -43,6 +44,7 @@ import com.jacktheogre.lightswitch.tools.DrawingAssistant;
  */
 
 public class LevelChoosingScreen extends GameScreen {
+    private final Color BACKGROUND = ColorLoader.colorMap.get("LEVEL_CHOOSING_SCREEN_BACKGROUND");
 
     public Stage stage;
     private ScreenActor screenActor;
@@ -173,24 +175,28 @@ public class LevelChoosingScreen extends GameScreen {
             main = new Table();
             main.setSize(getWidth(), getHeight());
             mapActor = new MapActor(0.8f, Assets.getAssetLoader().maps[levelNumber]);
-            levelLabel = new Label("Level "+levelNumber, new Label.LabelStyle(Assets.getAssetLoader().font, Color.WHITE));
-            levelLabel.getStyle().font.getData().setScale(1f);
+            levelLabel = new Label("Level "+levelNumber, new Label.LabelStyle(Assets.getAssetLoader().font, ColorLoader.colorMap.get("LEVEL_LABEL_COLOR")));
+            levelLabel.setFontScale(0.8f);
             levelLabel.setAlignment(Align.center);
 
             teleportImage = new Image(teleport);
             trapImage = new Image(trap);
-            teleportLabel = new Label(LevelManager.getAmountOfTeleports(levelNumber)+"", new Label.LabelStyle(Assets.getAssetLoader().font, Color.WHITE));
-            trapLabel = new Label(LevelManager.getAmountOfTraps(levelNumber)+"", new Label.LabelStyle(Assets.getAssetLoader().font, Color.WHITE));
+            teleportLabel = new Label(LevelManager.getAmountOfTeleports(levelNumber)+"",
+                    new Label.LabelStyle(Assets.getAssetLoader().font, ColorLoader.colorMap.get("RESOURSES_LABELS_COLOR")));
+            trapLabel = new Label(LevelManager.getAmountOfTraps(levelNumber)+"",
+                    new Label.LabelStyle(Assets.getAssetLoader().font, ColorLoader.colorMap.get("RESOURSES_LABELS_COLOR")));
             teleportLabel.setAlignment(Align.center);
-            teleportLabel.setFontScale(1.3f);
+//            teleportLabel.setFontScale(0.8f);
             trapLabel.setAlignment(Align.center);
-            trapLabel.setFontScale(1.3f);
+//            trapLabel.setFontScale(0.8f);
 
             final TextureRegion playButtonTexture = Assets.getAssetLoader().start_button;
-            playButton = new Button(new TextureRegionDrawable(new TextureRegion(playButtonTexture, playButtonTexture.getRegionWidth() / 2, 0,
-                    playButtonTexture.getRegionWidth() / 4, playButtonTexture.getRegionHeight())),
-                    new TextureRegionDrawable(new TextureRegion(playButtonTexture, playButtonTexture.getRegionWidth()*3 / 4, 0,
-                            playButtonTexture.getRegionWidth() / 4, playButtonTexture.getRegionHeight())));
+            TextureRegion usualButton, pressedButton;
+            usualButton = new TextureRegion(playButtonTexture, open ? playButtonTexture.getRegionWidth() / 2 : 0, 0,
+                    playButtonTexture.getRegionWidth() / 4, playButtonTexture.getRegionHeight());
+            pressedButton = open ? new TextureRegion(playButtonTexture, playButtonTexture.getRegionWidth()*3 / 4, 0,
+                    playButtonTexture.getRegionWidth() / 4, playButtonTexture.getRegionHeight()) : usualButton;
+            playButton = new Button(new TextureRegionDrawable(usualButton), new TextureRegionDrawable(pressedButton));
             playButton.setBounds(playButton.getX(), playButton.getY(), playButton.getWidth(), playButton.getHeight());
             playButton.addListener(new ClickListener() {
                 @Override
@@ -216,15 +222,16 @@ public class LevelChoosingScreen extends GameScreen {
             main.align(Align.top | Align.center);
             main.add(levelLabel).expandX().colspan(4).row();
             main.padLeft(0);
-            Cell<MapActor> cell = main.add(mapActor).expandX().colspan(4);
+            Cell<MapActor> cell = main.add(mapActor).expandX().colspan(4).padBottom(-5);
             cell.row();
 
-            int cellHeight = (int) ((mapActor.getWidth() / 4)*0.7f);
-            main.add(teleportImage).minHeight(cellHeight).fill(0.7f, 1f);
-            main.add(teleportLabel);
-            main.add(trapImage).fill(0.7f, 1f);
-            main.add(trapLabel).row();
-            main.padBottom(10);
+            float cellScale = 0.5f;
+            int cellHeight = (int) ((mapActor.getWidth() / 4)*cellScale);
+            main.add(teleportImage).minHeight(cellHeight).fill(cellScale, cellScale);
+            main.add(teleportLabel).maxHeight(cellHeight);
+            main.add(trapImage).minHeight(cellHeight).fill(cellScale, cellScale);
+            main.add(trapLabel).maxHeight(cellHeight).row();
+            main.padBottom(0);
             main.add(playButton).colspan(4);
             main.moveBy((main.getWidth() - mapActor.getWidth() )/ 2, 0);
             main.setWidth(mapActor.getWidth());
@@ -360,10 +367,10 @@ public class LevelChoosingScreen extends GameScreen {
                 return;
             }
             shardsToUnlock = new Label(LevelManager.getTotalShardsCollected() +"/"+LevelManager.getAmountOfShardsToUnlock(levelNumber),
-                    new Label.LabelStyle(Assets.getAssetLoader().font, new Color(100/256f, 100/256f, 150/256f, 1f)));
+                    new Label.LabelStyle(Assets.getAssetLoader().font, ColorLoader.colorMap.get("LEVEL_LOCKED_SHARDS_TO_UNLOCK_LABEL")));
             shardsToUnlock.setSize(main.getWidth(), mapActor.getHeight() / 2); // FIXME: 09.04.17 set correct height
             shardsToUnlock.setAlignment(Align.center);
-            shardsToUnlock.setFontScale(1.5f);
+            shardsToUnlock.setFontScale(1.7f);
             shardsCounter = new Group();
             shardsCounter.setSize(shardsToUnlock.getWidth(), shardsToUnlock.getHeight());
             shardsCounter.addActor(shardsToUnlock);
@@ -405,10 +412,11 @@ public class LevelChoosingScreen extends GameScreen {
             shapeRenderer.setProjectionMatrix(stage.getCamera().combined);
             shapeRenderer.setAutoShapeType(true);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.setColor(new Color(80/255f, 56/255f, 80/255f, 0.8f));
+            shapeRenderer.setColor(ColorLoader.colorMap.get("LEVEL_FRAME_STROKE"));
             DrawingAssistant.roundedRect(shapeRenderer, getX() + main.getX()*getScaleX(), getY() + main.getY()*getScaleY(),
                     main.getWidth()*getScaleX(), main.getHeight()*getScaleY(), 10);
-            shapeRenderer.setColor(open ? new Color(56/255f, 56/255f, 113/255f, 1f) : new Color(30/255f, 30/255f, 60/255f, 1f));
+            shapeRenderer.setColor(open ? ColorLoader.colorMap.get("LEVEL_FRAME_UNLOCKED_BACKGROUND")
+                    : ColorLoader.colorMap.get("LEVEL_FRAME_LOCKED_BACKGROUND"));
             int borderSize = 2;
             DrawingAssistant.roundedRect(shapeRenderer, getX() + main.getX()*getScaleX() + borderSize, getY() + main.getY()*getScaleY() + borderSize,
                     main.getWidth()*getScaleX() - 2*borderSize, main.getHeight()*getScaleY() - 2*borderSize, 6);
@@ -620,7 +628,7 @@ public class LevelChoosingScreen extends GameScreen {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0f, 0f, 0.1f, 1);
+        Gdx.gl.glClearColor(BACKGROUND.r, BACKGROUND.g, BACKGROUND.b, BACKGROUND.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 //        fpsLogger.log();

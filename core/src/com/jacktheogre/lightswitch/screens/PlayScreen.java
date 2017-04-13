@@ -1,6 +1,7 @@
 package com.jacktheogre.lightswitch.screens;
 
 import com.badlogic.gdx.Application;
+import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.FPSLogger;
@@ -32,6 +33,7 @@ import com.jacktheogre.lightswitch.sprites.EnemyPlayer;
 import com.jacktheogre.lightswitch.sprites.GameActor;
 import com.jacktheogre.lightswitch.sprites.Player;
 import com.jacktheogre.lightswitch.tools.CameraSettings;
+import com.jacktheogre.lightswitch.tools.ColorLoader;
 import com.jacktheogre.lightswitch.tools.input.PlayInputHandler;
 import com.jacktheogre.lightswitch.tools.Lighting;
 import com.jacktheogre.lightswitch.tools.WorldContactListener;
@@ -41,6 +43,7 @@ import com.jacktheogre.lightswitch.tools.WorldContactListener;
  * Created by luna on 10.12.16.
  */
 public class PlayScreen extends GameScreen {
+    private final Color BACKGROUND_COLOR = ColorLoader.colorMap.get("PLAYING_SCREEN_BACKGROUND");
     private final WorldContactListener contactListener;
     private PlayInputHandler inputHandler;
     public Array<InteractiveObject> objects;
@@ -121,13 +124,14 @@ public class PlayScreen extends GameScreen {
         runTime = 0;
 
         initializeButtons();
+//        game.batch.setShader(Assets.getAssetLoader().shaderProgram);
 
         Gdx.input.setInputProcessor(inputHandler);
     }
 
     //sorts them out by index
     private Array<InteractiveObject> combineTrapsAndTeleports(Array<Teleport> teleports, Array<Trap> traps) {
-        Array<InteractiveObject> objectArray = new Array<InteractiveObject>();
+        Array<InteractiveObject> objectArray =  new Array<InteractiveObject>();
         int index = 1, indexTeleports = 0, indexTraps = 0;
         Teleport currentTeleport;
         Trap currentTrap;
@@ -150,8 +154,19 @@ public class PlayScreen extends GameScreen {
         return objectArray;
     }
 
+    private int updateCounter = 0;
+    private long lastTimeUpdate = System.currentTimeMillis();
+
     public void update(float dt) {
         super.update(dt);
+
+        if(System.currentTimeMillis() - lastTimeUpdate >= 1000) {
+            Gdx.app.log("updates", updateCounter+"");
+            lastTimeUpdate = System.currentTimeMillis();
+            updateCounter = 0;
+        }
+        updateCounter++;
+
         inputHandler.update();
         runTime += dt;
         if (runTime > Constants.PLAYTIME) {
@@ -171,7 +186,9 @@ public class PlayScreen extends GameScreen {
         player.update(dt);
         enemyPlayer.update(dt);
         checkFixtureContacts();
-        world.step(1 / 60f, 6, 2);
+
+        world.step(1 / (float)FPS, 6, 2);
+
         player.getGameActor().remakePath();
 
         lerpCamera(targetSettings, dt);
@@ -180,20 +197,57 @@ public class PlayScreen extends GameScreen {
         mapRenderer.setView(gameCam);
     }
 
+    private long lastTime = System.nanoTime();
+    public static final long ONE_SECOND_NS = 1000000000;
+    private int maxUpdates = 0;
+    public static final int FPS = 60;
+    private final long timeStepNano = ONE_SECOND_NS / FPS;
+    private long timeLeft = 0;
+
     public void render(float dt) {
+        if(Gdx.app.getType() == Application.ApplicationType.Android) {
+            renderAndroid(dt);
+        } else if(Gdx.app.getType() == Application.ApplicationType.Desktop || Gdx.app.getType() == Application.ApplicationType.WebGL) {
+            //because fps is always ~60
+            update(dt);
+            renderWorld(dt);
+        }
+    }
+
+    private void renderAndroid(float dt) {
+        long time = System.nanoTime();
+        long timeDelta = time - lastTime + timeLeft;
+        lastTime = System.nanoTime();
+
+        int updateCount = 0;
+        while (timeDelta > timeStepNano && (maxUpdates <= 0 || updateCount < maxUpdates) /*&& !paused*/) {
+            // Update using a time step in seconds
+//            long updateTimeStep = Math.min(timeDelta, ONE_SECOND_NS / FPS);
+            long updateTimeStep = timeStepNano;
+            float updateTimeStepSeconds = updateTimeStep / (float) ONE_SECOND_NS;
+
+            update(updateTimeStepSeconds);
+
+            timeDelta -= updateTimeStep;
+            updateCount++;
+        }
+        timeLeft = timeDelta;
+
+        renderWorld(dt);
+
+    }
+
+    private void renderWorld(float dt) {
         shapeRenderer.setProjectionMatrix(gameCam.combined);
         shapeRenderer.setAutoShapeType(true);
         shapeRenderer.setColor(Color.WHITE);
-        update(dt);
 
-        Gdx.gl.glClearColor(0f, 0f, 0.1f, 1);
+        Gdx.gl.glClearColor(BACKGROUND_COLOR.r, BACKGROUND_COLOR.g, BACKGROUND_COLOR.b, BACKGROUND_COLOR.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         mapRenderer.render();
-
         game.batch.setProjectionMatrix(gameCam.combined);
         game.batch.begin();
-//        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         for (InteractiveObject object : objects) {
             object.render(game.batch, shapeRenderer, dt);
         }
@@ -211,26 +265,40 @@ public class PlayScreen extends GameScreen {
             }
             player.getGameActor().draw(game.batch);
         }
-
         game.batch.end();
 
-        shapeRenderer.begin();
-        shapeRenderer.setColor(Color.BLUE);
-        if(touchPoint != null)
-            shapeRenderer.circle(touchPoint.x, touchPoint.y, 1);
-        shapeRenderer.end();
+//        shapeRenderer.setProjectionMatrix(game.batch.getProjectionMatrix());
+//        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+//        shapeRenderer.setColor(Color.BLUE);
+//        shapeRenderer.rect(100, 100, 100, 100);
+//        shapeRenderer.circle(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 200);
+//        if(touchPoint != null)
+//            shapeRenderer.circle(touchPoint.x, touchPoint.y, 1);
+//        shapeRenderer.end();
 
         lighting.render(dt);
 
-        hud.render(dt);
+//        darkenScreen();
 
-        game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
+        hud.render(dt);
 
 //        LevelManager.graph.render(shapeRenderer);
 //        b2dRenderer.render(world, gameCam.combined);
 //        player.getGameActor().getPath().render(shapeRenderer);
 //        enemyPlayer.getGameActor().getPath().render(shapeRenderer);
 //        fpsLogger.log();
+    }
+
+    private void darkenScreen() {
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        shapeRenderer.setProjectionMatrix(gameCam.combined);
+        if(!shapeRenderer.isDrawing())
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(new Color(0, 0, 0, 0.5f));
+        shapeRenderer.rect(0, 0, gamePort.getScreenWidth(), gamePort.getScreenHeight());
+        shapeRenderer.end();
+        Gdx.gl.glDisable(GL20.GL_BLEND);
     }
 
     private boolean higher(GameActor first, GameActor second) {
@@ -303,6 +371,14 @@ public class PlayScreen extends GameScreen {
         hud.collectShard(number);
     }
 
+    //center of tile
+    public void activateShard(int x, int y) {
+        for (Shard shard : shards) {
+            if (shard.getCenter().equals(new Vector2(x, y)))
+                shard.activate(player);
+        }
+    }
+
     public void addFixtureContact(Contact contact) {
         fixturesContacts.add(contact);
     }
@@ -313,7 +389,8 @@ public class PlayScreen extends GameScreen {
 
 
     public void endGame() {
-        Gdx.app.log("PlayScreen", "endGame called");
+//        Gdx.app.log("PlayScreen", "endGame called");
+        game.batch.setShader(null);
         boolean win = false;
         if(runTime > Constants.PLAYTIME) {
             win = game.isPlayingHuman();

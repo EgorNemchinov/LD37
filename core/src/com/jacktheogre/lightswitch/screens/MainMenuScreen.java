@@ -13,13 +13,14 @@ import com.jacktheogre.lightswitch.sprites.Button;
 import com.jacktheogre.lightswitch.tools.AssetLoader;
 import com.jacktheogre.lightswitch.tools.Assets;
 import com.jacktheogre.lightswitch.multiplayer.BluetoothSingleton;
+import com.jacktheogre.lightswitch.tools.ColorLoader;
 import com.jacktheogre.lightswitch.tools.input.MainMenuInputHandler;
 
 /**
  * Created by luna on 10.12.16.
  */
 public class MainMenuScreen extends GameScreen{
-    private final Color BACKGROUND_COLOR = new Color(30/255f, 10/255f, 30/255f, 1f);
+    private final Color BACKGROUND_COLOR = ColorLoader.colorMap.get("MAINMENU_SCREEN_BACKGROUND");
 
     //basically every state has it's own array of buttons
     //inputhandler checks array of buttons received from getButtons(), which returns state's array

@@ -3,6 +3,7 @@ package com.jacktheogre.lightswitch;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.jacktheogre.lightswitch.screens.*;
+import com.jacktheogre.lightswitch.tools.ColorLoader;
 
 public class LightSwitch extends Game {
 
@@ -20,7 +21,8 @@ public class LightSwitch extends Game {
     @Override
 	public void create () {
 		batch = new SpriteBatch();
-		this.setScreen(new MainMenuScreen(this));
+        ColorLoader.load();
+        this.setScreen(new MainMenuScreen(this));
         state = State.SINGLEPLAYER;
 	}
 

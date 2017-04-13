@@ -32,6 +32,7 @@ import com.jacktheogre.lightswitch.sprites.Player;
 import com.jacktheogre.lightswitch.tools.AssetLoader;
 import com.jacktheogre.lightswitch.tools.Assets;
 import com.jacktheogre.lightswitch.tools.B2WorldCreator;
+import com.jacktheogre.lightswitch.tools.ColorLoader;
 import com.jacktheogre.lightswitch.tools.input.GenerateInputHandler;
 import com.jacktheogre.lightswitch.tools.Lighting;
 
@@ -45,7 +46,7 @@ public class GeneratingScreen extends GameScreen {
     private final Color DEFAULT = new Color(0.2f, 0.1f, 0.2f, 0.3f);
     private final Color CORRECT = new Color(0, 1, 0, 0.3f);
     private final Color WRONG = new Color(1, 0, 0, 0.3f);
-    private final Color BACKGROUND_COLOR = new Color(56/255f, 56/255f, 113/255f, 1f);
+    private final Color BACKGROUND_COLOR = ColorLoader.colorMap.get("GENERATING_SCREEN_BACKGROUND");
 //    private final Color BACKGROUND_COLOR = Color.BLACK;
 
     public enum State {DEFAULT, SETTING_TELEPORT, SETTING_TRAP}
@@ -84,7 +85,7 @@ public class GeneratingScreen extends GameScreen {
         loader = Assets.getAssetLoader();
         Node.Indexer.nullify();
         LevelManager.loadLevel(loader.getMap());
-        mapRenderer = new OrthogonalTiledMapRenderer(loader.getMap());
+        mapRenderer = new OrthogonalTiledMapRenderer(loader.getMap(), 1);
 
         state = State.DEFAULT;
 
@@ -116,6 +117,8 @@ public class GeneratingScreen extends GameScreen {
         Trap.Indexer.nullify();
         Teleport.Indexer.nullify();
         Gdx.input.setInputProcessor(new GenerateInputHandler(this));
+//        game.batch.setShader(Assets.getAssetLoader().shaderProgram);
+
         initObjects = true;
     }
 
@@ -204,7 +207,7 @@ public class GeneratingScreen extends GameScreen {
     }
 
     private void initializeLabels() {
-        Color fontColor = new Color(40/256f, 20/256f, 60/256f, 1f);
+        Color fontColor = ColorLoader.colorMap.get("RESOURSES_LEFT_LABELS_COLOR");
         teleportsLeft = new Label(teleportsLeft()+"x", new Label.LabelStyle(Assets.getAssetLoader().font, fontColor)) {
             @Override
             public void act(float delta) {

@@ -15,7 +15,7 @@ import com.jacktheogre.lightswitch.tools.Assets;
  * Created by luna on 19.10.16.
  */
 public class Human extends GameActor {
-    public static final int MAX_SPEED = 75;
+    public static final int MAX_SPEED = 50;
 
     private final int WIDTH = 22;
     private final int HEIGHT = 26;
@@ -185,7 +185,7 @@ public class Human extends GameActor {
     }
 
     public int getSpeed() {
-        return MAX_SPEED;
+        return (int) (MAX_SPEED*Constants.GAME_SPEED);
     }
 
     @Override

@@ -20,11 +20,11 @@ import box2dLight.RayHandler;
 public class Lighting {
 
     private final Color[] COLORS = {
-        new Color(0xed/255f, 0x8a/255f, 0x00/255f, 0.6f), new Color(0xed/255f, 0x8a/255f, 0x00/255f, 0.6f)
+            ColorLoader.colorMap.get("GLOBAL_LIGHTS_COLOR"), ColorLoader.colorMap.get("GLOBAL_LIGHTS_COLOR")
     };
-    private final Color AMBIENT_HUMAN = new Color(0.05f, 0.15f, 0.05f, 0.20f);
+    private final Color AMBIENT_HUMAN = ColorLoader.colorMap.get("AMBIENT_LIGHT_BOY_COLOR");
     private final Color AMBIENT_MONSTER = new Color(0.4f, 0.15f, 0.1f, 0.35f);
-    private final Color LIGHT_HUMAN= new Color(0xb6/255f, 0xFF/255f, 0xDB/255f, 0.8f);
+    private final Color LIGHT_HUMAN= ColorLoader.colorMap.get("ACTOR_LIGHT_COLOR");
     private final Color LIGHT_MONSTER = new Color(200/255f, 0/255f, 100/255f, 0.6f);
 
     //box2dlights

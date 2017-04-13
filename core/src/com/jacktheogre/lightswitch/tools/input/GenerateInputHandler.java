@@ -35,9 +35,6 @@ public class GenerateInputHandler implements InputProcessor{
         if(keycode == Input.Keys.T) {
             screen.getTeleportButton().press();
         }
-        if(keycode == Input.Keys.BACK || keycode == Input.Keys.BACKSPACE) {
-            screen.getGame().setScreen(new LevelChoosingScreen(screen.getGame()));
-        }
         return true;
     }
 
@@ -59,6 +56,9 @@ public class GenerateInputHandler implements InputProcessor{
         if(keycode == Input.Keys.T) {
             if(screen.getTeleportButton().unpress())
                 screen.setState(GeneratingScreen.State.SETTING_TELEPORT);
+        }
+        if(keycode == Input.Keys.BACK || keycode == Input.Keys.BACKSPACE) {
+            screen.getGame().setScreen(new LevelChoosingScreen(screen.getGame()));
         }
         return true;
     }

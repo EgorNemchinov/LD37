@@ -140,6 +140,7 @@ public abstract class GameActor extends Sprite {
         }
         setRegion(getFrame(dt));
         setPosition(b2body.getPosition().x - getWidth() / 2 , b2body.getPosition().y - getHeight() / 2 );
+//        Gdx.app.log("Actor", "Speed is "+ b2body.getLinearVelocity());
     }
 
 

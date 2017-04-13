@@ -90,6 +90,7 @@ public class Teleport extends InteractiveObject {
         spriteBatch.draw(getFrame(dt), x, y, 2*bounds.radius, 2*bounds.radius);
         spriteBatch.end();
         Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(REFRESH_COLOR);
         shapeRenderer.arc(x + bounds.radius, y + bounds.radius, bounds.radius, 90f,

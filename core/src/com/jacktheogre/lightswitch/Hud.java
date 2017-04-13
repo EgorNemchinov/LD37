@@ -25,6 +25,7 @@ import com.jacktheogre.lightswitch.commands.WallthroughCommand;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
 import com.jacktheogre.lightswitch.sprites.Button;
 import com.jacktheogre.lightswitch.tools.Assets;
+import com.jacktheogre.lightswitch.tools.ColorLoader;
 
 /**
  * Created by luna on 20.10.16.
@@ -60,10 +61,10 @@ public class Hud implements Disposable{
 
         initializeGraphicElements();
 
-        timeLabel = new Label(Constants.PLAYTIME+"", new Label.LabelStyle(Assets.getAssetLoader().font, new Color(0xb6/255F, 0XFf/255f, 0xcb/255f, 1f)));
-        timeLabel.setFontScale(0.6f);
-        timeLabel.setBounds(timer.getX() + 5, timer.getY() + 2, timer.getWidth() - 6, timer.getHeight() - 4);
-        timeLabel.setWrap(true);
+        timeLabel = new Label(Constants.PLAYTIME+"", new Label.LabelStyle(Assets.getAssetLoader().font, ColorLoader.colorMap.get("TIMER_LABEL_COLOR")));
+        timeLabel.setFontScale(0.5f);
+        timeLabel.setBounds(timer.getX() + 3, timer.getY() + 2, timer.getWidth() - 6, timer.getHeight() - 4);
+//        timeLabel.setWrap(true);
         timeLabel.setAlignment(Align.center);
 
         if(Gdx.app.getType() == Application.ApplicationType.Android) {

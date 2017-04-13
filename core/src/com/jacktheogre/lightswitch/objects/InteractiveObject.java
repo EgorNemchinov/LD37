@@ -163,7 +163,7 @@ public abstract class InteractiveObject {
     }
 
     public Vector2 getCenter() {
-        return new Vector2(x + 8, y + 8);
+        return new Vector2(x + bounds.radius, y + bounds.radius);
     }
 
     public int getIndex() {
