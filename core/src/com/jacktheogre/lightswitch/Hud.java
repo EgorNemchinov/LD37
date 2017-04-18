@@ -119,9 +119,11 @@ public class Hud implements Disposable{
                     public void update(float dt) {
                         if(playScreen.getEnergy() >= Constants.WASTE_ENERGY_PER_SWITCH) {
 //                            setState(State.DISABLED);
-                            enable();
+                            if(disabled)
+                                enable();
                         }
-                        // FIXME: 04.04.17 why is turning off
+                        if(disabled && state != State.DISABLED)
+                            disable();
                         if(playScreen.getLighting().lightsOn() && !isPressed())
                             playScreen.getCommandHandler().addCommandPlay(new TurnOffCommand(playScreen));
                     }
@@ -149,13 +151,13 @@ public class Hud implements Disposable{
                         int width = textureRegion.getRegionWidth() / 2;
                         Array<TextureRegion> frames = new Array<TextureRegion>();
 
-                        for (int i = 0; i < 2; i++) {
+                        for (int i = 0; i < 3; i++) {
                             frames.add(new TextureRegion(textureRegion, i*width, 0, width, textureRegion.getRegionHeight()));
                         }
                         disabledTexture = frames.get(0);
-                        activeTexture = frames.get(0);
-                        focusedTexture = frames.get(0);
-                        pressedTexture = frames.get(1);
+                        activeTexture = frames.get(1);
+                        focusedTexture = frames.get(1);
+                        pressedTexture = frames.get(2);
 
                         this.setSize(width, this.getHeight());
                     }
@@ -345,8 +347,6 @@ public class Hud implements Disposable{
     }
 
     public Button getLightButton() {
-        if(lightButton == null)
-            Gdx.app.log("", "lightbutton is null");
         return lightButton;
     }
 }

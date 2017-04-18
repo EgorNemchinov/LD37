@@ -72,7 +72,7 @@ public class LevelManager {
     }
     private static Map<Integer, Resourses> levelsMap;
 
-    public static final int LEVEL_AMOUNT = 7;
+    public static final int LEVEL_AMOUNT = 8;
     private static int levelNum = 1;
 
     static {

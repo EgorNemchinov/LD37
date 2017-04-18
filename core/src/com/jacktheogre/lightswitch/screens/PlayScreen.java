@@ -1,8 +1,8 @@
 package com.jacktheogre.lightswitch.screens;
 
 import com.badlogic.gdx.Application;
-import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.ai.msg.MessageManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL20;
@@ -37,6 +37,7 @@ import com.jacktheogre.lightswitch.tools.ColorLoader;
 import com.jacktheogre.lightswitch.tools.input.PlayInputHandler;
 import com.jacktheogre.lightswitch.tools.Lighting;
 import com.jacktheogre.lightswitch.tools.WorldContactListener;
+import com.jacktheogre.lightswitch.tutorials.TutorialTelegraph;
 
 
 /**
@@ -71,18 +72,19 @@ public class PlayScreen extends GameScreen {
     private float energy;
 
     private CameraSettings currentSetings, targetSettings;
+    private boolean paused = false;
 
     public PlayScreen(GeneratingScreen screen) {
         super();
         this.game = screen.getGame();
-        gameCam = screen.getGameCam();
+//        gameCam = screen.getGameCam();
         currentSetings = new CameraSettings(screen.getGameCam());
 //        if(!game.isPlayingHuman())
 //            targetSettings = new CameraSettings(currentSetings.getX() + 25, currentSetings.getY() + 30, currentSetings.getZoom() - 0.2f);
 //        else
             targetSettings = new CameraSettings(currentSetings.getX(), currentSetings.getY() + 30, currentSetings.getZoom() - 0.1f);
 
-        gamePort = screen.getGamePort();
+//        gamePort = screen.getGamePort();
         mapRenderer = screen.getMapRenderer();
         world = screen.getWorld();
         b2dRenderer = new Box2DDebugRenderer();
@@ -123,10 +125,19 @@ public class PlayScreen extends GameScreen {
         fixturesContacts = new Array<Contact>();
         runTime = 0;
 
+        paused = false;
         initializeButtons();
+
+        notifyTutorialTelegraph();
 //        game.batch.setShader(Assets.getAssetLoader().shaderProgram);
 
         Gdx.input.setInputProcessor(inputHandler);
+    }
+
+    @Override
+    protected void notifyTutorialTelegraph() {
+        super.notifyTutorialTelegraph();
+        MessageManager.getInstance().dispatchMessage(0.01f, null, TutorialTelegraph.getInstance(), TutorialTelegraph.LIGHT_BUTTON);
     }
 
     //sorts them out by index
@@ -157,36 +168,43 @@ public class PlayScreen extends GameScreen {
     private int updateCounter = 0;
     private long lastTimeUpdate = System.currentTimeMillis();
 
-    public void update(float dt) {
-        super.update(dt);
-
+    private void countUpdates() {
         if(System.currentTimeMillis() - lastTimeUpdate >= 1000) {
-            Gdx.app.log("updates", updateCounter+"");
+//            Gdx.app.log("updates", updateCounter+"");
             lastTimeUpdate = System.currentTimeMillis();
             updateCounter = 0;
         }
         updateCounter++;
+    }
 
-        inputHandler.update();
-        runTime += dt;
-        if (runTime > Constants.PLAYTIME) {
-            endGame();
-        }
-        addEnergy(Constants.ADD_ENERGY_PER_SEC * dt);
-        if(Gdx.app.getType() == Application.ApplicationType.Android) {
-            handleTouchpadInput();
-        }
+    public void update(float dt) {
+        super.update(dt);
 
-        MessageHandler.getMessage(commandHandler);
-        //messages are sent from commandhandler
-        commandHandler.update(dt);
-        for (InteractiveObject object :objects) {
-            object.update(dt);
-        }
-        player.update(dt);
-        enemyPlayer.update(dt);
-        checkFixtureContacts();
+        countUpdates();
 
+        if(!paused) {
+            inputHandler.update();
+            runTime += dt;
+            if (runTime > Constants.PLAYTIME) {
+                endGame();
+            }
+            addEnergy(Constants.ADD_ENERGY_PER_SEC * dt);
+            if(Gdx.app.getType() == Application.ApplicationType.Android) {
+                handleTouchpadInput();
+            }
+
+            MessageHandler.getMessage(commandHandler);
+            //messages are sent from commandhandler
+            commandHandler.update(dt);
+            for (InteractiveObject object :objects) {
+                object.update(dt);
+            }
+            player.update(dt);
+            enemyPlayer.update(dt);
+            checkFixtureContacts();
+
+        }
+        gamePort.apply();
         world.step(1 / (float)FPS, 6, 2);
 
         player.getGameActor().remakePath();
@@ -212,6 +230,7 @@ public class PlayScreen extends GameScreen {
             update(dt);
             renderWorld(dt);
         }
+        highlighter.render(dt);
     }
 
     private void renderAndroid(float dt) {
@@ -254,7 +273,7 @@ public class PlayScreen extends GameScreen {
         for (Shard shard: shards) {
             shard.render(game.batch, dt);
         }
-        if(higher(player.getGameActor(), enemyPlayer.getGameActor())) {
+        if(isHigher(player.getGameActor(), enemyPlayer.getGameActor())) {
             player.getGameActor().draw(game.batch);
             if(lighting.lightsOn() || !LightSwitch.isPlayingHuman()) {
                 enemyPlayer.getGameActor().draw(game.batch);
@@ -275,13 +294,9 @@ public class PlayScreen extends GameScreen {
 //        if(touchPoint != null)
 //            shapeRenderer.circle(touchPoint.x, touchPoint.y, 1);
 //        shapeRenderer.end();
-
         lighting.render(dt);
 
-//        darkenScreen();
-
         hud.render(dt);
-
 //        LevelManager.graph.render(shapeRenderer);
 //        b2dRenderer.render(world, gameCam.combined);
 //        player.getGameActor().getPath().render(shapeRenderer);
@@ -289,19 +304,7 @@ public class PlayScreen extends GameScreen {
 //        fpsLogger.log();
     }
 
-    private void darkenScreen() {
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        shapeRenderer.setProjectionMatrix(gameCam.combined);
-        if(!shapeRenderer.isDrawing())
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(new Color(0, 0, 0, 0.5f));
-        shapeRenderer.rect(0, 0, gamePort.getScreenWidth(), gamePort.getScreenHeight());
-        shapeRenderer.end();
-        Gdx.gl.glDisable(GL20.GL_BLEND);
-    }
-
-    private boolean higher(GameActor first, GameActor second) {
+    private boolean isHigher(GameActor first, GameActor second) {
         return first.b2body.getPosition().y > second.b2body.getPosition().y;
     }
 
@@ -357,8 +360,6 @@ public class PlayScreen extends GameScreen {
             commandHandler.addCommandPlay(new StartMovingCommand(direction, getPlayer()));
         player.getGameActor().setMoving(true);
     }
-
-
 
     private void checkFixtureContacts() {
         for (int i = 0; i < fixturesContacts.size; i++) {
@@ -455,9 +456,12 @@ public class PlayScreen extends GameScreen {
         touchPoint = new Vector2(x, y);
     }
 
-    @Override
-    public void resize(int width, int height) {
-        gamePort.update(width, height);
+    public boolean isPaused() {
+        return paused;
+    }
+
+    public void setPaused(boolean paused) {
+        this.paused = paused;
     }
 
     public float getRunTime() {

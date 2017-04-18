@@ -76,6 +76,11 @@ public class Shard extends InteractiveObject {
         render(spriteBatch, dt);
     }
 
+    //no blinking
+    public void render(SpriteBatch spriteBatch) {
+        spriteBatch.draw(textureRegion, x, y, rectBounds.getWidth(), rectBounds.getHeight());
+    }
+
     private float currentAlpha(float dt) {
         if(alpha <= 0.3f) {
             risingAlpha = true;

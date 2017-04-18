@@ -1,6 +1,7 @@
 package com.jacktheogre.lightswitch.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.ai.msg.MessageManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -35,6 +36,8 @@ import com.jacktheogre.lightswitch.tools.B2WorldCreator;
 import com.jacktheogre.lightswitch.tools.ColorLoader;
 import com.jacktheogre.lightswitch.tools.input.GenerateInputHandler;
 import com.jacktheogre.lightswitch.tools.Lighting;
+import com.jacktheogre.lightswitch.tutorials.Highlighter;
+import com.jacktheogre.lightswitch.tutorials.TutorialTelegraph;
 
 import static com.jacktheogre.lightswitch.tools.DrawingAssistant.drawDottedLine;
 import static com.jacktheogre.lightswitch.tools.DrawingAssistant.drawPulsingDottedLine;
@@ -47,13 +50,12 @@ public class GeneratingScreen extends GameScreen {
     private final Color CORRECT = new Color(0, 1, 0, 0.3f);
     private final Color WRONG = new Color(1, 0, 0, 0.3f);
     private final Color BACKGROUND_COLOR = ColorLoader.colorMap.get("GENERATING_SCREEN_BACKGROUND");
-//    private final Color BACKGROUND_COLOR = Color.BLACK;
 
     public enum State {DEFAULT, SETTING_TELEPORT, SETTING_TRAP}
 
     private State state;
-    private final EnemyPlayer enemyPlayer;
-    private final Player player;
+    private EnemyPlayer enemyPlayer;
+    private Player player;
     private Lighting lighting;
     private AssetLoader loader;
     private OrthogonalTiledMapRenderer mapRenderer;
@@ -69,15 +71,15 @@ public class GeneratingScreen extends GameScreen {
     private Node selectedNode;
 
     private Teleport unpairedTeleport = null;
+    private Array<InteractiveObject> interactiveObjects;
+    boolean initObjects;
 
     private float runTime;
 
     public GeneratingScreen(LightSwitch game) {
         super();
         this.game = game;
-        gameCam = new OrthographicCamera();
-        gamePort = new FitViewport(LightSwitch.WIDTH, LightSwitch.HEIGHT, gameCam);
-        gameCam.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
+        gameCam.position.set(gamePort.getWorldWidth() / 4, gamePort.getWorldHeight() / 4, 0);
         gameCam.zoom -= 0.2f;
 
         runTime = 0;
@@ -90,40 +92,18 @@ public class GeneratingScreen extends GameScreen {
         state = State.DEFAULT;
 
         initializeButtons();
-
-        world = new World(new Vector2(0, 0), true);
-        teleports = new Array<Teleport>();
-        traps = new Array<Trap>();
-        shards = new Array<Shard>();
-
-        player = new Player(this);
-        enemyPlayer = new EnemyPlayer(this);
-
-        lighting = new Lighting(this);
-        new B2WorldCreator(this);
-        if(maxTeleports()) {
-            teleportButton.disable();
-        }
-        if(maxTraps()) {
-            trapButton.disable();
-        }
-
+        initializeWorld();
         initializeLabels();
 
-        shapeRenderer = new ShapeRenderer();
-        shapeRenderer.setProjectionMatrix(gameCam.combined);
-        shapeRenderer.setAutoShapeType(true);
+        highlighter = new Highlighter(this);
+
+        notifyTutorialTelegraph();
+
         commandHandler = new CommandHandler(this);
-        Trap.Indexer.nullify();
-        Teleport.Indexer.nullify();
         Gdx.input.setInputProcessor(new GenerateInputHandler(this));
 //        game.batch.setShader(Assets.getAssetLoader().shaderProgram);
-
         initObjects = true;
     }
-
-    private Array<InteractiveObject> interactiveObjects;
-    boolean initObjects;
 
     public GeneratingScreen(LightSwitch game, Array<InteractiveObject> interactiveObjects) {
         this(game);
@@ -132,6 +112,27 @@ public class GeneratingScreen extends GameScreen {
         clearButton.setState(Button.State.ACTIVE);
     }
 
+    private void initializeWorld() {
+        world = new World(new Vector2(0, 0), false);
+        teleports = new Array<Teleport>();
+        traps = new Array<Trap>();
+        shards = new Array<Shard>();
+
+        player = new Player(this);
+        enemyPlayer = new EnemyPlayer(this);
+
+        lighting = new Lighting(world);
+        new B2WorldCreator(this);
+        if(maxTeleports()) {
+            teleportButton.disable();
+        }
+        if(maxTraps()) {
+            trapButton.disable();
+        }
+
+        Trap.Indexer.nullify();
+        Teleport.Indexer.nullify();
+    }
 
     @Override
     protected void initializeButtons() {
@@ -151,6 +152,7 @@ public class GeneratingScreen extends GameScreen {
             @Override
             protected void actUnpress() {
                 game.setScreen(new PlayScreen(generatingScreen));
+                TutorialTelegraph.getInstance().unlock(TutorialTelegraph.START_BUTTON_PRESSED);
             }
         };
         teleportButton = new Button(Assets.getAssetLoader().teleport_button, Button.State.ACTIVE, this) {
@@ -232,7 +234,18 @@ public class GeneratingScreen extends GameScreen {
 //        Gdx.app.log("teleportsLabel", teleportsLeft.getX() + " "+teleportsLeft.getY());
     }
 
+    @Override
+    protected void notifyTutorialTelegraph() {
+        MessageManager.getInstance().dispatchMessage( 2f, null, TutorialTelegraph.getInstance(), TutorialTelegraph.SHARDS_ON_LEVEL);
+        if(LevelManager.getAmountOfTeleports() > 0)
+            MessageManager.getInstance().dispatchMessage( 2f, null, TutorialTelegraph.getInstance(), TutorialTelegraph.TELEPORTS_ON_LEVEL);
+        if(LevelManager.getAmountOfTraps() > 0)
+            MessageManager.getInstance().dispatchMessage( 2f, null, TutorialTelegraph.getInstance(), TutorialTelegraph.TRAPS_ON_LEVEL);
+    }
+
     public void update(float dt){
+        super.update(dt);
+
         runTime += dt;
         commandHandler.update(dt);
         if(commandHandler.newCommands()) {
@@ -310,6 +323,8 @@ public class GeneratingScreen extends GameScreen {
         if(lighting.lightsOn())
             enemyPlayer.getGameActor().draw(game.batch);
         game.batch.end();
+
+        highlighter.render(delta);
 //        LevelManager.graph.render(shapeRenderer);
 
     }
@@ -520,11 +535,6 @@ public class GeneratingScreen extends GameScreen {
     @Override
     public void show() {
 
-    }
-
-    @Override
-    public void resize(int width, int height) {
-        gamePort.update(width, height);
     }
 
     @Override

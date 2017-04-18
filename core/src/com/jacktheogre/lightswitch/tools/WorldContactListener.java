@@ -8,8 +8,10 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.jacktheogre.lightswitch.Constants;
 import com.jacktheogre.lightswitch.LightSwitch;
+import com.jacktheogre.lightswitch.ai.LevelManager;
 import com.jacktheogre.lightswitch.objects.InteractiveObject;
 import com.jacktheogre.lightswitch.objects.Shard;
+import com.jacktheogre.lightswitch.objects.Teleport;
 import com.jacktheogre.lightswitch.objects.Trap;
 import com.jacktheogre.lightswitch.screens.PlayScreen;
 import com.jacktheogre.lightswitch.sprites.Monster;
@@ -33,12 +35,16 @@ public class WorldContactListener implements ContactListener {
         int cDef = fixA.getFilterData().categoryBits | fixB.getFilterData().categoryBits;
         switch(cDef) {
             case Constants.TELEPORT_BIT | Constants.BOY_BIT:
-                if(fixA.getFilterData().categoryBits == Constants.BOY_BIT || fixA.getFilterData().categoryBits == Constants.MONSTER_BIT) {
-                    if(!((InteractiveObject) fixB.getUserData()).activate(LightSwitch.isPlayingHuman()?screen.getPlayer():screen.getEnemyPlayer()))
+                if(fixA.getFilterData().categoryBits == Constants.BOY_BIT) {
+                    Teleport teleport = ((Teleport) fixB.getUserData());
+                    if(!teleport.activate(LightSwitch.isPlayingHuman()?screen.getPlayer():screen.getEnemyPlayer())) {
                         screen.addFixtureContact(contact);
+                    }
+                    screen.activateShard(teleport.getX() + LevelManager.tilePixelWidth / 2, teleport.getY() + LevelManager.tilePixelHeight / 2);
                 } else {
-                    if(!((InteractiveObject) fixA.getUserData()).activate(LightSwitch.isPlayingHuman()?screen.getPlayer():screen.getEnemyPlayer()))
+                    if(!((InteractiveObject) fixA.getUserData()).activate(LightSwitch.isPlayingHuman()?screen.getPlayer():screen.getEnemyPlayer())) {
                         screen.addFixtureContact(contact);
+                    }
                 }
                 break;
             case Constants.TELEPORT_BIT | Constants.MONSTER_BIT:
