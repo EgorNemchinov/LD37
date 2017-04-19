@@ -29,28 +29,112 @@ public abstract class GameActor extends Sprite {
     protected Agent agent;
     private boolean remakingPath;
 
-    public enum Direction {
-        RIGHT("R"), LEFT("L"), UP("U"), DOWN("D");
+    public enum VerticalDirection {
+        UP('U'), NONE('N'), DOWN('D');
 
-        private String string;
+        private char letter;
 
-        Direction(String string) {
-            this.string = string;
+        VerticalDirection(char letter) {
+            this.letter = letter;
         }
         public String toString() {
-            return string;
+            return String.valueOf(letter);
         }
-        public static Direction getDirectionByLetter(String letter) {
-            if(letter.equals(RIGHT.toString()))
-                return RIGHT;
-            else if(letter.equals(LEFT.toString()))
-                return LEFT;
-            else if(letter.equals(UP.toString()))
+        public static VerticalDirection getByLetter(char c) {
+            if(UP.toString().equals(c))
                 return UP;
-            else
+            else if(DOWN.toString().equals(c))
                 return DOWN;
+            else if(NONE.toString().equals(c))
+                return NONE;
+            else {
+                Gdx.app.log("VerticalDirection", "Called getByLetter("+c+")");
+                return NONE;
+            }
         }
-        // TODO: 13.02.17 nullDirection?
+    }
+    public enum HorizontalDirection {
+        LEFT('L'), NONE('N'), RIGHT('R');
+
+        private char letter;
+
+        HorizontalDirection(char letter) {
+            this.letter = letter;
+        }
+        public String toString() {
+            return String.valueOf(letter);
+        }
+        public static HorizontalDirection getByLetter(char c) {
+            if(LEFT.toString().equals(c))
+                return LEFT;
+            else if(RIGHT.toString().equals(c))
+                return RIGHT;
+            else if(NONE.toString().equals(c))
+                return NONE;
+            else {
+                Gdx.app.log("HorizontalDirection", "Called getByLetter("+c+")");
+                return NONE;
+            }
+        }
+    }
+
+    public static class Direction {
+        private HorizontalDirection horizontalDirection, lastHorizontalDirection = HorizontalDirection.RIGHT;
+        private VerticalDirection verticalDirection, lastVerticalDirection = VerticalDirection.DOWN;
+
+        public Direction(String string) {
+            if(string.length() != 2) {
+                Gdx.app.error("Direction","Attempt to create Direction with string "+ string);
+                Gdx.app.exit();
+            }
+            horizontalDirection = HorizontalDirection.getByLetter(string.charAt(0));
+            verticalDirection = VerticalDirection.getByLetter(string.charAt(1));
+        }
+        public Direction(HorizontalDirection horizontalDirection, VerticalDirection verticalDirection) {
+            this.horizontalDirection = horizontalDirection;
+            this.verticalDirection = verticalDirection;
+        }
+        public Direction() {
+            this(HorizontalDirection.NONE, VerticalDirection.NONE);
+        }
+
+        public static Direction getZero() {
+            return new Direction(HorizontalDirection.NONE, VerticalDirection.NONE);
+        }
+
+        public String toString() {
+            return horizontalDirection.toString() + verticalDirection.toString();
+        }
+
+        public HorizontalDirection getHorizontalDirection() {
+            return horizontalDirection;
+        }
+
+        public void setHorizontalDirection(HorizontalDirection horizontalDirection) {
+            if(this.horizontalDirection != HorizontalDirection.NONE) {
+                lastHorizontalDirection = this.horizontalDirection;
+            }
+            this.horizontalDirection = horizontalDirection;
+        }
+
+        public VerticalDirection getVerticalDirection() {
+            return verticalDirection;
+        }
+
+        public void setVerticalDirection(VerticalDirection verticalDirection) {
+            if(this.verticalDirection != VerticalDirection.NONE) {
+                this.lastVerticalDirection = this.verticalDirection;
+            }
+            this.verticalDirection = verticalDirection;
+        }
+
+        public HorizontalDirection getLastHorizontalDirection() {
+            return lastHorizontalDirection;
+        }
+
+        public VerticalDirection getLastVerticalDirection() {
+            return lastVerticalDirection;
+        }
     }
 
     protected Direction direction;
@@ -81,18 +165,16 @@ public abstract class GameActor extends Sprite {
 
     protected boolean keyboardControl;
 
-    protected boolean isMoving;
+    protected boolean isMoving;//// TODO: 19.04.17 remove it
 
     public GameActor(World world, float x, float y, Texture texture) {
         super(texture);
         setPosition(x, y);
         this.world = world;
         stateTimer = 0;
-        teleportTime = 0;
-        teleportReady = true;
 
-        direction = Direction.RIGHT;
-        lastDirection = Direction.RIGHT;
+        direction = Direction.getZero();
+        lastDirection = Direction.getZero();
 
         target = new Vector2(x, y);
         currentNodePointer = 0;
@@ -104,6 +186,8 @@ public abstract class GameActor extends Sprite {
         isMoving = false;
     }
 
+    private HorizontalDirection lastHorizontalDirection;
+    private VerticalDirection lastVerticalDirection;
     public void update(float dt) {
         if(!teleportReady) {
             teleportTime += dt;
@@ -113,23 +197,29 @@ public abstract class GameActor extends Sprite {
             }
         }
         if(keyboardControl) {
-            if(isMoving) {
-                switch(direction) {
-                    case DOWN:
-                        b2body.setLinearVelocity(0, -getSpeed());
-                        break;
-                    case UP:
-                        b2body.setLinearVelocity(0, getSpeed());
-                        break;
-                    case RIGHT:
-                        b2body.setLinearVelocity(getSpeed(), 0);
-                        break;
-                    case LEFT:
-                        b2body.setLinearVelocity(-getSpeed(), 0);
-                        break;
-                }
-            } else
-                b2body.setLinearVelocity(Vector2.Zero);
+            Vector2 velocity = new Vector2(0, 0);
+            switch (direction.horizontalDirection) {
+                case LEFT:
+                    velocity.x = -1;
+                    break;
+                case RIGHT:
+                    velocity.x = 1;
+                    break;
+                default:
+                case NONE:
+            }
+            switch (direction.verticalDirection) {
+                case UP:
+                    velocity.y = 1;
+                    break;
+                case DOWN:
+                    velocity.y = -1;
+                    break;
+                default:
+                case NONE:
+            }
+//            Gdx.app.log("Direction",direction.toString());
+            b2body.setLinearVelocity(velocity.nor().scl(getSpeed()));
         } else {
             curPosition = b2body.getPosition();
             if(nextPosition.cpy().sub(curPosition).len() < 2) {
@@ -148,7 +238,23 @@ public abstract class GameActor extends Sprite {
         xVel = b2body.getLinearVelocity().x;
         yVel = b2body.getLinearVelocity().y;
         if(xVel == 0 && yVel == 0)
-            return getDirection();
+            return Direction.getZero();
+        Direction direction = new Direction();
+        if(xVel < 0)
+            direction.horizontalDirection = HorizontalDirection.LEFT;
+        else if(xVel > 0)
+            direction.horizontalDirection = HorizontalDirection.RIGHT;
+        else
+            direction.horizontalDirection = HorizontalDirection.NONE;
+
+        if(yVel < 0)
+            direction.verticalDirection = VerticalDirection.DOWN;
+        else if(yVel > 0)
+            direction.verticalDirection = VerticalDirection.DOWN;
+        else
+            direction.verticalDirection = VerticalDirection.NONE;
+/*
+
         if(xVel > 0) {
             if(yVel > 0 && Math.abs(yVel) > Math.abs(xVel))
                 return Direction.UP;
@@ -170,7 +276,8 @@ public abstract class GameActor extends Sprite {
             else if(yVel < 0)
                 return Direction.DOWN;
         }
-        return lastDirection;
+*/
+        return direction;
     }
     public Direction getDirection() {
         return direction;

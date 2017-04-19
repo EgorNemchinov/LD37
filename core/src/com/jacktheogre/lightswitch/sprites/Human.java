@@ -1,5 +1,6 @@
 package com.jacktheogre.lightswitch.sprites;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -92,41 +93,58 @@ public class Human extends GameActor {
         currentState = getState();
         direction = getDirection();
 
-        TextureRegion region;
+        TextureRegion region = null;
         switch (currentState) {
             case RUNNING:
-                switch (direction) {
-                    case LEFT:
-                        region = playerRunLeft.getKeyFrame(stateTimer);
-                        break;
+                switch (direction.getVerticalDirection() == VerticalDirection.NONE ? direction.getLastVerticalDirection() :direction.getVerticalDirection()) {
                     case UP:
                         region = playerRunUp.getKeyFrame(stateTimer);
                         break;
                     case DOWN:
                         region = playerRunDown.getKeyFrame(stateTimer);
                         break;
-                    case RIGHT:
                     default:
+                    case NONE:
+                }
+                switch(direction.getHorizontalDirection() == HorizontalDirection.NONE && region == null ?
+                        direction.getLastHorizontalDirection() :direction.getHorizontalDirection()) {
+                    case LEFT:
+                        region = playerRunLeft.getKeyFrame(stateTimer);
+                        break;
+                    case RIGHT:
                         region = playerRunRight.getKeyFrame(stateTimer);
                         break;
+                    default:
+                    case NONE:
+                }
+                if(region == null) {
+                    region = playerStandRight;
                 }
                 break;
             case STANDING:
             default:
-                switch (direction) {
-                    case LEFT:
-                        region = playerStandLeft;
-                        break;
+                switch (direction.getVerticalDirection() == VerticalDirection.NONE ? direction.getLastVerticalDirection() :direction.getVerticalDirection()) {
                     case UP:
                         region = playerStandUp;
                         break;
                     case DOWN:
                         region = playerStandDown;
                         break;
-                    case RIGHT:
                     default:
+                    case NONE:
+                }
+                switch(direction.getHorizontalDirection() == HorizontalDirection.NONE ? direction.getLastHorizontalDirection() :direction.getHorizontalDirection()) {
+                    case LEFT:
+                        region = playerStandLeft;
+                        break;
+                    case RIGHT:
                         region = playerStandRight;
                         break;
+                    default:
+                    case NONE:
+                }
+                if(region == null) {
+                    region = playerStandRight;
                 }
         }
 

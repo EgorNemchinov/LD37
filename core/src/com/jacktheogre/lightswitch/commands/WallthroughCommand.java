@@ -46,7 +46,8 @@ public class WallthroughCommand extends ActorCommand {
         destination = new Vector2(x, y);
         boolean metWall = false;
 //        Gdx.app.log("WallthroughCommand", "Initial node: " + destination);
-        switch(direction) {
+        // fixme: 19.04.17
+        /*switch(direction) {
             case RIGHT:
                 x++;
                 while(x < LevelManager.lvlTileWidth - 1) {
@@ -99,7 +100,7 @@ public class WallthroughCommand extends ActorCommand {
                 destination = destination.scl(LevelManager.tilePixelWidth, LevelManager.tilePixelHeight);
                 destination.x = player.getGameActor().getX();
                 break;
-        }
+        }*/
 //        Gdx.app.log("WallthroughCommand", "After: " + destination);
         destination.add(LevelManager.tilePixelWidth / 2, LevelManager.tilePixelHeight / 2);
         //means that if there was no wall then no wallthrough

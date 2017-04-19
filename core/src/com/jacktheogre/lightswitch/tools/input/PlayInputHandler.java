@@ -44,22 +44,22 @@ public class PlayInputHandler extends Stage{
                 break;
             case Input.Keys.W:
             case Input.Keys.UP:
-                screen.getCommandHandler().addCommandPlay(new StartMovingCommand(GameActor.Direction.UP, screen.getPlayer()));
+                screen.getCommandHandler().addCommandPlay(new StartMovingCommand(GameActor.VerticalDirection.UP, screen.getPlayer()));
                 screen.getPlayer().getGameActor().setMoving(true);
                 break;
             case Input.Keys.A:
             case Input.Keys.LEFT:
-                screen.getCommandHandler().addCommandPlay(new StartMovingCommand(GameActor.Direction.LEFT, screen.getPlayer()));
+                screen.getCommandHandler().addCommandPlay(new StartMovingCommand(GameActor.HorizontalDirection.LEFT, screen.getPlayer()));
                 screen.getPlayer().getGameActor().setMoving(true);
                 break;
             case Input.Keys.S:
             case Input.Keys.DOWN:
-                screen.getCommandHandler().addCommandPlay(new StartMovingCommand(GameActor.Direction.DOWN, screen.getPlayer()));
+                screen.getCommandHandler().addCommandPlay(new StartMovingCommand(GameActor.VerticalDirection.DOWN, screen.getPlayer()));
                 screen.getPlayer().getGameActor().setMoving(true);
                 break;
             case Input.Keys.D:
             case Input.Keys.RIGHT:
-                screen.getCommandHandler().addCommandPlay(new StartMovingCommand(GameActor.Direction.RIGHT, screen.getPlayer()));
+                screen.getCommandHandler().addCommandPlay(new StartMovingCommand(GameActor.HorizontalDirection.RIGHT, screen.getPlayer()));
                 screen.getPlayer().getGameActor().setMoving(true);
                 break;
             case Input.Keys.BACK:
@@ -80,22 +80,22 @@ public class PlayInputHandler extends Stage{
             case Input.Keys.W:
             case Input.Keys.UP:
                 // TODO: 10.02.17 get command working
-                screen.getCommandHandler().stopMoving(GameActor.Direction.UP);
+                screen.getCommandHandler().stopMoving(GameActor.VerticalDirection.UP);
 //                screen.getCommandHandler().addCommandPlay(new StopDirectionCommand(screen.getCommandHandler(), GameActor.Direction.UP));
                 break;
             case Input.Keys.A:
             case Input.Keys.LEFT:
-                screen.getCommandHandler().stopMoving(GameActor.Direction.LEFT);
+                screen.getCommandHandler().stopMoving(GameActor.HorizontalDirection.LEFT);
 //                screen.getCommandHandler().addCommandPlay(new StopDirectionCommand(screen.getCommandHandler(), GameActor.Direction.LEFT));
                 break;
             case Input.Keys.S:
             case Input.Keys.DOWN:
-                screen.getCommandHandler().stopMoving(GameActor.Direction.DOWN);
+                screen.getCommandHandler().stopMoving(GameActor.VerticalDirection.DOWN);
 //                screen.getCommandHandler().addCommandPlay(new StopDirectionCommand(screen.getCommandHandler(), GameActor.Direction.DOWN));
                 break;
             case Input.Keys.D:
             case Input.Keys.RIGHT:
-                screen.getCommandHandler().stopMoving(GameActor.Direction.RIGHT);
+                screen.getCommandHandler().stopMoving(GameActor.HorizontalDirection.RIGHT);
 //                screen.getCommandHandler().addCommandPlay(new StopDirectionCommand(screen.getCommandHandler(), GameActor.Direction.RIGHT));
                 break;
         }

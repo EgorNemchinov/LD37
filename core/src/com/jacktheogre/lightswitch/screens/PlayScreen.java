@@ -200,7 +200,7 @@ public class PlayScreen extends GameScreen {
                 object.update(dt);
             }
             player.update(dt);
-            enemyPlayer.update(dt);
+//            enemyPlayer.update(dt);
             checkFixtureContacts();
 
         }
@@ -322,42 +322,27 @@ public class PlayScreen extends GameScreen {
         Touchpad touchpad = hud.getTouchpad();
         float x = touchpad.getKnobPercentX();
         float y = touchpad.getKnobPercentY();
-        GameActor.Direction direction;
-        if(x == 0 && y == 0) {
-            if(player.getGameActor().isMoving())
-                commandHandler.addCommandPlay(new StopCommand(player));
-            return;
-        }
-        if(x >= 0) {
-            if(y >= 0) {
-                if(x > y)
-                    direction = GameActor.Direction.RIGHT;
-                else
-                    direction = GameActor.Direction.UP;
-            }
-            else {
-                if(x > -y)
-                    direction = GameActor.Direction.RIGHT;
-                else
-                    direction = GameActor.Direction.DOWN;
-            }
-        } else {
-            if(y >= 0) {
-                if(-x > y)
-                    direction = GameActor.Direction.LEFT;
-                else
-                    direction = GameActor.Direction.UP;
-            }
-            else {
-                if(-x > -y)
-                    direction = GameActor.Direction.LEFT;
-                else
-                    direction = GameActor.Direction.DOWN;
-            }
-        }
+//        if(x == 0 && y == 0) {
+//            if(!player.getGameActor().getVelocity().equals(Vector2.Zero))
+//                commandHandler.addCommandPlay(new StopCommand(player));
+//            return;
+//        }
+        GameActor.HorizontalDirection horizontalDirection = GameActor.HorizontalDirection.NONE;
+        GameActor.VerticalDirection verticalDirection = GameActor.VerticalDirection.NONE;
+        if(x > Constants.TOUCHPAD_EDGE)
+            horizontalDirection = GameActor.HorizontalDirection.RIGHT;
+        else if(x < -Constants.TOUCHPAD_EDGE)
+            horizontalDirection = GameActor.HorizontalDirection.LEFT;
+        if(y > Constants.TOUCHPAD_EDGE)
+            verticalDirection = GameActor.VerticalDirection.UP;
+        else if(y < -Constants.TOUCHPAD_EDGE)
+            verticalDirection = GameActor.VerticalDirection.DOWN;
 
-        if(player.getGameActor().getDirection() != direction || !player.getGameActor().isMoving())
-            commandHandler.addCommandPlay(new StartMovingCommand(direction, getPlayer()));
+        if(player.getGameActor().getDirection().getHorizontalDirection() != horizontalDirection)
+            commandHandler.addCommandPlay(new StartMovingCommand(horizontalDirection, player));
+        if(player.getGameActor().getDirection().getVerticalDirection() != verticalDirection)
+            commandHandler.addCommandPlay(new StartMovingCommand(verticalDirection, player));
+
         player.getGameActor().setMoving(true);
     }
 

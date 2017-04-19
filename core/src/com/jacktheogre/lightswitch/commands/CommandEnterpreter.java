@@ -31,15 +31,15 @@ public class CommandEnterpreter {
             } else if(partsOfString[0].equals("sp")) {
 
             } else if(partsOfString[0].equals("sm")) {
-                cmd = new StartMovingCommand(GameActor.Direction.getDirectionByLetter(partsOfString[1]),
-                        GameActor.Direction.getDirectionByLetter(partsOfString[2]),
-                        Integer.parseInt(partsOfString[3])==1,
-                        Integer.parseInt(partsOfString[4]) == 1 ? playScreen.getEnemyPlayer():playScreen.getPlayer() );
+//                cmd = new StartMovingCommand(GameActor.Direction.getDirectionByLetter(partsOfString[1]),
+//                        GameActor.Direction.getDirectionByLetter(partsOfString[2]),
+//                        Integer.parseInt(partsOfString[3])==1,
+//                        Integer.parseInt(partsOfString[4]) == 1 ? playScreen.getEnemyPlayer():playScreen.getPlayer() );
             } else if(partsOfString[0].equals("stop")) {
 
             } else if(partsOfString[0].equals("sd")) {
-                cmd = new StartMovingCommand(GameActor.Direction.getDirectionByLetter(partsOfString[1]),
-                        Integer.parseInt(partsOfString[2]) == 1 ? playScreen.getEnemyPlayer():playScreen.getPlayer() );
+//                cmd = new StartMovingCommand(GameActor.Direction.getDirectionByLetter(partsOfString[1]),
+//                        Integer.parseInt(partsOfString[2]) == 1 ? playScreen.getEnemyPlayer():playScreen.getPlayer() );
             } else if(partsOfString[0].equals("teleport")) {
                 cmd = new TeleportCommand((Teleport)playScreen.getInteractiveObjectByIndex(Integer.parseInt(partsOfString[1])),
                         (Teleport) playScreen.getInteractiveObjectByIndex(Integer.parseInt(partsOfString[2])),

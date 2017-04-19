@@ -108,13 +108,13 @@ public class CommandHandler {
         return commands;
     }
 
-    public void stopMoving(GameActor.Direction direction) {
-        logger.logStringToFile("sd " + direction.toString());
+    public void stopMoving(GameActor.HorizontalDirection horizontalDirection) {
+        logger.logStringToFile("sd " + horizontalDirection.toString());
         //disabling all commands with that direction
         for (int i = commands.size() - 1; i >= 0 ; i--) {
             Command cmd = commands.get(i);
             if((ClassReflection.isInstance(StartMovingCommand.class, cmd)) &&
-                    (((StartMovingCommand) cmd).getDirection() == direction)) {
+                    (((StartMovingCommand) cmd).getDirection().getHorizontalDirection() == horizontalDirection)) {
                 ((StartMovingCommand) cmd).disabled = true;
             }
         }
@@ -123,20 +123,48 @@ public class CommandHandler {
             if(ClassReflection.isInstance(StopCommand.class, cmd) || ClassReflection.isInstance(MoveToCommand.class, cmd)) {
                 addCommandPlay(new StopCommand(((PlayScreen) screen).getPlayer()));
                 return;
-            } else if(ClassReflection.isInstance(StartMovingCommand.class, cmd)) {
-                if(((StartMovingCommand) cmd).getDirection() != direction) {
+            } else if(ClassReflection.isInstance(StartMovingCommand.class, cmd) && ((StartMovingCommand)cmd).isHorizontal()) {
+                if(((StartMovingCommand) cmd).getDirection().getHorizontalDirection() != horizontalDirection) {
                     if(((StartMovingCommand) cmd).disabled) {
                         continue;
                     } else {
-                        addCommandPlay(new StartMovingCommand(((StartMovingCommand) cmd).getDirection(), ((PlayScreen)screen).getPlayer()));
+                        addCommandPlay(new StartMovingCommand(((StartMovingCommand) cmd).getDirection().getHorizontalDirection(), ((PlayScreen)screen).getPlayer()));
                         return;
                     }
                 }
             }
         }
-        addCommandPlay(new StopCommand(((PlayScreen) screen).getPlayer()));
+        addCommandPlay(new StartMovingCommand(GameActor.HorizontalDirection.NONE, ((PlayScreen)screen).getPlayer()));
     }
 
+    public void stopMoving(GameActor.VerticalDirection verticalDirection) {
+        logger.logStringToFile("sd " + verticalDirection.toString());
+        //disabling all commands with that direction
+        for (int i = commands.size() - 1; i >= 0 ; i--) {
+            Command cmd = commands.get(i);
+            if((ClassReflection.isInstance(StartMovingCommand.class, cmd)) &&
+                    (((StartMovingCommand) cmd).getDirection().getVerticalDirection() == verticalDirection)) {
+                ((StartMovingCommand) cmd).disabled = true;
+            }
+        }
+        for (int i = commands.size() - 1; i >= 0 ; i--) {
+            Command cmd = commands.get(i);
+            if(ClassReflection.isInstance(StopCommand.class, cmd) || ClassReflection.isInstance(MoveToCommand.class, cmd)) {
+                addCommandPlay(new StopCommand(((PlayScreen) screen).getPlayer()));
+                return;
+            } else if(ClassReflection.isInstance(StartMovingCommand.class, cmd) && !((StartMovingCommand)cmd).isHorizontal()) {
+                if(((StartMovingCommand) cmd).getDirection().getVerticalDirection() != verticalDirection) {
+                    if(((StartMovingCommand) cmd).disabled) {
+                        continue;
+                    } else {
+                        addCommandPlay(new StartMovingCommand(((StartMovingCommand) cmd).getDirection().getVerticalDirection(), ((PlayScreen)screen).getPlayer()));
+                        return;
+                    }
+                }
+            }
+        }
+        addCommandPlay(new StartMovingCommand(GameActor.VerticalDirection.NONE, ((PlayScreen)screen).getPlayer()));
+    }
     public boolean undo() {
         if(pointer >= 1) {
             pointer--;

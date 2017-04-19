@@ -38,6 +38,7 @@ public class Constants {
     public static float GAME_SPEED = 1.4f;
 
     public static final float SYNCRONIZING_FREQUENCY_TIME = 0.5f;
+    public static final float TOUCHPAD_EDGE = 0.5f;
 
     public static boolean foundDevice = false;
 

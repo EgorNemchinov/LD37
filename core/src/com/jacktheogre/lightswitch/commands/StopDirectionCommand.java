@@ -26,7 +26,7 @@ public class StopDirectionCommand extends ActorCommand {
     public boolean execute(){
         if(executed)
             return false;
-        commandHandler.stopMoving(direction);
+//        commandHandler.stopMoving(direction);
         Gdx.app.log("StopMC", "executed, dir: " + direction);
         return true;
     }

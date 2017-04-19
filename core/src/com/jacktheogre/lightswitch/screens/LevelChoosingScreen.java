@@ -106,7 +106,7 @@ public class LevelChoosingScreen extends GameScreen {
         framesArray = new Frame[3];
         framesToBeDeleted = new Array<Frame>();
         frameWidth = (int)stage.getWidth() / 2;
-        frameHeight = (int) stage.getHeight() - 30;
+        frameHeight = (int) stage.getHeight() - 40;
 
         LevelManager.recountShards();
 
@@ -117,6 +117,8 @@ public class LevelChoosingScreen extends GameScreen {
 
 
     class Frame extends Group {
+        public static final int PRESSED_OFFSET_Y = 10;
+
         private Table main;
         private Label levelLabel;
         public MapActor mapActor;
@@ -142,6 +144,7 @@ public class LevelChoosingScreen extends GameScreen {
         private Group shardsCounter;
 
         private boolean open; //determines whether level is playable
+        private boolean pressed = false;
         private boolean drawing;
 
         public Frame(final int levelNumber) {
@@ -154,13 +157,30 @@ public class LevelChoosingScreen extends GameScreen {
             initializeTable();
             initializeShardsCount();
             this.addActor(main);
-            this.addListener(new InputListener() {
+            main.addListener(new InputListener() {
                 @Override
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                    return super.touchDown(event, x, y, pointer, button);
+                    if(!open)
+                        return false;
+                    if(0 <= x && x <= getWidth() && 0 <= y && y <= getHeight())
+                        pressed = true;
+                    else
+                        return false;
+                    return true;
+                }
+
+                @Override
+                public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                    pressed = false;
+                    if(0 <= x && x <= getWidth() && 0 <= y && y <= getHeight()) {
+                        LevelManager.setLevelNum(levelNumber);
+                        game.setScreen(new GeneratingScreen(game));
+                    }
+//                        Gdx.app.log("touchUp", x + ", " + y + ", size is "+getWidth() + "x" + getHeight());
                 }
             });
-            this.setTouchable(Touchable.enabled);
+            main.setTouchable(Touchable.enabled);
+//            main.debug();
 
             shardsCollected = new boolean[LevelManager.countAmountOfShards(levelNumber)];
             shards = new Image[LevelManager.countAmountOfShards(levelNumber)];
@@ -190,7 +210,7 @@ public class LevelChoosingScreen extends GameScreen {
             trapLabel.setAlignment(Align.center);
 //            trapLabel.setFontScale(0.8f);
 
-            final TextureRegion playButtonTexture = Assets.getAssetLoader().start_button;
+            /*final TextureRegion playButtonTexture = Assets.getAssetLoader().start_button;
             TextureRegion usualButton, pressedButton;
             usualButton = new TextureRegion(playButtonTexture, open ? playButtonTexture.getRegionWidth() / 2 : 0, 0,
                     playButtonTexture.getRegionWidth() / 4, playButtonTexture.getRegionHeight());
@@ -218,7 +238,7 @@ public class LevelChoosingScreen extends GameScreen {
                 }
             });
             playButton.setTouchable(open? Touchable.enabled: Touchable.disabled);
-
+*/
             main.align(Align.top | Align.center);
             main.add(levelLabel).expandX().colspan(4).row();
             main.padLeft(0);
@@ -231,8 +251,8 @@ public class LevelChoosingScreen extends GameScreen {
             main.add(teleportLabel).maxHeight(cellHeight);
             main.add(trapImage).minHeight(cellHeight).fill(cellScale, cellScale);
             main.add(trapLabel).maxHeight(cellHeight).row();
-            main.padBottom(0);
-            main.add(playButton).colspan(4);
+//            main.padBottom(0);
+//            main.add(playButton).colspan(4);
             main.moveBy((main.getWidth() - mapActor.getWidth() )/ 2, 0);
             main.setWidth(mapActor.getWidth());
         }
@@ -255,7 +275,7 @@ public class LevelChoosingScreen extends GameScreen {
 
         @Override
         public void setPosition(float x, float y) {
-            super.setPosition(x, y);
+            super.setPosition(x, y + (pressed && open ? -PRESSED_OFFSET_Y : 0));
             currentSettings.position = new Vector2(x, y);
         }
 
@@ -409,15 +429,20 @@ public class LevelChoosingScreen extends GameScreen {
         }
 
         private void drawBackground() {
+            int borderSize = 2;
             shapeRenderer.setProjectionMatrix(stage.getCamera().combined);
             shapeRenderer.setAutoShapeType(true);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.setColor(ColorLoader.colorMap.get("LEVEL_FRAME_STROKE"));
-            DrawingAssistant.roundedRect(shapeRenderer, getX() + main.getX()*getScaleX(), getY() + main.getY()*getScaleY(),
-                    main.getWidth()*getScaleX(), main.getHeight()*getScaleY(), 10);
+//            shapeRenderer.setColor(ColorLoader.colorMap.get("LEVEL_FRAME_STROKE"));
+//            DrawingAssistant.roundedRect(shapeRenderer, getX() + main.getX()*getScaleX(), getY() + main.getY()*getScaleY(),
+//                    main.getWidth()*getScaleX(), main.getHeight()*getScaleY(), 10);
+            shapeRenderer.setColor(ColorLoader.colorMap.get("LEVEL_FRAME_LOCKED_BACKGROUND"));
+            if(!pressed)
+                DrawingAssistant.roundedRect(shapeRenderer, getX() + main.getX()*getScaleX() + borderSize,
+                    getY() + main.getY()*getScaleY() + borderSize - PRESSED_OFFSET_Y*getScaleY(),
+                    main.getWidth()*getScaleX() - 2*borderSize, main.getHeight()*getScaleY() - 2*borderSize + PRESSED_OFFSET_Y*getScaleY(), 6);
             shapeRenderer.setColor(open ? ColorLoader.colorMap.get("LEVEL_FRAME_UNLOCKED_BACKGROUND")
                     : ColorLoader.colorMap.get("LEVEL_FRAME_LOCKED_BACKGROUND"));
-            int borderSize = 2;
             DrawingAssistant.roundedRect(shapeRenderer, getX() + main.getX()*getScaleX() + borderSize, getY() + main.getY()*getScaleY() + borderSize,
                     main.getWidth()*getScaleX() - 2*borderSize, main.getHeight()*getScaleY() - 2*borderSize, 6);
             shapeRenderer.end();
@@ -536,7 +561,7 @@ public class LevelChoosingScreen extends GameScreen {
         trap = new TextureRegion(Assets.getAssetLoader().trap);
         trap = new TextureRegion(trap, trap.getRegionWidth()*3 / 4, 0, trap.getRegionWidth() / 4, trap.getRegionHeight());
 //        Gdx.app.log("Actors", frame.getChildren().size +"");
-        currentFramePosition = new Vector2(stage.getWidth() / 2 - frameWidth / 2, 15);
+        currentFramePosition = new Vector2(stage.getWidth() / 2 - frameWidth / 2, 25);
         prevFramePosition = new Vector2(currentFramePosition.x - frameWidth*sideFramesScale/ 2 - 20, stage.getHeight() / 2 - frameHeight*sideFramesScale / 2);
         nextFramePosition = new Vector2(currentFramePosition.x + frameWidth - 20 , stage.getHeight() / 2 - frameHeight*sideFramesScale / 2);
         Frame frame1 = new Frame(1);
