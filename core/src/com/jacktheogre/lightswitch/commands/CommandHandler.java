@@ -113,22 +113,22 @@ public class CommandHandler {
         //disabling all commands with that direction
         for (int i = commands.size() - 1; i >= 0 ; i--) {
             Command cmd = commands.get(i);
-            if((ClassReflection.isInstance(StartMovingCommand.class, cmd)) &&
-                    (((StartMovingCommand) cmd).getDirection().getHorizontalDirection() == horizontalDirection)) {
+            if((ClassReflection.isInstance(StartMovingCommand.class, cmd)) && ((StartMovingCommand) cmd).isHorizontal() &&
+                    (((StartMovingCommand) cmd).getHorizontalDirection() == horizontalDirection)) {
                 ((StartMovingCommand) cmd).disabled = true;
             }
         }
         for (int i = commands.size() - 1; i >= 0 ; i--) {
             Command cmd = commands.get(i);
             if(ClassReflection.isInstance(StopCommand.class, cmd) || ClassReflection.isInstance(MoveToCommand.class, cmd)) {
-                addCommandPlay(new StopCommand(((PlayScreen) screen).getPlayer()));
+                addCommandPlay(new StartMovingCommand(GameActor.HorizontalDirection.NONE, ((PlayScreen) screen).getPlayer()));
                 return;
             } else if(ClassReflection.isInstance(StartMovingCommand.class, cmd) && ((StartMovingCommand)cmd).isHorizontal()) {
-                if(((StartMovingCommand) cmd).getDirection().getHorizontalDirection() != horizontalDirection) {
+                if(((StartMovingCommand) cmd).getHorizontalDirection() != horizontalDirection) {
                     if(((StartMovingCommand) cmd).disabled) {
                         continue;
                     } else {
-                        addCommandPlay(new StartMovingCommand(((StartMovingCommand) cmd).getDirection().getHorizontalDirection(), ((PlayScreen)screen).getPlayer()));
+                        addCommandPlay(new StartMovingCommand(((StartMovingCommand) cmd).getHorizontalDirection(), ((PlayScreen)screen).getPlayer()));
                         return;
                     }
                 }
@@ -142,22 +142,22 @@ public class CommandHandler {
         //disabling all commands with that direction
         for (int i = commands.size() - 1; i >= 0 ; i--) {
             Command cmd = commands.get(i);
-            if((ClassReflection.isInstance(StartMovingCommand.class, cmd)) &&
-                    (((StartMovingCommand) cmd).getDirection().getVerticalDirection() == verticalDirection)) {
+            if((ClassReflection.isInstance(StartMovingCommand.class, cmd)) && !((StartMovingCommand) cmd).isHorizontal() &&
+                    (((StartMovingCommand) cmd).getVerticalDirection() == verticalDirection)) {
                 ((StartMovingCommand) cmd).disabled = true;
             }
         }
         for (int i = commands.size() - 1; i >= 0 ; i--) {
             Command cmd = commands.get(i);
             if(ClassReflection.isInstance(StopCommand.class, cmd) || ClassReflection.isInstance(MoveToCommand.class, cmd)) {
-                addCommandPlay(new StopCommand(((PlayScreen) screen).getPlayer()));
+                addCommandPlay(new StartMovingCommand(GameActor.VerticalDirection.NONE, ((PlayScreen) screen).getPlayer()));
                 return;
             } else if(ClassReflection.isInstance(StartMovingCommand.class, cmd) && !((StartMovingCommand)cmd).isHorizontal()) {
-                if(((StartMovingCommand) cmd).getDirection().getVerticalDirection() != verticalDirection) {
+                if(((StartMovingCommand) cmd).getVerticalDirection() != verticalDirection) {
                     if(((StartMovingCommand) cmd).disabled) {
                         continue;
                     } else {
-                        addCommandPlay(new StartMovingCommand(((StartMovingCommand) cmd).getDirection().getVerticalDirection(), ((PlayScreen)screen).getPlayer()));
+                        addCommandPlay(new StartMovingCommand(((StartMovingCommand) cmd).getVerticalDirection(), ((PlayScreen)screen).getPlayer()));
                         return;
                     }
                 }

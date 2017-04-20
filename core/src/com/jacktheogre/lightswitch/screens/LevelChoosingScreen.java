@@ -27,13 +27,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.jacktheogre.lightswitch.LightSwitch;
 import com.jacktheogre.lightswitch.ai.LevelManager;
+import com.jacktheogre.lightswitch.sprites.MapActor;
 import com.jacktheogre.lightswitch.tools.Assets;
 import com.jacktheogre.lightswitch.tools.ColorLoader;
 import com.jacktheogre.lightswitch.tools.DrawingAssistant;
@@ -45,32 +44,42 @@ import com.jacktheogre.lightswitch.tools.DrawingAssistant;
 
 public class LevelChoosingScreen extends GameScreen {
     private final Color BACKGROUND = ColorLoader.colorMap.get("LEVEL_CHOOSING_SCREEN_BACKGROUND");
+    private final int PREVIOUS_INDEX = 0;
+    private final int CURRENT_INDEX = 1;
+    private final int NEXT_INDEX = 2;
 
     public Stage stage;
     private ScreenActor screenActor;
 
-    private ShapeRenderer shapeRenderer;
-
-    private Skin touchpadSkin;
-    private Touchpad.TouchpadStyle touchpadStyle;
-    private Touchpad touchpad;
-
-    private Frame[] framesArray;
-    private Array<Frame> framesToBeDeleted;
+    private Frame[] framesArray = new Frame[3];
+    private Array<Frame> framesToBeDeleted = new Array<Frame>();;
     private Vector2 prevFramePosition, currentFramePosition, nextFramePosition;
     private float sideFramesScale = 0.5f;
-    private int frameWidth, frameHeight;
+    private int middleLevel = LevelManager.maxUnlockedLevel();
 
     private TextureRegion teleport, trap;
 
-    private FPSLogger fpsLogger;
+    private FPSLogger fpsLogger = new FPSLogger();
 
     public LevelChoosingScreen(LightSwitch game) {
         this.game = game;
-        gamePort = new FitViewport(LightSwitch.WIDTH, LightSwitch.HEIGHT);
+        initializeStage();
+
+        LevelManager.recountShards();
+        initializeGraphicElements();
+    }
+
+    public LevelChoosingScreen(LightSwitch game, int middleLevel) {
+        this.game = game;
+        this.middleLevel = middleLevel;
+        initializeStage();
+        LevelManager.recountShards();
+        initializeGraphicElements();
+    }
+
+    private void initializeStage() {
         stage = new Stage(gamePort, game.batch);
         Gdx.input.setInputProcessor(stage);
-        fpsLogger = new FPSLogger();
         stage.addListener(new InputListener() {
             @Override
             public boolean keyUp(InputEvent event, int keycode) {
@@ -102,22 +111,11 @@ public class LevelChoosingScreen extends GameScreen {
         });
         Gdx.input.setCatchBackKey(true);
 
-        shapeRenderer = new ShapeRenderer();
-        framesArray = new Frame[3];
-        framesToBeDeleted = new Array<Frame>();
-        frameWidth = (int)stage.getWidth() / 2;
-        frameHeight = (int) stage.getHeight() - 40;
-
-        LevelManager.recountShards();
-
-        initializeGraphicElements();
-        Gdx.input.setInputProcessor(stage);
     }
 
-
-
     class Frame extends Group {
-        public static final int PRESSED_OFFSET_Y = 10;
+        private static final int PRESSED_OFFSET_Y = 10;
+        public static final float WIDTH = 200, HEIGHT = 200;
 
         private Table main;
         private Label levelLabel;
@@ -151,7 +149,7 @@ public class LevelChoosingScreen extends GameScreen {
             firstFrame = true;
             drawing = true;
             open = LevelManager.isOpenLevel(levelNumber);
-            this.setSize(frameWidth, frameHeight);
+            this.setSize(Frame.WIDTH, Frame.HEIGHT);
             this.levelNumber = levelNumber;
 
             initializeTable();
@@ -194,7 +192,7 @@ public class LevelChoosingScreen extends GameScreen {
         private void initializeTable() {
             main = new Table();
             main.setSize(getWidth(), getHeight());
-            mapActor = new MapActor(0.8f, Assets.getAssetLoader().maps[levelNumber]);
+            mapActor = new MapActor(0.8f, Assets.getAssetLoader().maps[levelNumber], stage.getViewport());
             levelLabel = new Label("Level "+levelNumber, new Label.LabelStyle(Assets.getAssetLoader().font, ColorLoader.colorMap.get("LEVEL_LABEL_COLOR")));
             levelLabel.setFontScale(0.8f);
             levelLabel.setAlignment(Align.center);
@@ -433,10 +431,11 @@ public class LevelChoosingScreen extends GameScreen {
             shapeRenderer.setProjectionMatrix(stage.getCamera().combined);
             shapeRenderer.setAutoShapeType(true);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-//            shapeRenderer.setColor(ColorLoader.colorMap.get("LEVEL_FRAME_STROKE"));
-//            DrawingAssistant.roundedRect(shapeRenderer, getX() + main.getX()*getScaleX(), getY() + main.getY()*getScaleY(),
-//                    main.getWidth()*getScaleX(), main.getHeight()*getScaleY(), 10);
-            shapeRenderer.setColor(ColorLoader.colorMap.get("LEVEL_FRAME_LOCKED_BACKGROUND"));
+            shapeRenderer.setColor(ColorLoader.colorMap.get("LEVEL_FRAME_STROKE"));
+            DrawingAssistant.roundedRect(shapeRenderer, getX() + main.getX()*getScaleX(),
+                    getY() + getScaleY()*(main.getY() + (pressed ? 0 : -PRESSED_OFFSET_Y)),
+                    main.getWidth()*getScaleX(), getScaleY()*(main.getHeight() + (pressed ? 0 : PRESSED_OFFSET_Y)), 8);
+            shapeRenderer.setColor(ColorLoader.colorMap.get("LEVEL_FRAME_BUTTON_SHADOW_COLOR"));
             if(!pressed)
                 DrawingAssistant.roundedRect(shapeRenderer, getX() + main.getX()*getScaleX() + borderSize,
                     getY() + main.getY()*getScaleY() + borderSize - PRESSED_OFFSET_Y*getScaleY(),
@@ -465,79 +464,6 @@ public class LevelChoosingScreen extends GameScreen {
         }
     }
 
-    class MapActor extends Actor {
-
-        private MyMapRenderer mapRenderer;
-        private OrthographicCamera camera;
-        private TiledMap map;
-
-        float initialScale;
-
-        public MapActor(float scale, TiledMap map) {
-            initialScale = scale;
-            this.map = map;
-            LevelManager.loadLevel(map);
-            mapRenderer = new MyMapRenderer(map, initialScale);
-            this.setSize(LevelManager.lvlPixelWidth*scale, LevelManager.lvlPixelHeight*scale);
-            camera = new OrthographicCamera(gamePort.getWorldWidth(), gamePort.getWorldHeight());
-            camera.position.set(stage.getCamera().position.x - getX(), stage.getCamera().position.y - getY(), 0);
-        }
-
-        public void centerAt(float x, float y) {
-            setPosition(x - getWidth() / 2, y - getHeight() / 2);
-        }
-
-        @Override
-        public void setScale(float scaleXY) {
-//            LevelManager.loadLevel(map);
-//            mapRenderer = new MyMapRenderer(map, initialScale*scaleXY);
-            mapRenderer.setUnitScale(initialScale*scaleXY);
-        }
-
-        @Override
-        public void act(float delta) {
-            syncCamera((int)getX(), (int)getY());
-            mapRenderer.setView(camera);
-        }
-
-        public MyMapRenderer getMapRenderer() {
-            return mapRenderer;
-        }
-
-        private void syncCamera(int x, int y) {
-            camera.position.x = stage.getCamera().position.x - x;
-            camera.position.y = stage.getCamera().position.y - y;
-            camera.update();
-        }
-    }
-
-    class MyMapRenderer extends OrthogonalTiledMapRenderer {
-        public MyMapRenderer(TiledMap map) {
-            super(map);
-        }
-
-        public MyMapRenderer(TiledMap map, Batch batch) {
-            super(map, batch);
-        }
-
-        public MyMapRenderer(TiledMap map, float unitScale) {
-            super(map, unitScale);
-        }
-
-        public MyMapRenderer(TiledMap map, float unitScale, Batch batch) {
-            super(map, unitScale, batch);
-        }
-
-        @Override
-        public void renderTileLayer(TiledMapTileLayer layer) {
-            super.renderTileLayer(layer);
-        }
-
-        public void setUnitScale(float scale) {
-            unitScale = scale;
-        }
-    }
-
     class ActorSettings {
         private float scale;
         private Vector2 position;
@@ -560,27 +486,44 @@ public class LevelChoosingScreen extends GameScreen {
         teleport = new TextureRegion(teleport, teleport.getRegionWidth()*3 / 4, 0, teleport.getRegionWidth() / 4, teleport.getRegionHeight());
         trap = new TextureRegion(Assets.getAssetLoader().trap);
         trap = new TextureRegion(trap, trap.getRegionWidth()*3 / 4, 0, trap.getRegionWidth() / 4, trap.getRegionHeight());
-//        Gdx.app.log("Actors", frame.getChildren().size +"");
-        currentFramePosition = new Vector2(stage.getWidth() / 2 - frameWidth / 2, 25);
-        prevFramePosition = new Vector2(currentFramePosition.x - frameWidth*sideFramesScale/ 2 - 20, stage.getHeight() / 2 - frameHeight*sideFramesScale / 2);
-        nextFramePosition = new Vector2(currentFramePosition.x + frameWidth - 20 , stage.getHeight() / 2 - frameHeight*sideFramesScale / 2);
-        Frame frame1 = new Frame(1);
-        frame1.setPosition(currentFramePosition.x, currentFramePosition.y);
-        frame1.setTargetSettings(frame1.currentSettings);
-        frame1.setScale(1f);
-        Frame frame2 = new Frame(2);
-        frame2.setPosition(nextFramePosition.x, nextFramePosition.y);
-        frame2.setTargetSettings(frame2.currentSettings);
-        frame2.setScale(sideFramesScale);
-        frame2.toBack();
-        stage.addActor(frame1);
-        stage.addActor(frame2);
+
+        currentFramePosition = new Vector2(stage.getWidth() / 2 - Frame.WIDTH / 2, 25);
+        prevFramePosition = new Vector2(currentFramePosition.x - Frame.WIDTH*sideFramesScale/ 2 - 20, stage.getHeight() / 2 - Frame.HEIGHT*sideFramesScale / 2);
+        nextFramePosition = new Vector2(currentFramePosition.x + Frame.WIDTH - 20 , stage.getHeight() / 2 - Frame.HEIGHT*sideFramesScale / 2);
+
+        if(middleLevel > 1)
+            createFrameAtPosition(middleLevel - 1, PREVIOUS_INDEX);
+        createFrameAtPosition(middleLevel, CURRENT_INDEX);
+        if(middleLevel < LevelManager.LEVEL_AMOUNT)
+            createFrameAtPosition(middleLevel + 1, NEXT_INDEX);
         screenActor = new ScreenActor(this);
         screenActor.setVisible(false);
-
-        framesArray[1] = frame1;
-        framesArray[2] = frame2;
 //        stage.setDebugAll(true);
+    }
+
+    private void createFrameAtPosition(int levelNum, int screenPosition) {
+        Frame frame = new Frame(levelNum);
+        switch(screenPosition) {
+            case PREVIOUS_INDEX:
+                frame.setPosition(prevFramePosition.x, prevFramePosition.y);
+                frame.setScale(sideFramesScale);
+                frame.toBack();
+                framesArray[0] = frame;
+                break;
+            case CURRENT_INDEX:
+                frame.setPosition(currentFramePosition.x, currentFramePosition.y);
+                frame.setScale(1);
+                framesArray[1] = frame;
+                break;
+            case NEXT_INDEX:
+                frame.setPosition(nextFramePosition.x, nextFramePosition.y);
+                frame.setScale(sideFramesScale);
+                frame.toBack();
+                framesArray[2] = frame;
+                break;
+        }
+        frame.setTargetSettings(frame.currentSettings);
+        stage.addActor(frame);
     }
 
     private Frame nextFrame() {

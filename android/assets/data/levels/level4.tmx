@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="15" height="10" tilewidth="16" tileheight="16" nextobjectid="60">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="15" height="10" tilewidth="16" tileheight="16" nextobjectid="67">
  <tileset firstgid="1" name="tiles" tilewidth="16" tileheight="16" tilecount="18" columns="9">
   <image source="../textures/tiles.png" width="144" height="32"/>
+  <tile id="0">
+   <properties>
+    <property name="lightTransparency" type="bool" value="true"/>
+   </properties>
+  </tile>
  </tileset>
  <layer name="background" width="15" height="10">
   <data encoding="base64">
@@ -52,14 +57,16 @@
   <object id="57" x="32" y="88" width="16" height="32"/>
   <object id="58" x="192" y="88" width="16" height="32"/>
   <object id="59" x="48" y="96" width="144" height="16"/>
+  <object id="62" x="16" y="0" width="208" height="16">
+   <properties>
+    <property name="lightTransparency" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="63" x="224" y="0" width="16" height="160"/>
+  <object id="65" x="0" y="0" width="16" height="160"/>
+  <object id="66" x="16" y="144" width="208" height="16"/>
  </objectgroup>
- <objectgroup name="static">
-  <object id="26" x="224" y="144" height="16"/>
-  <object id="28" x="0" y="16" width="16" height="128"/>
-  <object id="30" x="0" y="144" width="240" height="16"/>
-  <object id="31" x="224" y="0" width="16" height="144"/>
-  <object id="32" x="0" y="0" width="224" height="16"/>
- </objectgroup>
+ <objectgroup name="static"/>
  <objectgroup name="actors">
   <object id="23" x="16" y="64" width="16" height="16"/>
  </objectgroup>

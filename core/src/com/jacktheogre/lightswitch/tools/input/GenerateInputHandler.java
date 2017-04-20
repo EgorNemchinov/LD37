@@ -58,7 +58,7 @@ public class GenerateInputHandler implements InputProcessor{
                 screen.setState(GeneratingScreen.State.SETTING_TELEPORT);
         }
         if(keycode == Input.Keys.BACK || keycode == Input.Keys.BACKSPACE) {
-            screen.getGame().setScreen(new LevelChoosingScreen(screen.getGame()));
+            screen.getGame().setScreen(new LevelChoosingScreen(screen.getGame(), LevelManager.getLevelNum()));
         }
         return true;
     }
@@ -71,10 +71,13 @@ public class GenerateInputHandler implements InputProcessor{
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         Vector3 screenTouch = new Vector3(screenX, screenY, 0);
-        Vector3 point = screen.getGamePort().unproject(screenTouch.cpy());
+        Vector3 point = screen.getUiCamera().unproject(screenTouch.cpy(), screen.getGamePort().getScreenX(), screen.getGamePort().getScreenY(),
+                screen.getGamePort().getScreenWidth(), screen.getGamePort().getScreenHeight());
+        Vector3 worldPoint = screen.getGameCam().unproject(screenTouch.cpy(), screen.getGamePort().getScreenX(), screen.getGamePort().getScreenY(),
+                screen.getGamePort().getScreenWidth(), screen.getGamePort().getScreenHeight());
         screenTouch.y = screen.getGamePort().getScreenHeight() - screenTouch.y;
         screen.touchDownButtons(point.x, point.y, pointer);
-        screen.setSelectedNode(LevelManager.graph.getNodeByXY((int) point.x, (int)point.y));
+        screen.setSelectedNode(LevelManager.graph.getNodeByXY((int) worldPoint.x, (int)worldPoint.y));
         screen.addTeleport();
         screen.addTrap();
         return true;
@@ -83,7 +86,8 @@ public class GenerateInputHandler implements InputProcessor{
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         Vector3 screenTouch = new Vector3(screenX, screenY, 0);
-        Vector3 point = screen.getGamePort().unproject(screenTouch.cpy());
+        Vector3 point = screen.getUiCamera().unproject(screenTouch.cpy(), screen.getGamePort().getScreenX(), screen.getGamePort().getScreenY(),
+                screen.getGamePort().getScreenWidth(), screen.getGamePort().getScreenHeight());
         screenTouch.y = screen.getGamePort().getScreenHeight() - screenTouch.y;
         screen.touchUpButtons(point.x, point.y, pointer);
         return true;
@@ -92,7 +96,8 @@ public class GenerateInputHandler implements InputProcessor{
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         Vector3 screenTouch = new Vector3(screenX, screenY, 0);
-        Vector3 point = screen.getGamePort().unproject(screenTouch.cpy());
+        Vector3 point = screen.getUiCamera().unproject(screenTouch.cpy(), screen.getGamePort().getScreenX(), screen.getGamePort().getScreenY(),
+                screen.getGamePort().getScreenWidth(), screen.getGamePort().getScreenHeight());
         screenTouch.y = screen.getGamePort().getScreenHeight() - screenTouch.y;
         screen.touchDraggedButtons(point.x, point.y, pointer);
         return true;
@@ -101,10 +106,13 @@ public class GenerateInputHandler implements InputProcessor{
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
         Vector3 screenTouch = new Vector3(screenX, screenY, 0);
-        Vector3 point = screen.getGamePort().unproject(screenTouch.cpy());
+        Vector3 point = screen.getUiCamera().unproject(screenTouch.cpy(), screen.getGamePort().getScreenX(), screen.getGamePort().getScreenY(),
+                screen.getGamePort().getScreenWidth(), screen.getGamePort().getScreenHeight());
+        Vector3 worldPoint = screen.getGameCam().unproject(screenTouch.cpy(), screen.getGamePort().getScreenX(), screen.getGamePort().getScreenY(),
+                screen.getGamePort().getScreenWidth(), screen.getGamePort().getScreenHeight());
         screenTouch.y = screen.getGamePort().getScreenHeight() - screenTouch.y;
         screen.mouseMovedButtons(point.x, point.y);
-        screen.setSelectedNode(LevelManager.graph.getNodeByXY((int) point.x, (int)point.y));
+        screen.setSelectedNode(LevelManager.graph.getNodeByXY((int) worldPoint.x, (int)worldPoint.y));
         return true;
     }
 

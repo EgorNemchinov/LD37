@@ -72,13 +72,18 @@ public class B2WorldCreator {
                 circleShape.setRadius(ellipse.width / 2);
                 fixtureDef.shape = circleShape;
             }
-//            circleShape.setPosition(bodyDef.position);
+
+            boolean lightTransparency = false;
+            if(object.getProperties().containsKey("lightTransparency"))
+                lightTransparency = Boolean.valueOf(object.getProperties().get("lightTransparency", String.class));
+
             fixtureDef.filter.categoryBits = Constants.WALLS_BIT;
             fixtureDef.filter.maskBits = Constants.WALLS_BIT |
                     Constants.OBJECT_BIT |
                     Constants.BOY_BIT |
-                    Constants.MONSTER_BIT |
-                    Constants.LIGHT_BIT;
+                    Constants.MONSTER_BIT;
+            if(!lightTransparency)
+                fixtureDef.filter.maskBits = (short) (fixtureDef.filter.maskBits  | Constants.LIGHT_BIT);
 //            fixtureDef.filter.maskBits |= Constants.LIGHT_BIT;
             body.createFixture(fixtureDef);
         }

@@ -62,10 +62,6 @@ public class PlayInputHandler extends Stage{
                 screen.getCommandHandler().addCommandPlay(new StartMovingCommand(GameActor.HorizontalDirection.RIGHT, screen.getPlayer()));
                 screen.getPlayer().getGameActor().setMoving(true);
                 break;
-            case Input.Keys.BACK:
-            case Input.Keys.BACKSPACE:
-                screen.getGame().setScreen(new GeneratingScreen(screen.getGame()));
-                break;
         }
         return true;
     }
@@ -97,6 +93,10 @@ public class PlayInputHandler extends Stage{
             case Input.Keys.RIGHT:
                 screen.getCommandHandler().stopMoving(GameActor.HorizontalDirection.RIGHT);
 //                screen.getCommandHandler().addCommandPlay(new StopDirectionCommand(screen.getCommandHandler(), GameActor.Direction.RIGHT));
+                break;
+            case Input.Keys.BACK:
+            case Input.Keys.BACKSPACE:
+                screen.getGame().setScreen(new GeneratingScreen(screen.getGame()));
                 break;
         }
         return true;

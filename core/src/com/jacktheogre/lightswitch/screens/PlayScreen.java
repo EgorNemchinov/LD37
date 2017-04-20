@@ -31,7 +31,9 @@ import com.jacktheogre.lightswitch.objects.Teleport;
 import com.jacktheogre.lightswitch.objects.Trap;
 import com.jacktheogre.lightswitch.sprites.EnemyPlayer;
 import com.jacktheogre.lightswitch.sprites.GameActor;
+import com.jacktheogre.lightswitch.sprites.MapActor;
 import com.jacktheogre.lightswitch.sprites.Player;
+import com.jacktheogre.lightswitch.tools.Assets;
 import com.jacktheogre.lightswitch.tools.CameraSettings;
 import com.jacktheogre.lightswitch.tools.ColorLoader;
 import com.jacktheogre.lightswitch.tools.input.PlayInputHandler;
@@ -50,7 +52,8 @@ public class PlayScreen extends GameScreen {
     public Array<InteractiveObject> objects;
     private Array<Shard> shards;
 
-    private OrthogonalTiledMapRenderer mapRenderer;
+//    private OrthogonalTiledMapRenderer mapRenderer;
+    private MapActor mapActor;
 
     private World world;
     private Box2DDebugRenderer b2dRenderer;
@@ -85,7 +88,10 @@ public class PlayScreen extends GameScreen {
             targetSettings = new CameraSettings(currentSetings.getX(), currentSetings.getY() + 30, currentSetings.getZoom() - 0.1f);
 
 //        gamePort = screen.getGamePort();
-        mapRenderer = screen.getMapRenderer();
+//        mapRenderer = new OrthogonalTiledMapRenderer(Assets.getAssetLoader().getMap());
+        mapActor = new MapActor(1f, Assets.getAssetLoader().getMap(), gamePort);
+        mapActor.setCamera(gameCam);
+
         world = screen.getWorld();
         b2dRenderer = new Box2DDebugRenderer();
         contactListener = new WorldContactListener(this);
@@ -200,7 +206,7 @@ public class PlayScreen extends GameScreen {
                 object.update(dt);
             }
             player.update(dt);
-//            enemyPlayer.update(dt);
+            enemyPlayer.update(dt);
             checkFixtureContacts();
 
         }
@@ -212,7 +218,7 @@ public class PlayScreen extends GameScreen {
         lerpCamera(targetSettings, dt);
         gameCam.update();
 
-        mapRenderer.setView(gameCam);
+        mapActor.act(dt);
     }
 
     private long lastTime = System.nanoTime();
@@ -264,7 +270,7 @@ public class PlayScreen extends GameScreen {
         Gdx.gl.glClearColor(BACKGROUND_COLOR.r, BACKGROUND_COLOR.g, BACKGROUND_COLOR.b, BACKGROUND_COLOR.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        mapRenderer.render();
+        mapActor.getMapRenderer().render();
         game.batch.setProjectionMatrix(gameCam.combined);
         game.batch.begin();
         for (InteractiveObject object : objects) {
@@ -484,7 +490,7 @@ public class PlayScreen extends GameScreen {
     public void dispose() {
         hud.dispose();
         world.dispose();
-        mapRenderer.dispose();
+//        mapRenderer.dispose();
     }
 
     public World getWorld() {

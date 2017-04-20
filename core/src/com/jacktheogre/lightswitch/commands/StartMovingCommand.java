@@ -60,6 +60,14 @@ public class StartMovingCommand extends ActorCommand{
                 horizontal? GameActor.VerticalDirection.NONE : verticalDirection);
     }
 
+    public GameActor.HorizontalDirection getHorizontalDirection() {
+        return horizontalDirection;
+    }
+
+    public GameActor.VerticalDirection getVerticalDirection() {
+        return verticalDirection;
+    }
+
     @Override
     public void undo() {
         getGameActor().setDirection(pastDirection);
@@ -79,6 +87,6 @@ public class StartMovingCommand extends ActorCommand{
 
     @Override
     public String toString() {
-        return "StartMovingCommand. Direction: "+direction;
+        return "StartMovingCommand. Direction: "+(horizontal?horizontalDirection:verticalDirection);
     }
 }

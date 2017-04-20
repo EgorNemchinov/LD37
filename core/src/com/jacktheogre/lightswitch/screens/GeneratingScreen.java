@@ -2,6 +2,7 @@ package com.jacktheogre.lightswitch.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.msg.MessageManager;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -29,11 +30,13 @@ import com.jacktheogre.lightswitch.objects.Teleport;
 import com.jacktheogre.lightswitch.objects.Trap;
 import com.jacktheogre.lightswitch.sprites.Button;
 import com.jacktheogre.lightswitch.sprites.EnemyPlayer;
+import com.jacktheogre.lightswitch.sprites.MapActor;
 import com.jacktheogre.lightswitch.sprites.Player;
 import com.jacktheogre.lightswitch.tools.AssetLoader;
 import com.jacktheogre.lightswitch.tools.Assets;
 import com.jacktheogre.lightswitch.tools.B2WorldCreator;
 import com.jacktheogre.lightswitch.tools.ColorLoader;
+import com.jacktheogre.lightswitch.tools.ScalingMapRenderer;
 import com.jacktheogre.lightswitch.tools.input.GenerateInputHandler;
 import com.jacktheogre.lightswitch.tools.Lighting;
 import com.jacktheogre.lightswitch.tutorials.Highlighter;
@@ -53,12 +56,14 @@ public class GeneratingScreen extends GameScreen {
 
     public enum State {DEFAULT, SETTING_TELEPORT, SETTING_TRAP}
 
+    private OrthographicCamera uiCamera;
     private State state;
     private EnemyPlayer enemyPlayer;
     private Player player;
     private Lighting lighting;
     private AssetLoader loader;
-    private OrthogonalTiledMapRenderer mapRenderer;
+//    private OrthogonalTiledMapRenderer mapRenderer;
+    private MapActor mapActor;
     private World world;
     private CommandHandler commandHandler;
 
@@ -79,7 +84,11 @@ public class GeneratingScreen extends GameScreen {
     public GeneratingScreen(LightSwitch game) {
         super();
         this.game = game;
-        gameCam.position.set(gamePort.getWorldWidth() / 4, gamePort.getWorldHeight() / 4, 0);
+        uiCamera = new OrthographicCamera(gamePort.getWorldWidth(), gamePort.getWorldHeight());
+        uiCamera.position.set(-gamePort.getWorldWidth() / 2, -gamePort.getWorldHeight() / 2, 0);
+        uiCamera.zoom -= 0.2f;
+//        uiCamera.zoom = 5;
+        gameCam.position.set(-gamePort.getWorldWidth() / 2 , -gamePort.getWorldHeight() / 2, 0);
         gameCam.zoom -= 0.2f;
 
         runTime = 0;
@@ -87,7 +96,9 @@ public class GeneratingScreen extends GameScreen {
         loader = Assets.getAssetLoader();
         Node.Indexer.nullify();
         LevelManager.loadLevel(loader.getMap());
-        mapRenderer = new OrthogonalTiledMapRenderer(loader.getMap(), 1);
+//        mapRenderer = new OrthogonalTiledMapRenderer(loader.getMap(), 1);
+        mapActor = new MapActor(1f, loader.getMap(), gamePort);
+        mapActor.setCamera(gameCam);
 
         state = State.DEFAULT;
 
@@ -253,10 +264,10 @@ public class GeneratingScreen extends GameScreen {
         }
         world.step(1/60f, 6, 2);
 
-        lerpCamera(gamePort.getWorldWidth() / 4, gamePort.getWorldHeight() / 4, dt);
+        lerpCamera(gameCam, gamePort.getWorldWidth() / 4 - (gamePort.getWorldWidth()*3/4 - 50 - mapActor.getWidth()) / 2, gamePort.getWorldHeight() / 4, dt);
+        lerpCamera(uiCamera, gamePort.getWorldWidth() / 4, gamePort.getWorldHeight() / 4, dt);
         gameCam.update();
-
-        mapRenderer.setView(gameCam);
+        uiCamera.update();
 
         if(!initObjects) {
             Array<Command> commandArray = new Array<Command>();
@@ -273,7 +284,7 @@ public class GeneratingScreen extends GameScreen {
         }
     }
 
-    private void lerpCamera(float targetX, float targetY, float dt) {
+    private void lerpCamera(Camera gameCam, float targetX, float targetY, float dt) {
         float lerp;
         lerp = 10f;
         Vector3 position = gameCam.position;
@@ -284,17 +295,17 @@ public class GeneratingScreen extends GameScreen {
     @Override
     public void render(float delta) {
         shapeRenderer.setProjectionMatrix(gameCam.combined);
-        shapeRenderer.setAutoShapeType(true);
         game.batch.setProjectionMatrix(gameCam.combined);
+        gamePort.setCamera(gameCam);
+        gamePort.apply();
+        shapeRenderer.setAutoShapeType(true);
         update(delta);
 
         Gdx.gl.glClearColor(BACKGROUND_COLOR.r,BACKGROUND_COLOR.g, BACKGROUND_COLOR.b, BACKGROUND_COLOR.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        mapRenderer.render();
-
-        renderUI();
-        renderSelected();
+        mapActor.act(delta);
+        mapActor.getMapRenderer().render();
 
         game.batch.begin();
         boolean lineDrawn = false;
@@ -324,20 +335,27 @@ public class GeneratingScreen extends GameScreen {
             enemyPlayer.getGameActor().draw(game.batch);
         game.batch.end();
 
+        renderUI();
+        renderSelected();
+
         highlighter.render(delta);
 //        LevelManager.graph.render(shapeRenderer);
 
     }
 
     public void renderUI() {
-        game.batch.setProjectionMatrix(gameCam.combined);
+        gamePort.setCamera(uiCamera);
+        gamePort.apply();
+        game.batch.setProjectionMatrix(uiCamera.combined);
         game.batch.begin();
-        game.batch.draw(Assets.getAssetLoader().moon, Assets.getAssetLoader().moon.getWidth()-gamePort.getWorldWidth() / 4, -gameCam.position.y / 2);
+        game.batch.draw(Assets.getAssetLoader().moon, Assets.getAssetLoader().moon.getWidth()-gamePort.getWorldWidth() / 4, -uiCamera.position.y / 2);
         //buttons
-        renderButtons(gameCam);
+        renderButtons(uiCamera);
         renderLabels();
-        if(game.batch.isDrawing())
-            game.batch.end();
+        game.batch.end();
+        game.batch.setProjectionMatrix(gameCam.combined);
+        gamePort.setCamera(gameCam);
+        gamePort.apply();
     }
 
     private void renderLabels() {
@@ -397,6 +415,10 @@ public class GeneratingScreen extends GameScreen {
             return true;
         else
             return false;
+    }
+
+    public OrthographicCamera getUiCamera() {
+        return uiCamera;
     }
 
     public void setState(State state) {
@@ -518,10 +540,6 @@ public class GeneratingScreen extends GameScreen {
 
     public ShapeRenderer getShapeRenderer() {
         return shapeRenderer;
-    }
-
-    public OrthogonalTiledMapRenderer getMapRenderer() {
-        return mapRenderer;
     }
 
     public World getWorld() {

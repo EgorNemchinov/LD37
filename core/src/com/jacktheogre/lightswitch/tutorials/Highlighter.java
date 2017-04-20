@@ -1,6 +1,7 @@
 package com.jacktheogre.lightswitch.tutorials;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -29,6 +30,8 @@ public class Highlighter {
     private float timeSinceLastLetter = 0;
     private boolean textFinished = false;
 
+    protected Camera camera;
+
     // TODO: 14.04.17 also draw button "OK"
 
     public Highlighter(GameScreen screen) {
@@ -37,6 +40,7 @@ public class Highlighter {
         timeSinceBegin = 0;
         targetText = "";
         initializeLabel();
+        onCreate();
     }
 
     public Highlighter(GameScreen screen, float showTime, String targetText) {
@@ -51,6 +55,10 @@ public class Highlighter {
         label.setWidth(screen.getGamePort().getWorldWidth() / 3);
         label.setFontScale(0.3f);
         label.setText("");
+    }
+
+    protected void onCreate() {
+
     }
 
     private boolean nextLetter() {
@@ -104,6 +112,7 @@ public class Highlighter {
         boolean wasDrawing = screen.getSpriteBatch().isDrawing();
         if(wasDrawing)
             screen.getSpriteBatch().end();
+        screen.getSpriteBatch().setProjectionMatrix(camera == null ? screen.getGameCam().combined : camera.combined);
         screen.getSpriteBatch().begin();
         Color color = screen.getSpriteBatch().getColor();
         screen.getSpriteBatch().setColor(color.r, color.g, color.b, calculateOpacity());
@@ -125,7 +134,7 @@ public class Highlighter {
     private void darkenScreen() {
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        screen.getShapeRenderer().setProjectionMatrix(screen.getGameCam().combined);
+        screen.getShapeRenderer().setProjectionMatrix(camera == null ? screen.getGameCam().combined : camera.combined);
         if(!screen.getShapeRenderer().isDrawing())
             screen.getShapeRenderer().begin(ShapeRenderer.ShapeType.Filled);
         screen.getShapeRenderer().setColor(new Color(0, 0, 0, currentOpacity));
@@ -145,6 +154,7 @@ public class Highlighter {
         timeSinceBegin = 0;
         timeSinceLastLetter = 0;
         textFinished = false;
+//        screen.setInputHAndling(false);
         beginAction();
     }
 
@@ -156,6 +166,7 @@ public class Highlighter {
         if(state == State.WAITING)
             Gdx.app.error("Highlighter", "Called end before beginning.");
         state = State.FINISHING;
+        screen.setInputHAndling(true);
         finishAction();
     }
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="15" height="10" tilewidth="16" tileheight="16" nextobjectid="65">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="15" height="10" tilewidth="16" tileheight="16" nextobjectid="68">
  <tileset firstgid="1" name="small_tiles" tilewidth="16" tileheight="16" tilecount="18" columns="9">
   <image source="../textures/tiles.png" width="144" height="32"/>
  </tileset>
@@ -46,10 +46,7 @@
 </data>
  </layer>
  <objectgroup name="walls">
-  <object id="14" x="0" y="0" width="240" height="16"/>
   <object id="17" x="0" y="144" width="240" height="16"/>
-  <object id="18" x="0" y="16" width="16" height="128"/>
-  <object id="21" x="224" y="16" width="16" height="128"/>
   <object id="44" x="144" y="16" width="16" height="24"/>
   <object id="45" x="40" y="32" width="112" height="16"/>
   <object id="46" x="32" y="32" width="16" height="16">
@@ -88,6 +85,13 @@
   <object id="62" x="144" y="72" width="16" height="32"/>
   <object id="63" x="152" y="96" width="32" height="16"/>
   <object id="64" x="112" y="120" width="16" height="24"/>
+  <object id="65" x="224" y="0" width="16" height="144"/>
+  <object id="66" x="0" y="0" width="16" height="144"/>
+  <object id="67" x="16" y="0" width="208" height="16">
+   <properties>
+    <property name="lightTransparency" type="bool" value="true"/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup name="static"/>
  <objectgroup name="actors">

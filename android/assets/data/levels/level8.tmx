@@ -19,7 +19,11 @@
   </data>
  </layer>
  <objectgroup name="walls">
-  <object id="35" x="0" y="0" width="224" height="16"/>
+  <object id="35" x="0" y="0" width="224" height="16">
+   <properties>
+    <property name="lightTransparency" type="bool" value="true"/>
+   </properties>
+  </object>
   <object id="37" x="0" y="128" width="224" height="16"/>
   <object id="38" x="0" y="16" width="16" height="112"/>
   <object id="39" x="208" y="16" width="16" height="112"/>

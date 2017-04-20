@@ -24,14 +24,11 @@ public class LevelManager {
     public static int tilePixelHeight;
 
     private static int[] amountOfShards;
-    private static int[] totalAmountOfShardsBefore;
     private static int totalShardsCollected = 0;
 
     public static boolean isOpenLevel(int levelNumber) {
         if(levelNumber == 1)
             return true;
-//        if(getAmountOfCollectedShards(levelNumber - 1) == countAmountOfShards(levelNumber - 1))
-//            return true;
         if(totalShardsCollected >= getAmountOfShardsToUnlock(levelNumber))
             return true;
         else
@@ -48,6 +45,13 @@ public class LevelManager {
             collected += getAmountOfCollectedShards(i);
         }
         totalShardsCollected = collected;
+    }
+
+    public static int maxUnlockedLevel() {
+        for(int i = LEVEL_AMOUNT; i > 0; i--)
+            if(isOpenLevel(i))
+                return i;
+        return 1;
     }
 
     static class Resourses {

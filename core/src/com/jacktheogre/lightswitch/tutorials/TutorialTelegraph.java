@@ -49,7 +49,15 @@ public class TutorialTelegraph implements Telegraph{
             final GeneratingScreen generatingScreen = (GeneratingScreen) screen;
             screen.setHighlighter(new Highlighter(screen, 5f, "Use portals to shorten the distance. \nIt works on the monster too though.") {
                 @Override
+                protected void onCreate() {
+                    super.onCreate();
+                    camera = generatingScreen.getUiCamera();
+                }
+
+                @Override
                 protected void renderItems(float dt) {
+                    screen.getGamePort().setCamera(camera);
+                    screen.getGamePort().apply();
                     generatingScreen.getTeleportButton().draw(generatingScreen.getSpriteBatch());
                 }
 
@@ -79,6 +87,12 @@ public class TutorialTelegraph implements Telegraph{
                     "Turn your ships around, fools! \n" +
                     "Actually it just holds the clumsy\n" +
                     "monster who stepped into it.") {
+                @Override
+                protected void onCreate() {
+                    super.onCreate();
+                    camera = generatingScreen.getUiCamera();
+                }
+
                 @Override
                 protected void renderItems(float dt) {
                     generatingScreen.getTrapButton().draw(generatingScreen.getSpriteBatch());
@@ -121,6 +135,12 @@ public class TutorialTelegraph implements Telegraph{
             final GeneratingScreen generatingScreen = (GeneratingScreen) screen;
             screen.setHighlighter(new Highlighter(screen) {
                 @Override
+                protected void onCreate() {
+                    super.onCreate();
+                    camera = generatingScreen.getUiCamera();
+                }
+
+                @Override
                 protected void renderItems(float dt) {
                     generatingScreen.getStart().draw(screen.getSpriteBatch());
                 }
@@ -142,6 +162,12 @@ public class TutorialTelegraph implements Telegraph{
                         "but be careful: amount of energy\n" +
                         "\t\t\tis limited!";
             screen.setHighlighter(new Highlighter(screen, 5F, label) {
+                @Override
+                protected void onCreate() {
+                    super.onCreate();
+                    camera = playScreen.getHud().stage.getCamera();
+                }
+
                 @Override
                 protected void renderItems(float dt) {
                     Button lightButton = playScreen.getHud().getLightButton();
