@@ -20,6 +20,7 @@ public class MapActor extends Actor {
     private Viewport benchmarkViewport;
 
     float initialScale;
+    private float opacity = 1f;
 
     public MapActor(float scale, TiledMap map, Viewport benchmarkViewport) {
         initialScale = scale;
@@ -50,6 +51,20 @@ public class MapActor extends Actor {
 
     public ScalingMapRenderer getMapRenderer() {
         return mapRenderer;
+    }
+
+    public void setOpacity(float opacity) {
+        this.opacity = opacity;
+    }
+
+    public void render() {
+        if(opacity != 1) {
+            if(!mapRenderer.getBatch().isBlendingEnabled())
+                mapRenderer.getBatch().enableBlending();
+        }
+        mapRenderer.getBatch().setColor(mapRenderer.getBatch().getColor().r, mapRenderer.getBatch().getColor().g,
+                    mapRenderer.getBatch().getColor().b, opacity);
+        mapRenderer.render();
     }
 
     private void syncCamera(int x, int y) {

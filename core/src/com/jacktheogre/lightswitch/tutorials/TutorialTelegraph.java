@@ -2,11 +2,15 @@ package com.jacktheogre.lightswitch.tutorials;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ai.msg.MessageManager;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.ai.msg.Telegraph;
 import com.badlogic.gdx.utils.Align;
+import com.jacktheogre.lightswitch.Constants;
 import com.jacktheogre.lightswitch.ai.LevelManager;
+import com.jacktheogre.lightswitch.commands.TurnOffCommand;
+import com.jacktheogre.lightswitch.commands.TurnOnCommand;
 import com.jacktheogre.lightswitch.objects.Shard;
 import com.jacktheogre.lightswitch.screens.*;
 import com.jacktheogre.lightswitch.sprites.Button;
@@ -22,6 +26,7 @@ public class TutorialTelegraph implements Telegraph{
     public final static int SHARDS_ON_LEVEL = index++;
     public final static int START_BUTTON_PRESSED = index++;
     public static final int LIGHT_BUTTON = index++;
+    public static final int LEVEL_FRAME = index++;
 
     //// FIXME: 14.04.17 into preferences
     public boolean[] unlocked = new boolean[index];
@@ -47,11 +52,14 @@ public class TutorialTelegraph implements Telegraph{
                 return true;
             }
             final GeneratingScreen generatingScreen = (GeneratingScreen) screen;
-            screen.setHighlighter(new Highlighter(screen, 5f, "Use portals to shorten the distance. \nIt works on the monster too though.") {
+            screen.setHighlighter(new Highlighter(screen, 8f, "Use portals to shorten the distance. \nIt works on the monster too though.") {
                 @Override
                 protected void onCreate() {
                     super.onCreate();
                     camera = generatingScreen.getUiCamera();
+                    addButton(generatingScreen.getTeleportButton());
+                    okButton.setScale(1.1f);
+                    okButton.setPosition(screen.getGamePort().getWorldWidth() / 2 - okButton.getBoundingRectangle().getWidth() / 2 - 90, -35);
                 }
 
                 @Override
@@ -83,7 +91,7 @@ public class TutorialTelegraph implements Telegraph{
                 return true;
             }
             final GeneratingScreen generatingScreen = (GeneratingScreen) screen;
-            screen.setHighlighter(new Highlighter(screen, 5f, "It's a trap! \n" +
+            screen.setHighlighter(new Highlighter(screen, 8f, "It's a trap! \n" +
                     "Turn your ships around, fools! \n" +
                     "Actually it just holds the clumsy\n" +
                     "monster who stepped into it.") {
@@ -91,6 +99,9 @@ public class TutorialTelegraph implements Telegraph{
                 protected void onCreate() {
                     super.onCreate();
                     camera = generatingScreen.getUiCamera();
+                    addButton(generatingScreen.getTrapButton());
+                    okButton.setScale(1.1f);
+                    okButton.setPosition(screen.getGamePort().getWorldWidth() / 2 - okButton.getBoundingRectangle().getWidth() / 2 - 90, -35);
                 }
 
                 @Override
@@ -117,7 +128,14 @@ public class TutorialTelegraph implements Telegraph{
                 return true;
             }
             final GeneratingScreen generatingScreen = (GeneratingScreen) screen;
-            screen.setHighlighter(new Highlighter(screen, 5f, "Collect shards to unlock next levels.") {
+            screen.setHighlighter(new Highlighter(screen, 8f, "Collect shards to unlock next levels.") {
+                @Override
+                protected void onCreate() {
+                    super.onCreate();
+                    okButton.setScale(1.1f);
+                    okButton.setPosition(screen.getGamePort().getWorldWidth() / 2 - okButton.getBoundingRectangle().getWidth() / 2 - 90, -35);
+                }
+
                 @Override
                 protected void renderItems(float dt) {
                     for(Shard shard: generatingScreen.getShards()) {
@@ -138,6 +156,9 @@ public class TutorialTelegraph implements Telegraph{
                 protected void onCreate() {
                     super.onCreate();
                     camera = generatingScreen.getUiCamera();
+                    addButton(generatingScreen.getStart());
+                    okButton.setScale(1.1f);
+                    okButton.setPosition(screen.getGamePort().getWorldWidth() / 2 - okButton.getBoundingRectangle().getWidth() / 2 - 90, -35);
                 }
 
                 @Override
@@ -154,18 +175,24 @@ public class TutorialTelegraph implements Telegraph{
             final PlayScreen playScreen = (PlayScreen) screen;
             String label;
             if(Gdx.app.getType() == Application.ApplicationType.Android)
-                label =  "You can turn on the lights,\n" +
+                label =  "Press the button to \n" +
+                        "turn on the lights,\n" +
                     "but be careful: amount of energy\n" +
-                    "\t\t\tis limited!";
+                    "\t\t\tis limited!\n" +
+                        "Try it out now!";
             else
                 label = "Press SPACE to turn on the lights,\n" +
                         "but be careful: amount of energy\n" +
-                        "\t\t\tis limited!";
-            screen.setHighlighter(new Highlighter(screen, 5F, label) {
+                        "\t\t\tis limited! \n" +
+                        "Try it out now!";
+            screen.setHighlighter(new Highlighter(screen, -1f, label) {
                 @Override
                 protected void onCreate() {
                     super.onCreate();
                     camera = playScreen.getHud().stage.getCamera();
+                    okButton.setScale(1);
+                    okButton.setPosition(label.getX() + label.getWidth() - okButton.getBoundingRectangle().getWidth() / 2 - 25,
+                                        label.getY() - okButton.getBoundingRectangle().getHeight() - 20);
                 }
 
                 @Override
@@ -178,18 +205,104 @@ public class TutorialTelegraph implements Telegraph{
                 @Override
                 protected void beginAction() {
                     playScreen.setPaused(true);
+                    if(Gdx.app.getType() == Application.ApplicationType.Android)
+                        addButton(playScreen.getHud().getLightButton());
                 }
 
                 @Override
                 protected void finishAction() {
                     TutorialTelegraph.getInstance().unlock(LIGHT_BUTTON);
                     playScreen.setPaused(false);
+                    playScreen.addEnergy(100);
+                }
+
+                @Override
+                public boolean keyDown(int keycode) {
+                    if(keycode == Input.Keys.SPACE) {
+                        playScreen.getCommandHandler().addCommandPlay(new TurnOnCommand(playScreen));
+                    } else if(keycode == Input.Keys.ENTER) {
+                        okButton.press();
+                    }
+                    return true;
+                }
+
+                @Override
+                public boolean keyUp(int keycode) {
+                    if(keycode == Input.Keys.SPACE) {
+                        playScreen.getCommandHandler().addCommandPlay(new TurnOffCommand(playScreen));
+                    } else if(keycode == Input.Keys.ENTER) {
+                        okButton.unpress();
+                    }
+                    return true;
                 }
 
                 @Override
                 protected void initializeLabel() {
                     super.initializeLabel();
                     label.setPosition(100, screen.getGamePort().getWorldHeight() - 100, Align.bottomLeft);
+                }
+
+                @Override
+                protected void update(float dt) {
+                    playScreen.addEnergy(Constants.ADD_ENERGY_PER_SEC*dt);
+                }
+            });
+            screen.getHighlighter().begin();
+        } else if(msg.message == LEVEL_FRAME) {
+            final LevelChoosingScreen levelChoosingScreen= (LevelChoosingScreen) screen;
+            String label;
+            if(Gdx.app.getType() == Application.ApplicationType.Android)
+                label =  "I have no idea\n" +
+                         "what to write here so\n" +
+                        "I'll just pretend that \n" +
+                        "it's part of the plan :s";
+            else
+                label = "\tI have no idea\n" +
+                        "what to write here so\n" +
+                        "I'll just pretend that \n" +
+                        "it's part of the plan :s";
+            screen.setHighlighter(new Highlighter(screen, 8F, label) {
+                LevelChoosingScreen.Frame frame;
+                @Override
+                protected void onCreate() {
+                    super.onCreate();
+                    frame = levelChoosingScreen.getFrame(1);
+                }
+
+                @Override
+                protected void renderItems(float dt) {
+                    frame.setOpacity(calculateOpacity());
+                    frame.drawBefore();
+                    screen.getSpriteBatch().end();
+                    levelChoosingScreen.getStage().draw();
+                    screen.getSpriteBatch().begin();
+                    frame.drawAfter();
+                }
+
+                @Override
+                protected float calculateOpacity() {
+                    if(getState() == State.WAITING)
+                        return 1f;
+                    float baseOpacity = 0.6f;
+                    return (float) (baseOpacity + (1-baseOpacity)*Math.abs(Math.cos(timeSinceBegin)));
+                }
+
+                @Override
+                protected void beginAction() {
+                }
+
+                @Override
+                protected void finishAction() {
+                    TutorialTelegraph.getInstance().unlock(LEVEL_FRAME);
+                    frame.setOpacity(1f);
+                }
+
+                @Override
+                protected void initializeLabel() {
+                    super.initializeLabel();
+                    label.setPosition(20, screen.getGamePort().getWorldHeight() - 100, Align.bottomLeft);
+                    label.setWidth(100);
+                    label.setFontScale(0.4f);
                 }
             });
             screen.getHighlighter().begin();

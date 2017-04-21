@@ -247,11 +247,11 @@ public class GeneratingScreen extends GameScreen {
 
     @Override
     protected void notifyTutorialTelegraph() {
-        MessageManager.getInstance().dispatchMessage( 2f, null, TutorialTelegraph.getInstance(), TutorialTelegraph.SHARDS_ON_LEVEL);
+        MessageManager.getInstance().dispatchMessage( 0.5f, null, TutorialTelegraph.getInstance(), TutorialTelegraph.SHARDS_ON_LEVEL);
         if(LevelManager.getAmountOfTeleports() > 0)
-            MessageManager.getInstance().dispatchMessage( 2f, null, TutorialTelegraph.getInstance(), TutorialTelegraph.TELEPORTS_ON_LEVEL);
+            MessageManager.getInstance().dispatchMessage( 0.5f, null, TutorialTelegraph.getInstance(), TutorialTelegraph.TELEPORTS_ON_LEVEL);
         if(LevelManager.getAmountOfTraps() > 0)
-            MessageManager.getInstance().dispatchMessage( 2f, null, TutorialTelegraph.getInstance(), TutorialTelegraph.TRAPS_ON_LEVEL);
+            MessageManager.getInstance().dispatchMessage( 0.5f, null, TutorialTelegraph.getInstance(), TutorialTelegraph.TRAPS_ON_LEVEL);
     }
 
     public void update(float dt){

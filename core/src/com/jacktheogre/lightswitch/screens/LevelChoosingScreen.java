@@ -2,6 +2,7 @@ package com.jacktheogre.lightswitch.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.ai.msg.MessageManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL20;
@@ -36,6 +37,7 @@ import com.jacktheogre.lightswitch.sprites.MapActor;
 import com.jacktheogre.lightswitch.tools.Assets;
 import com.jacktheogre.lightswitch.tools.ColorLoader;
 import com.jacktheogre.lightswitch.tools.DrawingAssistant;
+import com.jacktheogre.lightswitch.tutorials.TutorialTelegraph;
 
 
 /**
@@ -62,19 +64,31 @@ public class LevelChoosingScreen extends GameScreen {
     private FPSLogger fpsLogger = new FPSLogger();
 
     public LevelChoosingScreen(LightSwitch game) {
+        super();
         this.game = game;
         initializeStage();
 
         LevelManager.recountShards();
         initializeGraphicElements();
+
+        notifyTutorialTelegraph();
     }
 
     public LevelChoosingScreen(LightSwitch game, int middleLevel) {
+        super();
         this.game = game;
         this.middleLevel = middleLevel;
         initializeStage();
         LevelManager.recountShards();
         initializeGraphicElements();
+
+        notifyTutorialTelegraph();
+    }
+
+    @Override
+    protected void notifyTutorialTelegraph() {
+        super.notifyTutorialTelegraph();
+        MessageManager.getInstance().dispatchMessage( 0.5f, null, TutorialTelegraph.getInstance(), TutorialTelegraph.LEVEL_FRAME);
     }
 
     private void initializeStage() {
@@ -113,7 +127,7 @@ public class LevelChoosingScreen extends GameScreen {
 
     }
 
-    class Frame extends Group {
+    public class Frame extends Group {
         private static final int PRESSED_OFFSET_Y = 10;
         public static final float WIDTH = 200, HEIGHT = 200;
 
@@ -123,7 +137,6 @@ public class LevelChoosingScreen extends GameScreen {
 
         private Image teleportImage, trapImage;
         private Label teleportLabel, trapLabel;
-        private Button playButton;
         private int levelNumber;
 
         private ActorSettings targetSettings, currentSettings;
@@ -144,6 +157,8 @@ public class LevelChoosingScreen extends GameScreen {
         private boolean open; //determines whether level is playable
         private boolean pressed = false;
         private boolean drawing;
+
+        protected float opacity = 1f;
 
         public Frame(final int levelNumber) {
             firstFrame = true;
@@ -174,7 +189,6 @@ public class LevelChoosingScreen extends GameScreen {
                         LevelManager.setLevelNum(levelNumber);
                         game.setScreen(new GeneratingScreen(game));
                     }
-//                        Gdx.app.log("touchUp", x + ", " + y + ", size is "+getWidth() + "x" + getHeight());
                 }
             });
             main.setTouchable(Touchable.enabled);
@@ -204,39 +218,8 @@ public class LevelChoosingScreen extends GameScreen {
             trapLabel = new Label(LevelManager.getAmountOfTraps(levelNumber)+"",
                     new Label.LabelStyle(Assets.getAssetLoader().font, ColorLoader.colorMap.get("RESOURSES_LABELS_COLOR")));
             teleportLabel.setAlignment(Align.center);
-//            teleportLabel.setFontScale(0.8f);
             trapLabel.setAlignment(Align.center);
-//            trapLabel.setFontScale(0.8f);
 
-            /*final TextureRegion playButtonTexture = Assets.getAssetLoader().start_button;
-            TextureRegion usualButton, pressedButton;
-            usualButton = new TextureRegion(playButtonTexture, open ? playButtonTexture.getRegionWidth() / 2 : 0, 0,
-                    playButtonTexture.getRegionWidth() / 4, playButtonTexture.getRegionHeight());
-            pressedButton = open ? new TextureRegion(playButtonTexture, playButtonTexture.getRegionWidth()*3 / 4, 0,
-                    playButtonTexture.getRegionWidth() / 4, playButtonTexture.getRegionHeight()) : usualButton;
-            playButton = new Button(new TextureRegionDrawable(usualButton), new TextureRegionDrawable(pressedButton));
-            playButton.setBounds(playButton.getX(), playButton.getY(), playButton.getWidth(), playButton.getHeight());
-            playButton.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-//                    Gdx.app.log("playButton", "clicked");
-                    super.clicked(event, x, y);
-                }
-
-                @Override
-                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-//                    Gdx.app.log("playButton", "touchDown");
-                    return true;
-                }
-
-                @Override
-                public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                    LevelManager.setLevelNum(levelNumber);
-                    game.setScreen(new GeneratingScreen(game));
-                }
-            });
-            playButton.setTouchable(open? Touchable.enabled: Touchable.disabled);
-*/
             main.align(Align.top | Align.center);
             main.add(levelLabel).expandX().colspan(4).row();
             main.padLeft(0);
@@ -249,8 +232,6 @@ public class LevelChoosingScreen extends GameScreen {
             main.add(teleportLabel).maxHeight(cellHeight);
             main.add(trapImage).minHeight(cellHeight).fill(cellScale, cellScale);
             main.add(trapLabel).maxHeight(cellHeight).row();
-//            main.padBottom(0);
-//            main.add(playButton).colspan(4);
             main.moveBy((main.getWidth() - mapActor.getWidth() )/ 2, 0);
             main.setWidth(mapActor.getWidth());
         }
@@ -280,7 +261,7 @@ public class LevelChoosingScreen extends GameScreen {
         @Override
         public void draw(Batch batch, float parentAlpha) {
             if(drawing)
-                super.draw(batch, parentAlpha);
+                super.draw(batch, opacity);
         }
 
         @Override
@@ -399,6 +380,10 @@ public class LevelChoosingScreen extends GameScreen {
         @Override
         public void setScale(float scaleXY) {
             super.setScale(scaleXY);
+            if(scaleXY == 1f)
+                main.setTouchable(Touchable.enabled);
+            else
+                main.setTouchable(Touchable.disabled);
             mapActor.setScale(scaleXY);
             shardsImages.setScale(2*scaleXY);
             shardsCounter.setScale(scaleXY);
@@ -411,19 +396,32 @@ public class LevelChoosingScreen extends GameScreen {
 
         public void drawBefore() {
             setDrawing(true);
+            if(opacity != 1) {
+                Gdx.gl.glEnable(GL20.GL_BLEND);
+                Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            }
             drawBackground();
         }
 
         public void drawAfter() {
             drawMap();
             boolean wasActive = stage.getBatch().isDrawing();
-            if(!wasActive)
-                stage.getBatch().begin();
+            if(wasActive)
+                stage.getBatch().end();
+            stage.getBatch().enableBlending();
+            stage.getBatch().setColor(stage.getBatch().getColor().r, stage.getBatch().getColor().g,
+                    stage.getBatch().getColor().b, opacity);
+            stage.getBatch().begin();
             drawShards();
             drawShardsCounter();
             setDrawing(false);
             if(!wasActive)
                 stage.getBatch().end();
+            if(opacity != 1) {
+                Gdx.gl.glDisable(GL20.GL_BLEND);
+            }
+            game.batch.getColor().a = 1;
+            shapeRenderer.getColor().a = 1;
         }
 
         private void drawBackground() {
@@ -432,16 +430,19 @@ public class LevelChoosingScreen extends GameScreen {
             shapeRenderer.setAutoShapeType(true);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             shapeRenderer.setColor(ColorLoader.colorMap.get("LEVEL_FRAME_STROKE"));
+            shapeRenderer.getColor().a = opacity;
             DrawingAssistant.roundedRect(shapeRenderer, getX() + main.getX()*getScaleX(),
                     getY() + getScaleY()*(main.getY() + (pressed ? 0 : -PRESSED_OFFSET_Y)),
                     main.getWidth()*getScaleX(), getScaleY()*(main.getHeight() + (pressed ? 0 : PRESSED_OFFSET_Y)), 8);
             shapeRenderer.setColor(ColorLoader.colorMap.get("LEVEL_FRAME_BUTTON_SHADOW_COLOR"));
+            shapeRenderer.getColor().a = opacity;
             if(!pressed)
                 DrawingAssistant.roundedRect(shapeRenderer, getX() + main.getX()*getScaleX() + borderSize,
                     getY() + main.getY()*getScaleY() + borderSize - PRESSED_OFFSET_Y*getScaleY(),
                     main.getWidth()*getScaleX() - 2*borderSize, main.getHeight()*getScaleY() - 2*borderSize + PRESSED_OFFSET_Y*getScaleY(), 6);
             shapeRenderer.setColor(open ? ColorLoader.colorMap.get("LEVEL_FRAME_UNLOCKED_BACKGROUND")
                     : ColorLoader.colorMap.get("LEVEL_FRAME_LOCKED_BACKGROUND"));
+            shapeRenderer.getColor().a = opacity;
             DrawingAssistant.roundedRect(shapeRenderer, getX() + main.getX()*getScaleX() + borderSize, getY() + main.getY()*getScaleY() + borderSize,
                     main.getWidth()*getScaleX() - 2*borderSize, main.getHeight()*getScaleY() - 2*borderSize, 6);
             shapeRenderer.end();
@@ -450,17 +451,22 @@ public class LevelChoosingScreen extends GameScreen {
         private void drawMap() {
             mapActor.act(0);
             if(!firstFrame) {
-                mapActor.getMapRenderer().render();
+                mapActor.render();
             } else firstFrame = false;
         }
 
         private void drawShards() {
-            shardsImages.draw(stage.getBatch(), 1f);
+            shardsImages.draw(stage.getBatch(), opacity);
         }
 
         private void drawShardsCounter() {
             if(!open)
-                shardsCounter.draw(game.batch, 1f);
+                shardsCounter.draw(game.batch, opacity);
+        }
+
+        public void setOpacity(float opacity) {
+            this.opacity = opacity;
+            mapActor.setOpacity(opacity);
         }
     }
 
@@ -594,13 +600,19 @@ public class LevelChoosingScreen extends GameScreen {
         stage.addActor(prev);
     }
 
+    public Frame getFrame(int index) {
+        return framesArray[index];
+    }
+
     @Override
     public void render(float delta) {
+        super.update(delta);
         Gdx.gl.glClearColor(BACKGROUND.r, BACKGROUND.g, BACKGROUND.b, BACKGROUND.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 //        fpsLogger.log();
         drawFrames(delta);
+        highlighter.render(delta);
     }
 
     private void drawFrames(float delta) {
@@ -646,6 +658,11 @@ public class LevelChoosingScreen extends GameScreen {
             frameMiddle.drawAfter();
         }
     }
+
+    public Stage getStage() {
+        return stage;
+    }
+
 
     @Override
     protected void initializeButtons() {

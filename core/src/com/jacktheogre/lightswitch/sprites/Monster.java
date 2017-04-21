@@ -111,7 +111,8 @@ public class Monster extends GameActor {
                     default:
                     case NONE:
                 }
-                switch(direction.getHorizontalDirection() == HorizontalDirection.NONE ? direction.getLastHorizontalDirection() :direction.getHorizontalDirection()) {
+                switch(direction.getHorizontalDirection() == HorizontalDirection.NONE && region == null ?
+                        direction.getLastHorizontalDirection() :direction.getHorizontalDirection()) {
                     case LEFT:
                         region = playerRunLeft.getKeyFrame(stateTimer);
                         break;
@@ -137,7 +138,8 @@ public class Monster extends GameActor {
                     default:
                     case NONE:
                 }
-                switch(direction.getHorizontalDirection() == HorizontalDirection.NONE ? direction.getLastHorizontalDirection() :direction.getHorizontalDirection()) {
+                switch(direction.getHorizontalDirection() == HorizontalDirection.NONE && region == null
+                        ? direction.getLastHorizontalDirection() :direction.getHorizontalDirection()) {
                     case LEFT:
                         region = playerStandLeft;
                         break;

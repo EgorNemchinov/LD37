@@ -8,6 +8,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.jacktheogre.lightswitch.ai.LevelManager;
@@ -25,6 +26,7 @@ public class AssetLoader {
     public TextureRegion next_level_button, home_button, replay_button, light_button;
     public TextureRegion undo_button, redo_button, start_button, teleport_button, clear_button, play_button;
     public TextureRegion boy_button, monster_button, trap_button, singleplayer_button, multiplayer_button;
+    public TextureRegion ok_button;
     public TextureRegion[] twoShards, threeShards;
     public TiledMap[] maps;
     private TmxMapLoader mapLoader;
@@ -33,6 +35,7 @@ public class AssetLoader {
     public Sound teleportCloseSound;
     public Sound[] shardsSounds;
     public FileHandle logHandle, levelHandle;
+    public ShaderProgram shaderProgram;
 
     private Preferences collectedShards;
 
@@ -109,6 +112,7 @@ public class AssetLoader {
         touchBg = new TextureRegion(joystick, 0, 0, 132, 132);
         touchKnob = new TextureRegion(joystick, 130, 0, 126, 126);
         clear_button = new TextureRegion(buttons, 0, 690, 128, 27);
+        ok_button = new TextureRegion(buttons, 0, 721, 128, 27);
 
         for (int i = 0; i < 2; i++) {
             twoShards[i] = new TextureRegion(shards_sheet, 1 + 15*i, 52, 14, 14);
@@ -116,6 +120,10 @@ public class AssetLoader {
         for (int i = 0; i < 3; i++) {
             threeShards[i] = new TextureRegion(shards_sheet, 1 + 15*i, 19, 11, 11);
         }
+
+        String vertexShader = Gdx.files.internal("data/vertex.glsl").readString();
+        String fragmentShader = Gdx.files.internal("data/shader.glsl").readString();
+        shaderProgram = new ShaderProgram(vertexShader,fragmentShader);
 
         font = new BitmapFont(Gdx.files.internal("data/manaspace.fnt"));
         font.getData().setScale(FONT_SCALE,FONT_SCALE);
